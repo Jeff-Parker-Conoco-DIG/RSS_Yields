@@ -1,0 +1,152 @@
+.container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: auto;
+  font-family: 'Roboto Mono', monospace;
+  font-size: 12px;
+}
+
+.table {
+  border-collapse: collapse;
+  width: max-content;
+  min-width: 100%;
+}
+
+.table th,
+.table td {
+  padding: 5px 8px;
+  border: 1px solid #3a3a3a;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.table thead th {
+  position: sticky;
+  top: 0;
+  background: #1e1e1e;
+  color: #aaa;
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  z-index: 2;
+}
+
+.table td {
+  color: #ddd;
+  background: #141414;
+}
+
+.table tr:hover td {
+  background: #1e1e1e;
+}
+
+.latestRow td {
+  background: #1a2a1a !important;
+}
+
+/* Section badge */
+.thSection { width: 40px; text-align: center; }
+.sectionCell { text-align: center; }
+.sectionBadge {
+  display: inline-block;
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+/* Depth cell */
+.depthCell {
+  font-weight: 600;
+  color: #fff !important;
+}
+
+/* Notes column */
+.thNotes { min-width: 150px; text-align: left; }
+.notesCell {
+  text-align: left !important;
+  max-width: 250px;
+}
+
+.notesText {
+  cursor: pointer;
+  color: #666;
+  font-style: italic;
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+}
+
+.notesText:hover {
+  color: #aaa;
+}
+
+/* If notes has content, show it normally */
+.notesCell .notesText:not(:empty) {
+  color: #bbb;
+  font-style: normal;
+}
+
+.notesInput {
+  background: #2a2a2a;
+  color: #ddd;
+  border: 1px solid #4a9eed;
+  border-radius: 2px;
+  padding: 2px 6px;
+  font-size: 11px;
+  font-family: 'Inter', sans-serif;
+  width: 100%;
+  min-width: 120px;
+}
+
+/* Source indicator */
+.thSrc { width: 30px; text-align: center; }
+.srcCell { text-align: center !important; }
+
+.srcAuto {
+  color: #4a9eed;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.srcManual {
+  color: #f59e0b;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+/* Delete button */
+.thDel { width: 30px; }
+.deleteCell { text-align: center !important; }
+
+.deleteBtn {
+  background: transparent;
+  border: 1px solid transparent;
+  color: #555;
+  cursor: pointer;
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: 3px;
+  transition: all 0.15s;
+}
+
+.deleteBtn:hover {
+  color: #f44336;
+  border-color: #f44336;
+  background: #3a1a1a;
+}
+
+.deleteConfirm {
+  color: #f44336 !important;
+  border-color: #f44336 !important;
+  background: #5a1a1a !important;
+  animation: blink 0.5s ease-in-out 3;
+}
+
+@keyframes blink {
+  50% { opacity: 0.5; }
+}

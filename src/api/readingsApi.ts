@@ -1,0 +1,248 @@
+import type { YieldReading } from '../types';
+import { READINGS_DATASET } from '../constants';
+import { log, error } from '../utils/logger';
+
+// ─── Corva SDK Client (same pattern as corvaApi.ts) ────────────────
+type ApiClient = {
+  get: (url: string, params?: Record<string, unknown>) => Promise<unknown>;
+  post: (url: string, data?: unknown) => Promise<unknown>;
+};
+
+let corvaDataAPI: ApiClient | null = null;
+
+try {
+  const clients = require('@corva/ui/clients');
+  corvaDataAPI = clients.corvaDataAPI;
+} catch {
+  const apiKey = process.env.CORVA_API_KEY ?? process.env.REACT_APP_CORVA_API_KEY;
+  if (apiKey) {
+    corvaDataAPI = {
+      async get(path: string, params?: Record<string, unknown>) {
+        const url = new URL(path, 'https://data.corva.ai');
+        if (params) {
+          for (const [k, v] of Object.entries(params)) {
+            if (v !== undefined) url.searchParams.set(k, String(v));
+          }
+        }
+        const res = await fetch(url.toString(), {
+          headers: { Authorization: `API ${apiKey}`, 'Content-Type': 'application/json' },
+        });
+        if (!res.ok) throw new Error(`API ${res.status}: ${res.statusText}`);
+        return res.json();
+      },
+      async post(path: string, data?: unknown) {
+        const res = await fetch(new URL(path, 'https://data.corva.ai').toString(), {
+          method: 'POST',
+          headers: { Authorization: `API ${apiKey}`, 'Content-Type': 'application/json' },
+          body: data ? JSON.stringify(data) : undefined,
+        });
+        if (!res.ok) throw new Error(`API ${res.status}: ${res.statusText}`);
+        return res.json();
+      },
+    };
+  }
+}
+
+// ─── 404 guard: only log dataset-missing errors once ─────────────────
+let datasetMissingLogged = false;
+
+function isDatasetMissing(e: unknown): boolean {
+  // Corva SDK errors have a .status property
+  const status = (e as any)?.status;
+  if (status === 404) return true;
+  const msg = String(e);
+  return msg.includes('404') || msg.includes('Not Found');
+}
+
+// ─── Fetch all readings for a well ─────────────────────────────────
+
+export async function fetchReadings(assetId: number): Promise<YieldReading[]> {
+  if (!corvaDataAPI) return [];
+  try {
+    const data = await corvaDataAPI.get(
+      `/api/v1/data/${READINGS_DATASET}/`,
+      {
+        query: JSON.stringify({ asset_id: assetId }),
+        sort: JSON.stringify({ 'data.depth': 1 }),
+        limit: 5000,
+      },
+    );
+    const records = Array.isArray(data) ? data : [];
+    return records.map(docToReading).filter((r): r is YieldReading => r !== null);
+  } catch (e) {
+    if (isDatasetMissing(e)) {
+      if (!datasetMissingLogged) {
+        datasetMissingLogged = true;
+        log(`Readings dataset "${READINGS_DATASET}" not found (404). Readings will be stored in local state only.`);
+      }
+    } else {
+      error('fetchReadings failed:', e);
+    }
+    return [];
+  }
+}
+
+// ─── Save a new reading ────────────────────────────────────────────
+
+export async function saveReading(reading: YieldReading): Promise<boolean> {
+  if (!corvaDataAPI) {
+    log('No API client — reading not persisted (dev mode)');
+    return false;
+  }
+  if (datasetMissingLogged) {
+    // Dataset doesn't exist — skip silently (already logged once)
+    return false;
+  }
+  try {
+    await corvaDataAPI.post(
+      `/api/v1/data/${READINGS_DATASET}/`,
+      {
+        asset_id: reading.assetId,
+        timestamp: Math.floor(reading.timestamp / 1000), // Corva uses seconds
+        version: 1,
+        data: readingToData(reading),
+      },
+    );
+    log(`Saved reading at ${reading.depth} ft`);
+    return true;
+  } catch (e) {
+    if (isDatasetMissing(e)) {
+      if (!datasetMissingLogged) {
+        datasetMissingLogged = true;
+        log(`Readings dataset "${READINGS_DATASET}" not found (404). Readings will be stored in local state only.`);
+      }
+    } else {
+      error('saveReading failed:', e);
+    }
+    return false;
+  }
+}
+
+// ─── Update notes on a reading ─────────────────────────────────────
+
+export async function updateReadingNotes(
+  assetId: number,
+  readingId: string,
+  notes: string,
+): Promise<boolean> {
+  if (!corvaDataAPI || datasetMissingLogged) return false;
+  try {
+    // Find the record by reading ID, then update
+    const data = await corvaDataAPI.get(
+      `/api/v1/data/${READINGS_DATASET}/`,
+      {
+        query: JSON.stringify({ asset_id: assetId, 'data.id': readingId }),
+        limit: 1,
+      },
+    );
+    const records = Array.isArray(data) ? data : [];
+    if (records.length === 0) return false;
+
+    const doc = records[0] as Record<string, unknown>;
+    const docId = doc._id as string;
+
+    // PATCH the notes field
+    await corvaDataAPI.post(
+      `/api/v1/data/${READINGS_DATASET}/${docId}`,
+      { 'data.notes': notes },
+    );
+    log(`Updated notes for reading ${readingId}`);
+    return true;
+  } catch (e) {
+    error('updateReadingNotes failed:', e);
+    return false;
+  }
+}
+
+// ─── Delete a reading ──────────────────────────────────────────────
+
+export async function deleteReading(assetId: number, readingId: string): Promise<boolean> {
+  if (!corvaDataAPI || datasetMissingLogged) return false;
+  try {
+    const data = await corvaDataAPI.get(
+      `/api/v1/data/${READINGS_DATASET}/`,
+      {
+        query: JSON.stringify({ asset_id: assetId, 'data.id': readingId }),
+        limit: 1,
+      },
+    );
+    const records = Array.isArray(data) ? data : [];
+    if (records.length === 0) return false;
+
+    const doc = records[0] as Record<string, unknown>;
+    const docId = doc._id as string;
+
+    // DELETE the document
+    const url = new URL(
+      `/api/v1/data/${READINGS_DATASET}/${docId}`,
+      'https://data.corva.ai',
+    );
+    await fetch(url.toString(), {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+    });
+    log(`Deleted reading ${readingId}`);
+    return true;
+  } catch (e) {
+    error('deleteReading failed:', e);
+    return false;
+  }
+}
+
+// ─── Helpers: convert between Corva doc and YieldReading ───────────
+
+function readingToData(r: YieldReading): Record<string, unknown> {
+  return {
+    id: r.id,
+    depth: r.depth,
+    inc: r.inc,
+    az: r.az,
+    courseLength: r.courseLength,
+    br: r.br,
+    tr: r.tr,
+    dls: r.dls,
+    dutyCycle: r.dutyCycle,
+    toolFaceSet: r.toolFaceSet,
+    toolFaceActual: r.toolFaceActual,
+    toolFaceStdDev: r.toolFaceStdDev,
+    steeringForce: r.steeringForce,
+    buildCommand: r.buildCommand,
+    turnCommand: r.turnCommand,
+    notes: r.notes,
+    section: r.section,
+    source: r.source,
+  };
+}
+
+function docToReading(doc: unknown): YieldReading | null {
+  try {
+    const d = doc as Record<string, unknown>;
+    const data = d.data as Record<string, unknown>;
+    if (!data || !data.id) return null;
+
+    return {
+      id: String(data.id),
+      assetId: Number(d.asset_id),
+      depth: Number(data.depth ?? 0),
+      inc: Number(data.inc ?? 0),
+      az: Number(data.az ?? 0),
+      courseLength: data.courseLength != null ? Number(data.courseLength) : null,
+      br: data.br != null ? Number(data.br) : null,
+      tr: data.tr != null ? Number(data.tr) : null,
+      dls: data.dls != null ? Number(data.dls) : null,
+      dutyCycle: data.dutyCycle != null ? Number(data.dutyCycle) : null,
+      toolFaceSet: data.toolFaceSet != null ? Number(data.toolFaceSet) : null,
+      toolFaceActual: data.toolFaceActual != null ? Number(data.toolFaceActual) : null,
+      toolFaceStdDev: data.toolFaceStdDev != null ? Number(data.toolFaceStdDev) : null,
+      steeringForce: data.steeringForce != null ? Number(data.steeringForce) : null,
+      buildCommand: data.buildCommand != null ? Number(data.buildCommand) : null,
+      turnCommand: data.turnCommand != null ? Number(data.turnCommand) : null,
+      notes: String(data.notes ?? ''),
+      section: (data.section as YieldReading['section']) ?? 'curve',
+      timestamp: Number(d.timestamp ?? 0) * 1000, // Corva stores seconds, we use ms
+      source: (data.source as 'auto' | 'manual') ?? 'manual',
+    };
+  } catch {
+    return null;
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "name": "yieldtracker",
+  "version": "1.0.1",
+  "private": true,
+  "engines": {
+    "node": ">=20",
+    "yarn": "*"
+  },
+  "scripts": {
+    "start": "webpack-dev-server --config=./config-overrides.js --open --mode development --port 8081",
+    "build": "webpack --config=./config-overrides.js --mode production",
+    "zip": "create-corva-app zip .",
+    "release": "create-corva-app release .",
+    "lint": "eslint --cache ./src/",
+    "test": "jest"
+  },
+  "dependencies": {
+    "@corva/ui": "^3.52.0",
+    "jspdf": "^4.2.0",
+    "jspdf-autotable": "^5.0.7",
+    "react": "17.0.1",
+    "react-dom": "17.0.1",
+    "xlsx-js-style": "^1.2.0"
+  },
+  "devDependencies": {
+    "@corva/dc-platform-shared": "^0.58.0",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "12",
+    "@types/jest": "^30.0.0",
+    "@types/react": "^17.0.22",
+    "@types/react-dom": "^17.0.9",
+    "jest": "^30.2.0",
+    "jest-environment-jsdom": "^30.2.0",
+    "postcss-loader": "4.1.0",
+    "ts-jest": "^29.4.6",
+    "ts-loader": "^9.4.4",
+    "typescript": "^5.1.6"
+  }
+}

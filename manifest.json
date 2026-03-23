@@ -1,0 +1,51 @@
+{
+  "format": 1,
+  "license": {
+    "type": "MIT",
+    "url": "https://example.com/license/"
+  },
+  "developer": {
+    "name": "ConocoPhillips",
+    "identifier": "copca",
+    "authors": ["Jeff Parker"]
+  },
+  "application": {
+    "type": "ui",
+    "key": "copca.yieldtracker.ui",
+    "visibility": "private",
+    "name": "YieldTracker",
+    "description": "RSS steering performance tracker — user-controlled, interval-based yield tracking with WITS channel mapping for iCruise and PowerDrive",
+    "summary": "RSS yield and steering performance analytics",
+    "category": "directional",
+    "website": "https://corva.ai",
+    "segments": ["drilling"],
+    "ui": {
+      "initial_size": { "w": 8, "h": 12 },
+      "multi_rig": false,
+      "full_screen_report": false,
+      "use_app_header_v3": true
+    }
+  },
+  "settings": {
+    "entrypoint": {
+      "file": "src/index.js",
+      "function": "handler"
+    },
+    "environment": {},
+    "runtime": "ui",
+    "app": { "log_type": "time" }
+  },
+  "datasets": {
+    "corva.data.actual_survey": { "permissions": ["read"] },
+    "corva.data.drillstring": { "permissions": ["read"] },
+    "corva.wits": { "permissions": ["read"] },
+    "corva.wits.summary-1ft": { "permissions": ["read"] },
+    "corva.drilling.halliburton.cerebro-raw": { "permissions": ["read"] },
+    "corva.directional.rotational-tendency": { "permissions": ["read"] },
+    "corva.directional.toolface.summary-1ft": { "permissions": ["read"] },
+    "corva.directional.slide-sheet": { "permissions": ["read"] },
+    "corva.directional.surveys": { "permissions": ["read"] },
+    "corva.data.well-sections": { "permissions": ["read"] },
+    "copca.yieldtracker.readings": { "permissions": ["read", "write", "delete"] }
+  }
+}
