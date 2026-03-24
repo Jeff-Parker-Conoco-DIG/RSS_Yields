@@ -1,7 +1,15 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import type { TrackingConfig, IntervalMode, WellSection } from '../../types';
 import { WELL_SECTIONS } from '../../constants';
 import styles from './ControlsBar.module.css';
+
+function formatTimeRemaining(startedAt: number, hours: number): string {
+  const stopAt = startedAt + hours * 3600000;
+  const remaining = Math.max(0, stopAt - Date.now());
+  const h = Math.floor(remaining / 3600000);
+  const m = Math.floor((remaining % 3600000) / 60000);
+  return `${h}h ${m}m left`;
+}
 
 interface ControlsBarProps {
   config: TrackingConfig;
@@ -9,6 +17,7 @@ interface ControlsBarProps {
   onTakeReading: () => void;
   onExportExcel: () => void;
   onExportPdf: () => void;
+  onClearAll: () => Promise<void>;
   currentBitDepth: number | null;
   readingCount: number;
   takingReading?: boolean;
@@ -20,10 +29,18 @@ export const ControlsBar: React.FC<ControlsBarProps> = ({
   onTakeReading,
   onExportExcel,
   onExportPdf,
+  onClearAll,
   currentBitDepth,
   readingCount,
   takingReading,
 }) => {
+  // Tick for countdown re-render
+  const [, setTick] = useState(0);
+  useEffect(() => {
+    if (!config.isRunning || !config.autoStopHours) return;
+    const timer = setInterval(() => setTick((t) => t + 1), 60000);
+    return () => clearInterval(timer);
+  }, [config.isRunning, config.autoStopHours]);
   const set = <K extends keyof TrackingConfig>(key: K, value: TrackingConfig[K]) =>
     onConfigChange({ ...config, [key]: value });
 
@@ -104,6 +121,27 @@ export const ControlsBar: React.FC<ControlsBarProps> = ({
           </div>
         </div>
 
+        <div className={styles.field}>
+          <label className={styles.label}>Stop After</label>
+          <div className={styles.inputGroup}>
+            <input
+              type="number"
+              className={styles.numInput}
+              style={{ width: 50 }}
+              value={config.autoStopHours ?? ''}
+              onChange={(e) => {
+                const v = e.target.value;
+                set('autoStopHours', v ? Number(v) : null);
+              }}
+              placeholder="\u2014"
+              min={0.5}
+              step={0.5}
+              disabled={config.isRunning}
+            />
+            <span className={styles.unit}>hrs</span>
+          </div>
+        </div>
+
         <div className={styles.divider} />
 
         {/* Action buttons */}
@@ -139,15 +177,32 @@ export const ControlsBar: React.FC<ControlsBarProps> = ({
           {config.isRunning && (
             <span className={styles.liveTag}>● LIVE</span>
           )}
+          {config.isRunning && config.autoStopHours && config.startedAt && (
+            <span className={styles.timerTag}>
+              {formatTimeRemaining(config.startedAt, config.autoStopHours)}
+            </span>
+          )}
         </div>
 
-        {/* Export */}
+        {/* Export + Clear */}
         <div className={styles.exportGroup}>
           <button className={styles.exportBtn} onClick={onExportExcel} title="Export Excel">
             📊
           </button>
           <button className={styles.exportBtn} onClick={onExportPdf} title="Export PDF">
             📄
+          </button>
+          <button
+            className={styles.clearBtn}
+            onClick={() => {
+              if (window.confirm(`Clear all ${readingCount} readings? This cannot be undone.`)) {
+                onClearAll();
+              }
+            }}
+            disabled={readingCount === 0}
+            title="Clear all readings"
+          >
+            Clear
           </button>
         </div>
       </div>

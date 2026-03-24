@@ -66,6 +66,14 @@
   color: #fff !important;
 }
 
+/* MWD columns — visually muted to distinguish from RSS primary columns */
+.thMwd {
+  color: #888 !important;
+}
+.mwdCell {
+  color: #aaa !important;
+}
+
 /* Notes column */
 .thNotes { min-width: 150px; text-align: left; }
 .notesCell {

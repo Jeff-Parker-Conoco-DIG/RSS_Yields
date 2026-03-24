@@ -1,16 +1,15 @@
 import { useMemo } from 'react';
 import type { AppSettingsData } from '../types';
-import type { WitsChannelProfile } from '../witsMapper/types';
 import { DEFAULT_SETTINGS } from '../constants';
-import { getProfile } from '../witsMapper';
 
 export interface UseSettingsResult {
   settings: AppSettingsData;
-  profile: WitsChannelProfile;
 }
 
 /**
- * Resolves app settings with defaults and builds the active WITS channel profile.
+ * Resolves app settings with defaults.
+ * NOTE: RSS profile and channel overrides are managed locally (localStorage),
+ * not through Corva app settings. This hook only handles display preferences.
  */
 export function useSettings(appSettings?: Partial<AppSettingsData>): UseSettingsResult {
   const settings: AppSettingsData = useMemo(
@@ -18,10 +17,5 @@ export function useSettings(appSettings?: Partial<AppSettingsData>): UseSettings
     [appSettings],
   );
 
-  const profile = useMemo(
-    () => getProfile(settings.activeProfile, settings.customChannelOverrides),
-    [settings.activeProfile, settings.customChannelOverrides],
-  );
-
-  return { settings, profile };
+  return { settings };
 }

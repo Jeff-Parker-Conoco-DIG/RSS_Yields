@@ -95,9 +95,16 @@ export function useDrillstringInfo(assetId: number | undefined): UseDrillstringI
             rssBitToSurvey = Number(comp.bit_to_survey ?? comp.length ?? 0);
           }
 
-          // MWD component — get its bit_to_survey distance
+          // MWD component — get its sensor-to-bit distance
+          // Corva field: "bit_to_survey_distance" (confirmed from BHA component data)
           if (family === 'mwd' || family === 'lwd') {
-            mwdBitToSurvey = Number(comp.bit_to_survey ?? comp.length ?? 0);
+            mwdBitToSurvey = Number(
+              comp.bit_to_survey_distance   // Corva standard field name
+              ?? comp.sensor_to_bit_distance // alternate naming
+              ?? comp.bit_to_survey          // legacy field name
+              ?? 0
+            );
+            log(`MWD sensor-to-bit: ${mwdBitToSurvey}ft (from BHA component)`);
           }
 
           // Motor (PDM)
@@ -108,21 +115,22 @@ export function useDrillstringInfo(assetId: number | undefined): UseDrillstringI
           }
         }
 
-        // The effective bit-to-survey for the RSS is its own value;
-        // if not set, fall back to MWD distance as an approximation
-        const bitToSurvey = rssBitToSurvey > 0 ? rssBitToSurvey : (mwdBitToSurvey || 50);
+        // RSS B2S is fixed at ~8ft (near-bit sensor, not entered in BHA data)
+        // MWD B2S is what's entered in Corva — this is the MWD sensor measurement distance
+        const rssBts = 8; // Fixed — RSS near-bit sensor is always ~8ft from bit
+        const mwdBts = mwdBitToSurvey > 0 ? mwdBitToSurvey : 50; // From BHA, default 50ft if not set
 
         if (rssInfo) {
           setToolInfo({
             ...rssInfo,
             serialNumber: null,
-            bitToSurveyDistance: bitToSurvey,
-            mwdBitToSurveyDistance: mwdBitToSurvey,
+            bitToSurveyDistance: rssBts,
+            mwdBitToSurveyDistance: mwdBts,
             hasMotor,
             motorBendAngle,
             motorYield,
           });
-          log(`RSS tool identified: ${rssInfo.toolName} (${rssInfo.vendor}), B2S=${bitToSurvey}ft`);
+          log(`RSS tool identified: ${rssInfo.toolName} (${rssInfo.vendor}), RSS B2S=~${rssBts}ft (fixed), MWD B2S=${mwdBts}ft`);
         } else {
           setToolInfo(null);
         }

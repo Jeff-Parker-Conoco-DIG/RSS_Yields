@@ -36,28 +36,16 @@ export const RssToolInfo: React.FC<RssToolInfoProps> = ({
 
       {toolInfo && (
         <>
-          <span>B2S: {toolInfo.bitToSurveyDistance} ft</span>
-          {toolInfo.hasMotor && <span>Motor: Yes (bend {toolInfo.motorBendAngle ?? '?'}°)</span>}
+          <span>MWD Sensor to Bit: {toolInfo.mwdBitToSurveyDistance} ft</span>
+          {toolInfo.hasMotor && (
+            <span>
+              Motor: Yes{toolInfo.motorBendAngle != null ? ` (bend ${toolInfo.motorBendAngle}°)` : ''}
+            </span>
+          )}
         </>
       )}
 
-      <span>Profile: {profile.vendorName}</span>
-
       {lastSurveyDepth != null && <span>Last: {lastSurveyDepth.toFixed(1)} ft</span>}
-
-      <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-        <span
-          style={{
-            width: 8,
-            height: 8,
-            borderRadius: '50%',
-            background: wsConnected ? '#4caf50' : '#666',
-            display: 'inline-block',
-            animation: wsConnected ? 'pulse 2s infinite' : 'none',
-          }}
-        />
-        {wsConnected ? 'Live' : 'Offline'}
-      </span>
     </div>
   );
 };

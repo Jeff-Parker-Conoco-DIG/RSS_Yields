@@ -176,3 +176,29 @@
 .exportBtn:hover {
   background: #333;
 }
+
+.timerTag {
+  color: #ff9800;
+  font-size: 11px;
+  font-family: 'Roboto Mono', monospace;
+}
+
+.clearBtn {
+  background: transparent;
+  border: 1px solid #555;
+  color: #f44336;
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.clearBtn:hover {
+  background: rgba(244, 67, 54, 0.1);
+  border-color: #f44336;
+}
+
+.clearBtn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}

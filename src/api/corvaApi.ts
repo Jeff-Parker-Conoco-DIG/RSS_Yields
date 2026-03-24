@@ -66,6 +66,72 @@ let cerebroFailed = false;
 // ─── Fetch Functions ──────────────────────────────────────────────
 
 /**
+ * Fetch the active (highest BHA number) non-planning drillstring for a well.
+ *
+ * Corva drillstrings have a `data.id` field that represents the BHA number.
+ * BHA #1 is the first run, BHA #5 is the 5th run, etc.
+ * The highest non-planning BHA number is the currently active one.
+ *
+ * We sort by data.id descending and take the first non-planning result.
+ */
+export async function fetchCurrentDrillstring(assetId: number): Promise<unknown | null> {
+  if (!corvaAPI) return null;
+  try {
+    // First fetch ALL non-planning drillstrings to find the highest BHA number
+    // data.id can be a string or number, so we fetch all and sort client-side
+    const data = await corvaAPI.get(
+      '/v1/data/corva/data.drillstring',
+      {
+        aggregate: JSON.stringify([
+          {
+            $match: {
+              asset_id: assetId,
+              'data.planning': { $ne: true },
+            },
+          },
+          {
+            $project: {
+              _id: 1,
+              asset_id: 1,
+              timestamp: 1,
+              'data.id': 1,
+              'data.name': 1,
+              'data.components': 1,
+              'data.planning': 1,
+            },
+          },
+        ]),
+      },
+    );
+    const arr = Array.isArray(data) ? (data as Record<string, unknown>[]) : [];
+    if (arr.length === 0) return null;
+
+    // Log all BHAs found for debugging
+    const bhaList = arr.map(ds => {
+      const d = ds.data as Record<string, unknown> | undefined;
+      return { id: Number(d?.id ?? 0), name: d?.name ?? '' };
+    });
+    log(`Found ${arr.length} non-planning BHAs: ${bhaList.map(b => `#${b.id} "${b.name}"`).join(', ')}`);
+
+    // Sort by numeric BHA ID descending — handles string or number data.id
+    arr.sort((a, b) => {
+      const aData = a.data as Record<string, unknown> | undefined;
+      const bData = b.data as Record<string, unknown> | undefined;
+      return Number(bData?.id ?? 0) - Number(aData?.id ?? 0);
+    });
+
+    const selected = arr[0];
+    const dsData = (selected.data as Record<string, unknown> | undefined);
+    log(`Selected active BHA: #${dsData?.id ?? '?'} "${dsData?.name ?? ''}"`);
+
+    return selected;
+  } catch (e) {
+    error('fetchCurrentDrillstring failed:', e);
+    return null;
+  }
+}
+
+/**
  * Fetch all MWD survey stations for a well.
  * actual_survey is a single document per well with data.stations[] array.
  * We use the aggregate endpoint to unwind stations into individual records.
@@ -217,6 +283,32 @@ export async function fetchLatestWitsRecord(assetId: number): Promise<Record<str
   }
 }
 
+/**
+ * Fetch the N most recent raw WITS records for a well.
+ * Used by "Take Reading" to find the last change point for the watched channel.
+ * Returns records sorted by timestamp DESCENDING (newest first).
+ */
+export async function fetchRecentWitsRecords(
+  assetId: number,
+  limit: number = 50,
+): Promise<Record<string, unknown>[]> {
+  if (!corvaDataAPI) return [];
+  try {
+    const data = await corvaDataAPI.get(
+      '/api/v1/data/corva/wits/',
+      {
+        query: JSON.stringify({ asset_id: assetId }),
+        sort: JSON.stringify({ timestamp: -1 }),
+        limit,
+      },
+    );
+    return Array.isArray(data) ? (data as Record<string, unknown>[]) : [];
+  } catch (e) {
+    error('fetchRecentWitsRecords failed:', e);
+    return [];
+  }
+}
+
 /** Fetch Cerebro raw data (iCruise) for a well */
 export async function fetchCerebroRaw(
   assetId: number,
@@ -254,47 +346,7 @@ export async function fetchCerebroRaw(
   }
 }
 
-/**
- * Fetch the most recent non-planning drillstring for a well.
- * Uses corvaAPI (api.corva.ai) with aggregate to get latest by timestamp,
- * excluding planning BHAs.
- */
-export async function fetchCurrentDrillstring(assetId: number): Promise<unknown | null> {
-  if (!corvaAPI) return null;
-  try {
-    const data = await corvaAPI.get(
-      '/v1/data/corva/data.drillstring',
-      {
-        aggregate: JSON.stringify([
-          {
-            $match: {
-              asset_id: assetId,
-              'data.planning': { $ne: true },
-            },
-          },
-          { $sort: { timestamp: -1 } },
-          { $limit: 1 },
-          {
-            $project: {
-              _id: 1,
-              asset_id: 1,
-              timestamp: 1,
-              'data.id': 1,
-              'data.name': 1,
-              'data.components': 1,
-              'data.planning': 1,
-            },
-          },
-        ]),
-      },
-    );
-    const arr = Array.isArray(data) ? data : [];
-    return arr[0] ?? null;
-  } catch (e) {
-    error('fetchCurrentDrillstring failed:', e);
-    return null;
-  }
-}
+
 
 /** Fetch slide sheet records for a well */
 export async function fetchSlideSheet(assetId: number): Promise<unknown[]> {
@@ -358,23 +410,31 @@ export interface DiscoveredChannel {
 export async function discoverWitsChannels(assetId: number): Promise<DiscoveredChannel[]> {
   if (!corvaDataAPI) return [];
   try {
-    // Fetch the most recent 5 raw WITS records (not summary-1ft which has aggregated field names)
-    const data = await corvaDataAPI.get(
-      `/api/v1/data/corva/wits/`,
-      {
+    // Fetch from BOTH raw WITS and summary-1ft in parallel
+    // Some channels only exist in one dataset (e.g. toolface may only be in summary-1ft)
+    const [rawData, summaryData] = await Promise.all([
+      corvaDataAPI.get(`/api/v1/data/corva/wits/`, {
         query: JSON.stringify({ asset_id: assetId }),
         sort: JSON.stringify({ timestamp: -1 }),
         limit: 5,
-      },
-    );
+      }),
+      corvaDataAPI.get(`/api/v1/data/corva/wits.summary-1ft/`, {
+        query: JSON.stringify({ asset_id: assetId }),
+        sort: JSON.stringify({ timestamp: -1 }),
+        limit: 5,
+      }),
+    ]);
 
-    const records = Array.isArray(data) ? data : [];
-    if (records.length === 0) return [];
+    const rawRecords = Array.isArray(rawData) ? rawData : [];
+    const summaryRecords = Array.isArray(summaryData) ? summaryData : [];
+    const allRecords = [...rawRecords, ...summaryRecords];
 
-    // Collect all unique data.* keys across the sampled records
+    if (allRecords.length === 0) return [];
+
+    // Collect all unique data.* keys across ALL records from both datasets
     const fieldMap = new Map<string, { lastValue: unknown; count: number }>();
 
-    for (const record of records) {
+    for (const record of allRecords) {
       const dataObj = (record as Record<string, unknown>)?.data;
       if (!dataObj || typeof dataObj !== 'object') continue;
 
@@ -408,7 +468,7 @@ export async function discoverWitsChannels(assetId: number): Promise<DiscoveredC
       return a.field.localeCompare(b.field);
     });
 
-    log(`Discovered ${channels.length} WITS channels (${channels.filter(c => c.hasData).length} with data)`);
+    log(`Discovered ${channels.length} WITS channels from raw+summary (${channels.filter(c => c.hasData).length} with data, raw=${rawRecords.length} summary=${summaryRecords.length} records)`);
     return channels;
   } catch (e) {
     error('discoverWitsChannels failed:', e);

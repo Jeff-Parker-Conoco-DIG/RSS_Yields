@@ -1,9 +1,8 @@
 import React, { useCallback } from 'react';
 import type { AppProps } from './types';
-import { WitsMapperPanel } from './witsMapper/WitsMapperPanel';
 import { DEFAULT_SETTINGS } from './constants';
 
-const AppSettings: React.FC<AppProps> = ({ well, appSettings, onSettingChange }) => {
+const AppSettings: React.FC<AppProps> = ({ appSettings, onSettingChange }) => {
   const settings = { ...DEFAULT_SETTINGS, ...appSettings };
 
   const set = useCallback(
@@ -13,16 +12,11 @@ const AppSettings: React.FC<AppProps> = ({ well, appSettings, onSettingChange })
 
   return (
     <div style={{ padding: 16, color: '#ddd', fontSize: 13 }}>
-      <h3 style={{ color: '#aaa', fontSize: 14, marginBottom: 16 }}>RSS Yields Settings</h3>
+      <h3 style={{ color: '#aaa', fontSize: 14, marginBottom: 16 }}>Display Settings</h3>
 
-      {/* WITS Channel Mapper — now with auto-detect */}
-      <WitsMapperPanel
-        activeProfileId={settings.activeProfile}
-        customOverrides={settings.customChannelOverrides}
-        onProfileChange={(id) => set('activeProfile', id)}
-        onOverrideChange={(overrides) => set('customChannelOverrides', overrides)}
-        assetId={well?.asset_id}
-      />
+      <p style={{ color: '#666', fontSize: 11, marginBottom: 16 }}>
+        RSS vendor profile and channel mappings are configured via the gear icon in the app.
+      </p>
 
       {/* Unit System */}
       <div style={{ marginTop: 20 }}>

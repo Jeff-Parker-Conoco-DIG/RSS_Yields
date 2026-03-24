@@ -188,3 +188,56 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+/* ─── Save / Load / Export / Import Row ──────────── */
+.mappingRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.loadSelect {
+  background: #2a2a2a;
+  color: #ccc;
+  border: 1px solid #555;
+  border-radius: 4px;
+  padding: 5px 8px;
+  font-size: 12px;
+  min-width: 180px;
+}
+
+.mappingBtn {
+  background: #2a2a2a;
+  color: #aaa;
+  border: 1px solid #444;
+  border-radius: 4px;
+  padding: 5px 10px;
+  font-size: 11px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+
+.mappingBtn:hover {
+  background: #3a3a3a;
+  color: #ddd;
+}
+
+.mappingBtnDanger {
+  background: #3a1a1a;
+  color: #e57373;
+  border: 1px solid #5a2a2a;
+  border-radius: 4px;
+  padding: 5px 10px;
+  font-size: 11px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+
+.mappingBtnDanger:hover {
+  background: #4a2020;
+  color: #ff8a80;
+}

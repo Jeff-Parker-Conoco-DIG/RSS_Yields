@@ -12,8 +12,6 @@ export interface AppProps {
 
 // ─── App Settings ──────────────────────────────────────────────────
 export interface AppSettingsData {
-  activeProfile: string;
-  customChannelOverrides: Record<string, string>;
   unitSystem: 'imperial' | 'metric';
   dlsNormalization: 'per100ft' | 'per30m';
   yieldDivergenceThreshold: number;
@@ -32,6 +30,8 @@ export interface TrackingConfig {
   intervalMode: IntervalMode;
   intervalValue: number;          // ft for depth mode, minutes for time mode
   isRunning: boolean;
+  autoStopHours: number | null;  // null = no auto-stop
+  startedAt: number | null;      // timestamp when Start was clicked (for timer calculation)
 }
 
 // ─── Yield Reading — One row in the tracking table ─────────────────
@@ -45,18 +45,29 @@ export interface YieldReading {
   inc: number;                    // Inclination (degrees)
   az: number;                     // Azimuth (degrees)
 
-  // Rates — calculated from previous reading
+  // Rates — calculated from previous reading (RSS near-bit)
   courseLength: number | null;     // Distance from prev reading (ft)
   br: number | null;              // Build rate (°/100ft)
   tr: number | null;              // Turn rate (°/100ft)
   dls: number | null;             // DLS (°/100ft)
 
+  // MWD survey snapshot (from MWD tool, ~50-90ft behind bit)
+  mwdInc: number | null;
+  mwdAz: number | null;
+
+  // MWD rates — calculated from MWD inc/az between readings
+  mwdBr: number | null;           // MWD build rate °/100ft
+  mwdTr: number | null;           // MWD turn rate °/100ft
+  mwdDls: number | null;          // MWD DLS °/100ft
+
   // Steering parameters — averaged over interval from prev depth to this depth
   dutyCycle: number | null;       // 0-100%
   toolFaceSet: number | null;     // Gravity TF (degrees)
   toolFaceActual: number | null;  // Gravity TF (degrees)
-  toolFaceStdDev: number | null;  // TF consistency (degrees)
   steeringForce: number | null;
+
+  // Resultant toolface — calculated from RSS inc/az change, NOT a WITS channel
+  resultantTF: number | null;     // Effective steering direction (degrees)
 
   // Toolface-decomposed steering commands
   buildCommand: number | null;    // (DC/100) × cos(TF)

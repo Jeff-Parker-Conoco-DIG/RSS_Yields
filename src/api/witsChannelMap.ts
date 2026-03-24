@@ -43,10 +43,11 @@ export function resolveAllChannels(
   const keys: (keyof ChannelMapping)[] = [
     'nearBitInc',
     'nearBitAz',
+    'mwdInc',
+    'mwdAz',
     'dutyCycle',
     'toolFaceSet',
     'toolFaceActual',
-    'toolFaceStdDev',
     'steeringForce',
     'turbineRPM',
     'peakLateral',

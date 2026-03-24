@@ -1,4 +1,6 @@
 import type { YieldReading, YieldAnalysis } from '../types';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 /**
  * Export a one-page RSS yield summary PDF using jspdf + jspdf-autotable.
@@ -9,8 +11,6 @@ export function exportToPdf(
   wellName: string,
 ): void {
   try {
-    const { jsPDF } = require('jspdf');
-    require('jspdf-autotable');
 
     const doc = new jsPDF('landscape', 'mm', 'a4');
 
@@ -42,34 +42,46 @@ export function exportToPdf(
 
     const columns = [
       'Depth',
-      'Inc',
-      'Az',
+      'RSS Inc',
+      'RSS Az',
+      'MWD Inc',
+      'MWD Az',
       'C.L.',
       'BR',
       'TR',
       'DLS',
+      'MWD BR',
+      'MWD TR',
+      'MWD DLS',
       'DC %',
       'TF Set',
+      'Res TF',
       'Section',
     ];
 
     const fmt = (v: number | null | undefined, d: number): string =>
-      v != null ? v.toFixed(d) : '—';
+      v != null ? v.toFixed(d) : '\u2014';
 
     const rows = displayReadings.map((r) => [
       fmt(r.depth, 1),
       fmt(r.inc, 2),
       fmt(r.az, 2),
+      fmt(r.mwdInc, 2),
+      fmt(r.mwdAz, 2),
       fmt(r.courseLength, 1),
       fmt(r.br, 2),
       fmt(r.tr, 2),
       fmt(r.dls, 2),
+      fmt(r.mwdBr, 2),
+      fmt(r.mwdTr, 2),
+      fmt(r.mwdDls, 2),
       fmt(r.dutyCycle, 1),
       fmt(r.toolFaceSet, 1),
+      fmt(r.resultantTF, 1),
       r.section,
     ]);
 
-    (doc as any).autoTable({
+    autoTable(doc, {
       startY: regression ? 42 : 37,
       head: [columns],
       body: rows,

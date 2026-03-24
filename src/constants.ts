@@ -2,8 +2,6 @@ import type { AppSettingsData, TabId, TrackingConfig, WellSection } from './type
 
 // ─── Default Settings ──────────────────────────────────────────────
 export const DEFAULT_SETTINGS: AppSettingsData = {
-  activeProfile: 'icruise',
-  customChannelOverrides: {},
   unitSystem: 'imperial',
   dlsNormalization: 'per100ft',
   yieldDivergenceThreshold: 0.5,
@@ -18,6 +16,8 @@ export const DEFAULT_TRACKING: TrackingConfig = {
   intervalMode: 'depth',
   intervalValue: 90,
   isRunning: false,
+  autoStopHours: null,
+  startedAt: null,
 };
 
 // ─── Well Sections ─────────────────────────────────────────────────
