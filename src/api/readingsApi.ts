@@ -68,6 +68,11 @@ export async function fetchReadings(assetId: number): Promise<YieldReading[]> {
       },
     );
     const records = Array.isArray(data) ? data : [];
+    // Fetch succeeded — dataset exists, clear any previous missing flag
+    if (datasetMissingLogged) {
+      datasetMissingLogged = false;
+      log(`Dataset "${READINGS_DATASET}" is now available`);
+    }
     return records.map(docToReading).filter((r): r is YieldReading => r !== null);
   } catch (e) {
     if (isDatasetMissing(e)) {
@@ -89,10 +94,6 @@ export async function saveReading(reading: YieldReading): Promise<boolean> {
     log('No API client — reading not persisted (dev mode)');
     return false;
   }
-  if (datasetMissingLogged) {
-    // Dataset doesn't exist — skip silently (already logged once)
-    return false;
-  }
   try {
     await corvaDataAPI.post(
       `/api/v1/data/${READINGS_DATASET}/`,
@@ -103,6 +104,11 @@ export async function saveReading(reading: YieldReading): Promise<boolean> {
         data: readingToData(reading),
       },
     );
+    // If save succeeds, dataset exists — clear the missing flag
+    if (datasetMissingLogged) {
+      datasetMissingLogged = false;
+      log(`Dataset "${READINGS_DATASET}" is now available — readings will persist server-side`);
+    }
     log(`Saved reading at ${reading.depth} ft`);
     return true;
   } catch (e) {
@@ -125,7 +131,7 @@ export async function updateReadingNotes(
   readingId: string,
   notes: string,
 ): Promise<boolean> {
-  if (!corvaDataAPI || datasetMissingLogged) return false;
+  if (!corvaDataAPI) return false;
   try {
     // Find the record by reading ID, then update
     const data = await corvaDataAPI.get(
@@ -157,7 +163,7 @@ export async function updateReadingNotes(
 // ─── Delete a reading ──────────────────────────────────────────────
 
 export async function deleteReading(assetId: number, readingId: string): Promise<boolean> {
-  if (!corvaDataAPI || datasetMissingLogged) return false;
+  if (!corvaDataAPI) return false;
   try {
     const data = await corvaDataAPI.get(
       `/api/v1/data/${READINGS_DATASET}/`,

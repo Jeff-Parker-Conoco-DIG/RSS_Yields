@@ -70,4 +70,4 @@ export const RSS_VENDORS = ['icruise', 'powerdrive', 'custom', 'bentmotor_curve'
 export type RssVendorId = (typeof RSS_VENDORS)[number];
 
 // ─── Dataset name for readings persistence ─────────────────────────
-export const READINGS_DATASET = 'copca.yieldtracker.readings';
+export const READINGS_DATASET = 'copca/yieldtracker.readings';
