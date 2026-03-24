@@ -7,6 +7,8 @@ interface ReadingsTableProps {
   readings: YieldReading[];
   onSetNotes: (readingId: string, notes: string) => void;
   onDelete: (readingId: string) => void;
+  /** Required DLS to reach planned target (°/100ft). When set, colors BR/TR/DLS green/orange/red. */
+  dlNeeded: number | null;
 }
 
 function fmt(v: number | null | undefined, decimals: number): string {
@@ -14,12 +16,72 @@ function fmt(v: number | null | undefined, decimals: number): string {
   return v.toFixed(decimals);
 }
 
-function rateColor(val: number | null): string | undefined {
+/** Fallback magnitude-based color — used only when dlNeeded is not set */
+function rateColorMagnitude(val: number | null): string | undefined {
   if (val == null) return undefined;
   const abs = Math.abs(val);
   if (abs > 5) return YIELD_COLORS.bad;
   if (abs > 3) return YIELD_COLORS.warning;
   return undefined;
+}
+
+/**
+ * DLS color against a required dogleg target.
+ * Green ≥ 100% of target, orange 85–99%, red < 85%.
+ * Falls back to magnitude-based coloring when dlNeeded is not set.
+ */
+function dlsColor(val: number | null, dlNeeded: number | null): string | undefined {
+  if (val == null) return undefined;
+  if (dlNeeded != null && dlNeeded > 0) {
+    const pct = val / dlNeeded;
+    if (pct >= 1.0) return YIELD_COLORS.good;
+    if (pct >= 0.85) return YIELD_COLORS.warning;
+    return YIELD_COLORS.bad;
+  }
+  return rateColorMagnitude(val);
+}
+
+/**
+ * BR color against the build component of dlNeeded.
+ * brNeeded = dlNeeded × cos(TF). Comparison is sign-aware:
+ *   building (brNeeded > 0): higher BR is better.
+ *   dropping (brNeeded < 0): more-negative BR is better.
+ * Falls back to magnitude color when dlNeeded or TF not available.
+ */
+function brColor(br: number | null, dlNeeded: number | null, tf: number | null): string | undefined {
+  if (br == null) return undefined;
+  if (dlNeeded != null && dlNeeded > 0 && tf != null) {
+    const brNeeded = dlNeeded * Math.cos((tf * Math.PI) / 180);
+    if (Math.abs(brNeeded) < 0.05) {
+      // TF near 90°/270° — BR contribution is negligible, no DL-based color
+      return undefined;
+    }
+    const pct = br / brNeeded;  // Works for both positive (build) and negative (drop) targets
+    if (pct >= 1.0) return YIELD_COLORS.good;
+    if (pct >= 0.85) return YIELD_COLORS.warning;
+    return YIELD_COLORS.bad;
+  }
+  return rateColorMagnitude(br);
+}
+
+/**
+ * TR color against the turn component of dlNeeded.
+ * trNeeded = dlNeeded × sin(TF). Same sign-aware logic as brColor.
+ */
+function trColor(tr: number | null, dlNeeded: number | null, tf: number | null): string | undefined {
+  if (tr == null) return undefined;
+  if (dlNeeded != null && dlNeeded > 0 && tf != null) {
+    const trNeeded = dlNeeded * Math.sin((tf * Math.PI) / 180);
+    if (Math.abs(trNeeded) < 0.05) {
+      // TF near 0°/180° — TR contribution is negligible, no DL-based color
+      return undefined;
+    }
+    const pct = tr / trNeeded;
+    if (pct >= 1.0) return YIELD_COLORS.good;
+    if (pct >= 0.85) return YIELD_COLORS.warning;
+    return YIELD_COLORS.bad;
+  }
+  return rateColorMagnitude(tr);
 }
 
 /** Color code resultant TF based on divergence from TF Set */
@@ -36,6 +98,7 @@ export const ReadingsTable: React.FC<ReadingsTableProps> = ({
   readings,
   onSetNotes,
   onDelete,
+  dlNeeded,
 }) => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editText, setEditText] = useState('');
@@ -120,15 +183,15 @@ export const ReadingsTable: React.FC<ReadingsTableProps> = ({
 
                 <td>{isFirst ? '\u2014' : fmt(r.courseLength, 1)}</td>
 
-                {/* RSS Rates */}
-                <td style={{ color: rateColor(r.br) }}>{isFirst ? '\u2014' : fmt(r.br, 2)}</td>
-                <td style={{ color: rateColor(r.tr) }}>{isFirst ? '\u2014' : fmt(r.tr, 2)}</td>
-                <td style={{ color: rateColor(r.dls) }}>{isFirst ? '\u2014' : fmt(r.dls, 2)}</td>
+                {/* RSS Rates — colored against DL Needed when set */}
+                <td style={{ color: brColor(r.br, dlNeeded, r.toolFaceSet) }}>{isFirst ? '\u2014' : fmt(r.br, 2)}</td>
+                <td style={{ color: trColor(r.tr, dlNeeded, r.toolFaceSet) }}>{isFirst ? '\u2014' : fmt(r.tr, 2)}</td>
+                <td style={{ color: dlsColor(r.dls, dlNeeded) }}>{isFirst ? '\u2014' : fmt(r.dls, 2)}</td>
 
-                {/* MWD Rates */}
-                <td className={styles.mwdCell} style={{ color: rateColor(r.mwdBr) }}>{isFirst ? '\u2014' : fmt(r.mwdBr, 2)}</td>
-                <td className={styles.mwdCell} style={{ color: rateColor(r.mwdTr) }}>{isFirst ? '\u2014' : fmt(r.mwdTr, 2)}</td>
-                <td className={styles.mwdCell} style={{ color: rateColor(r.mwdDls) }}>{isFirst ? '\u2014' : fmt(r.mwdDls, 2)}</td>
+                {/* MWD Rates — ground-truth; also colored against DL Needed */}
+                <td className={styles.mwdCell} style={{ color: brColor(r.mwdBr, dlNeeded, r.toolFaceSet) }}>{isFirst ? '\u2014' : fmt(r.mwdBr, 2)}</td>
+                <td className={styles.mwdCell} style={{ color: trColor(r.mwdTr, dlNeeded, r.toolFaceSet) }}>{isFirst ? '\u2014' : fmt(r.mwdTr, 2)}</td>
+                <td className={styles.mwdCell} style={{ color: dlsColor(r.mwdDls, dlNeeded) }}>{isFirst ? '\u2014' : fmt(r.mwdDls, 2)}</td>
 
                 {/* Steering */}
                 <td>{fmt(r.dutyCycle, 1)}</td>

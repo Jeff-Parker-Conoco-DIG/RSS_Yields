@@ -32,6 +32,7 @@ export interface TrackingConfig {
   isRunning: boolean;
   autoStopHours: number | null;  // null = no auto-stop
   startedAt: number | null;      // timestamp when Start was clicked (for timer calculation)
+  dlNeeded: number | null;       // Required DLS to reach target (°/100ft). Drives BR/TR/DLS color coding.
 }
 
 // ─── Yield Reading — One row in the tracking table ─────────────────
@@ -60,13 +61,18 @@ export interface YieldReading {
   mwdTr: number | null;           // MWD turn rate °/100ft
   mwdDls: number | null;          // MWD DLS °/100ft
 
+  // Sensor comparison (RSS leads MWD by ~B2S gap)
+  deltaInc: number | null;        // RSS Inc − MWD Inc (degrees)
+  deltaAz: number | null;         // RSS Az − MWD Az, wrapped ±180° (degrees)
+
   // Steering parameters — averaged over interval from prev depth to this depth
   dutyCycle: number | null;       // 0-100%
-  toolFaceSet: number | null;     // Gravity TF (degrees)
-  toolFaceActual: number | null;  // Gravity TF (degrees)
+  toolFaceSet: number | null;     // Commanded gravity TF (degrees)
+  toolFaceActual: number | null;  // Achieved gravity TF (degrees)
+  toolFaceStdDev: number | null;  // TF consistency (degrees)
   steeringForce: number | null;
 
-  // Resultant toolface — calculated from RSS inc/az change, NOT a WITS channel
+  // Resultant toolface — back-calculated from actual RSS BR/TR
   resultantTF: number | null;     // Effective steering direction (degrees)
 
   // Toolface-decomposed steering commands

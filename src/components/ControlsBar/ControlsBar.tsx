@@ -142,6 +142,26 @@ export const ControlsBar: React.FC<ControlsBarProps> = ({
           </div>
         </div>
 
+        <div className={styles.field}>
+          <label className={styles.label} title="Minimum dogleg severity needed to reach planned target. Colors BR/TR/DLS green when achieved.">DL Needed</label>
+          <div className={styles.inputGroup}>
+            <input
+              type="number"
+              className={styles.numInput}
+              style={{ width: 55 }}
+              value={config.dlNeeded ?? ''}
+              onChange={(e) => {
+                const v = e.target.value;
+                set('dlNeeded', v ? Number(v) : null);
+              }}
+              placeholder="\u2014"
+              min={0}
+              step={0.1}
+            />
+            <span className={styles.unit}>°/100ft</span>
+          </div>
+        </div>
+
         <div className={styles.divider} />
 
         {/* Action buttons */}

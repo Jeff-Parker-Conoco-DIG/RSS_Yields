@@ -3,7 +3,7 @@ import type { YieldReading, TrackingConfig, WellSection } from '../types';
 import type { ResolvedChannelMap } from '../witsMapper/types';
 import { fetchReadings, saveReading, updateReadingNotes, deleteReading } from '../api/readingsApi';
 import { fetchLatestWitsRecord, fetchRecentWitsRecords } from '../api/corvaApi';
-import { buildRate, turnRate, dls, decomposeSteeringCommand, effectiveToolface } from '../calculations/surveyMath';
+import { buildRate, turnRate, dls, decomposeSteeringCommand, effectiveToolface, azimuthDelta } from '../calculations/surveyMath';
 import { MIN_COURSE_LENGTH_FOR_RATES } from '../constants';
 import { log, error } from '../utils/logger';
 
@@ -266,6 +266,16 @@ export function useReadings(
         resultTF = effectiveTF;
       }
 
+      // 3d. Delta between RSS and MWD sensors
+      let deltaInc_: number | null = null;
+      let deltaAz_: number | null = null;
+      if (mwdInc != null) {
+        deltaInc_ = inc - mwdInc;
+      }
+      if (azRaw != null && mwdAz != null) {
+        deltaAz_ = azimuthDelta(mwdAz, az); // RSS Az − MWD Az, wrapped ±180°
+      }
+
       // 4. Toolface decomposition
       let buildCmd: number | null = null;
       let turnCmd: number | null = null;
@@ -283,18 +293,21 @@ export function useReadings(
         depth,
         inc,
         az,
+        mwdInc,
+        mwdAz,
         courseLength: cl,
         br: br_,
         tr: tr_,
         dls: dls_,
-        mwdInc,
-        mwdAz,
         mwdBr,
         mwdTr,
         mwdDls,
+        deltaInc: deltaInc_,
+        deltaAz: deltaAz_,
         dutyCycle: dc,
         toolFaceSet: tfSet,
         toolFaceActual: tfAct,
+        toolFaceStdDev: null,  // Not available as a direct WITS channel; computed from slide-sheet in future
         steeringForce: sf,
         resultantTF: resultTF,
         buildCommand: buildCmd,

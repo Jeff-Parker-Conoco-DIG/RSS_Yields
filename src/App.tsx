@@ -152,18 +152,20 @@ const App: React.FC<AppProps> = ({ well, app, appSettings, appHeaderProps }) => 
     reload,
   } = useReadings(assetId, trackingConfig, resolvedMapFinal);
 
-  // Yield analysis for scatter plot
+  // Yield analysis for scatter plot — uses MWD-derived rates as ground truth.
+  // Falls back to RSS rates for wells/readings where MWD channels aren't mapped yet.
   const yieldAnalysis = useMemo(() => {
-    // Convert readings to the shape yieldCalc expects
-    const stations = readings.filter((r) => r.dls != null).map((r) => ({
-      mwdDLS: r.dls!,
-      mwdBUR: r.br!,
-      mwdTUR: r.tr!,
-      avgDutyCycle: r.dutyCycle,
-      buildCommand: r.buildCommand,
-      turnCommand: r.turnCommand,
-      courseLength: r.courseLength ?? 0,
-    }));
+    const stations = readings
+      .filter((r) => (r.mwdDls ?? r.dls) != null)
+      .map((r) => ({
+        mwdDLS: r.mwdDls ?? r.dls!,        // Ground-truth DLS (prefer MWD)
+        mwdBUR: r.mwdBr ?? r.br ?? 0,      // Ground-truth build rate
+        mwdTUR: r.mwdTr ?? r.tr ?? 0,      // Ground-truth turn rate
+        avgDutyCycle: r.dutyCycle,
+        buildCommand: r.buildCommand,
+        turnCommand: r.turnCommand,
+        courseLength: r.courseLength ?? 0,
+      }));
     return computeYieldAnalysis(stations);
   }, [readings]);
 
@@ -271,16 +273,17 @@ const App: React.FC<AppProps> = ({ well, app, appSettings, appHeaderProps }) => 
             readings={readings}
             onSetNotes={setNotes}
             onDelete={removeReading}
+            dlNeeded={trackingConfig.dlNeeded ?? null}
           />
         )}
         {activeTab === 'scatter' && (
           <YieldScatterPlot
-            stations={readings.filter((r) => r.dls != null).map((r) => ({
+            stations={readings.filter((r) => (r.mwdDls ?? r.dls) != null).map((r) => ({
               avgDutyCycle: r.dutyCycle,
-              mwdDLS: r.dls!,
-              mwdBUR: r.br!,
-              mwdTUR: r.tr!,
-              rssDLS: r.dls!,
+              mwdDLS: r.mwdDls ?? r.dls!,   // Ground-truth DLS for regression
+              mwdBUR: r.mwdBr ?? r.br ?? 0,
+              mwdTUR: r.mwdTr ?? r.tr ?? 0,
+              rssDLS: r.dls ?? r.mwdDls!,   // RSS near-bit DLS for divergence coloring
               mwdDepth: r.depth,
               avgToolFaceSet: r.toolFaceSet,
               buildCommand: r.buildCommand,

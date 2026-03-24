@@ -18,6 +18,7 @@ export const DEFAULT_TRACKING: TrackingConfig = {
   isRunning: false,
   autoStopHours: null,
   startedAt: null,
+  dlNeeded: null,
 };
 
 // ─── Well Sections ─────────────────────────────────────────────────
