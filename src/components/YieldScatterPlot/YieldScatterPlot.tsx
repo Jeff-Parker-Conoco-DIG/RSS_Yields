@@ -139,7 +139,7 @@ export const YieldScatterPlot: React.FC<YieldScatterPlotProps> = ({
       {tooltip && (
         <div
           className={styles.tooltip}
-          style={{ left: tooltip.x + 12, top: tooltip.y - 30 }}
+          style={{ left: tooltip.x + 12, top: Math.max(10, tooltip.y - 80) }}
         >
           <div>Depth: {tooltip.station.mwdDepth.toFixed(1)} ft</div>
           <div>DC: {tooltip.station.avgDutyCycle?.toFixed(1)}%</div>

@@ -5,10 +5,14 @@ import { useSettings } from './effects/useSettings';
 import { getProfile, buildResolvedMap, WitsMapperPanel } from './witsMapper';
 import { useDrillstringInfo } from './effects/useDrillstringInfo';
 import { useReadings } from './effects/useReadings';
+import { useRssMonitor } from './effects/useRssMonitor';
 import { RssToolInfo } from './components/RssToolInfo';
+import { RssMonitorBar } from './components/RssMonitorBar';
 import { ControlsBar } from './components/ControlsBar';
 import { ReadingsTable } from './components/ReadingsTable';
 import { YieldScatterPlot } from './components/YieldScatterPlot';
+import { DepthTrackPlot } from './components/DepthTrackPlot';
+import { AverageRatesModal } from './components/AverageRatesModal';
 import { computeYieldAnalysis } from './calculations/yieldCalc';
 import { exportToExcel } from './reports/excelExport';
 import { exportToPdf } from './reports/pdfExport';
@@ -37,6 +41,9 @@ const App: React.FC<AppProps> = ({ well, app, appSettings, appHeaderProps }) => 
 
   // WITS Mapper panel visibility
   const [showMapper, setShowMapper] = useState(false);
+
+  // Average Rates modal visibility
+  const [showAvgRates, setShowAvgRates] = useState(false);
 
   // RSS profile & channel overrides — managed ONLY via our WITS Mapper panel, not Corva settings
   const [localOverrides, setLocalOverrides] = useState<Record<string, string>>(() => {
@@ -139,6 +146,9 @@ const App: React.FC<AppProps> = ({ well, app, appSettings, appHeaderProps }) => 
     return () => clearTimeout(timer);
   }, [trackingConfig.isRunning, trackingConfig.autoStopHours, trackingConfig.startedAt]);
 
+  // RSS monitor — always-on shock/vibe gauges (independent of tracking state)
+  const { values: monitorValues, thresholds, setThresholds } = useRssMonitor(assetId, true);
+
   // Core data — readings, CRUD, auto-trigger
   const {
     readings,
@@ -156,11 +166,17 @@ const App: React.FC<AppProps> = ({ well, app, appSettings, appHeaderProps }) => 
   // Falls back to RSS rates for wells/readings where MWD channels aren't mapped yet.
   const yieldAnalysis = useMemo(() => {
     const stations = readings
-      .filter((r) => (r.mwdDls ?? r.dls) != null)
+      .filter((r) => {
+        const dlsVal = r.mwdDls ?? r.dls;
+        if (dlsVal == null) return false;
+        // Skip zero-DLS readings when DC > 0 — MWD hadn't updated yet (bogus data)
+        if (dlsVal === 0 && r.dutyCycle != null && r.dutyCycle > 0) return false;
+        return true;
+      })
       .map((r) => ({
-        mwdDLS: r.mwdDls ?? r.dls!,        // Ground-truth DLS (prefer MWD)
-        mwdBUR: r.mwdBr ?? r.br ?? 0,      // Ground-truth build rate
-        mwdTUR: r.mwdTr ?? r.tr ?? 0,      // Ground-truth turn rate
+        mwdDLS: r.mwdDls ?? r.dls!,
+        mwdBUR: r.mwdBr ?? r.br ?? 0,
+        mwdTUR: r.mwdTr ?? r.tr ?? 0,
         avgDutyCycle: r.dutyCycle,
         buildCommand: r.buildCommand,
         turnCommand: r.turnCommand,
@@ -225,6 +241,13 @@ const App: React.FC<AppProps> = ({ well, app, appSettings, appHeaderProps }) => 
         />
       )}
 
+      {/* RSS Monitor Bar — always visible shock/vibe gauges */}
+      <RssMonitorBar
+        values={monitorValues}
+        thresholds={thresholds}
+        onThresholdsChange={setThresholds}
+      />
+
       {/* Controls bar */}
       <ControlsBar
         config={trackingConfig}
@@ -257,6 +280,22 @@ const App: React.FC<AppProps> = ({ well, app, appSettings, appHeaderProps }) => 
             {tab.label}
           </button>
         ))}
+        <div style={{ flex: 1 }} />
+        <button
+          onClick={() => setShowAvgRates(true)}
+          style={{
+            background: 'transparent',
+            border: '1px solid #444',
+            borderRadius: 4,
+            color: '#888',
+            padding: '4px 10px',
+            cursor: 'pointer',
+            fontSize: 11,
+          }}
+          title="Average Rates Calculator"
+        >
+          Avg Rates
+        </button>
       </div>
 
       {/* Error state */}
@@ -278,22 +317,40 @@ const App: React.FC<AppProps> = ({ well, app, appSettings, appHeaderProps }) => 
         )}
         {activeTab === 'scatter' && (
           <YieldScatterPlot
-            stations={readings.filter((r) => (r.mwdDls ?? r.dls) != null).map((r) => ({
-              avgDutyCycle: r.dutyCycle,
-              mwdDLS: r.mwdDls ?? r.dls!,   // Ground-truth DLS for regression
-              mwdBUR: r.mwdBr ?? r.br ?? 0,
-              mwdTUR: r.mwdTr ?? r.tr ?? 0,
-              rssDLS: r.dls ?? r.mwdDls!,   // RSS near-bit DLS for divergence coloring
-              mwdDepth: r.depth,
-              avgToolFaceSet: r.toolFaceSet,
-              buildCommand: r.buildCommand,
-              turnCommand: r.turnCommand,
-              courseLength: r.courseLength ?? 0,
-            }))}
+            stations={readings
+              .filter((r) => {
+                // Filter out readings with no rates (first reading) and readings
+                // where MWD hasn't updated (DLS = 0 at non-zero DC is bogus data)
+                const dlsVal = r.dls ?? r.mwdDls;
+                if (dlsVal == null) return false;
+                // Skip zero-DLS readings when DC > 0 — MWD hadn't updated yet
+                if (dlsVal === 0 && r.dutyCycle != null && r.dutyCycle > 0) return false;
+                return true;
+              })
+              .map((r) => ({
+                avgDutyCycle: r.dutyCycle,
+                mwdDLS: r.mwdDls ?? r.dls!,
+                mwdBUR: r.mwdBr ?? r.br ?? 0,
+                mwdTUR: r.mwdTr ?? r.tr ?? 0,
+                rssDLS: r.dls ?? r.mwdDls!,
+                mwdDepth: r.depth,
+                avgToolFaceSet: r.toolFaceSet,
+                buildCommand: r.buildCommand,
+                turnCommand: r.turnCommand,
+                courseLength: r.courseLength ?? 0,
+              }))}
             divergenceThreshold={settings.yieldDivergenceThreshold}
           />
         )}
+        {activeTab === 'depthTrack' && (
+          <DepthTrackPlot readings={readings} />
+        )}
       </div>
+
+      {/* Average Rates Modal */}
+      {showAvgRates && (
+        <AverageRatesModal readings={readings} onClose={() => setShowAvgRates(false)} />
+      )}
     </div>
   );
 

@@ -1,0 +1,1 @@
+export { AverageRatesModal } from './AverageRatesModal';

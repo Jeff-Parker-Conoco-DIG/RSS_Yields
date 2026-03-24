@@ -169,6 +169,36 @@
   color: #fff;
 }
 
+/* ─── WITS ID Annotation ─────────────────────────── */
+.witsAnnotation {
+  color: #666;
+  font-size: 10px;
+  margin-left: auto;
+  padding-left: 6px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* ─── WITS Missing Channel Hint ──────────────────── */
+.witsHint {
+  padding: 6px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.witsHintName {
+  color: #888;
+  font-size: 11px;
+  font-family: 'Roboto Mono', monospace;
+}
+
+.witsHintWarning {
+  color: #ff9800;
+  font-size: 10px;
+  opacity: 0.8;
+}
+
 /* ─── Empty state ────────────────────────────────── */
 .noResults {
   padding: 12px 10px;

@@ -3,7 +3,7 @@ import type { YieldReading, TrackingConfig, WellSection } from '../types';
 import type { ResolvedChannelMap } from '../witsMapper/types';
 import { fetchReadings, saveReading, updateReadingNotes, deleteReading } from '../api/readingsApi';
 import { fetchLatestWitsRecord, fetchRecentWitsRecords } from '../api/corvaApi';
-import { buildRate, turnRate, dls, decomposeSteeringCommand, effectiveToolface, azimuthDelta } from '../calculations/surveyMath';
+import { buildRate, turnRate, dls, decomposeSteeringCommand, effectiveToolface } from '../calculations/surveyMath';
 import { MIN_COURSE_LENGTH_FOR_RATES } from '../constants';
 import { log, error } from '../utils/logger';
 
@@ -256,7 +256,6 @@ export function useReadings(
           mwdTr = turnRate(prev.mwdAz, mwdAz, cl);
           mwdDls = dls(prev.mwdInc, mwdInc, prev.mwdAz, mwdAz, cl);
         }
-        log(`MWD rates: prevInc=${prev.mwdInc} currInc=${mwdInc} prevAz=${prev.mwdAz} currAz=${mwdAz} CL=${cl} → BR=${mwdBr?.toFixed(4)} TR=${mwdTr?.toFixed(4)} DLS=${mwdDls?.toFixed(4)}`);
       }
 
       // 3c. Calculate resultant toolface from RSS inc/az change
@@ -264,16 +263,6 @@ export function useReadings(
       if (br_ != null && tr_ != null) {
         const { effectiveTF } = effectiveToolface(br_, tr_, inc);
         resultTF = effectiveTF;
-      }
-
-      // 3d. Delta between RSS and MWD sensors
-      let deltaInc_: number | null = null;
-      let deltaAz_: number | null = null;
-      if (mwdInc != null) {
-        deltaInc_ = inc - mwdInc;
-      }
-      if (azRaw != null && mwdAz != null) {
-        deltaAz_ = azimuthDelta(mwdAz, az); // RSS Az − MWD Az, wrapped ±180°
       }
 
       // 4. Toolface decomposition
@@ -302,12 +291,9 @@ export function useReadings(
         mwdBr,
         mwdTr,
         mwdDls,
-        deltaInc: deltaInc_,
-        deltaAz: deltaAz_,
         dutyCycle: dc,
         toolFaceSet: tfSet,
         toolFaceActual: tfAct,
-        toolFaceStdDev: null,  // Not available as a direct WITS channel; computed from slide-sheet in future
         steeringForce: sf,
         resultantTF: resultTF,
         buildCommand: buildCmd,

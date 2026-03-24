@@ -61,15 +61,10 @@ export interface YieldReading {
   mwdTr: number | null;           // MWD turn rate °/100ft
   mwdDls: number | null;          // MWD DLS °/100ft
 
-  // Sensor comparison (RSS leads MWD by ~B2S gap)
-  deltaInc: number | null;        // RSS Inc − MWD Inc (degrees)
-  deltaAz: number | null;         // RSS Az − MWD Az, wrapped ±180° (degrees)
-
   // Steering parameters — averaged over interval from prev depth to this depth
   dutyCycle: number | null;       // 0-100%
   toolFaceSet: number | null;     // Commanded gravity TF (degrees)
   toolFaceActual: number | null;  // Achieved gravity TF (degrees)
-  toolFaceStdDev: number | null;  // TF consistency (degrees)
   steeringForce: number | null;
 
   // Resultant toolface — back-calculated from actual RSS BR/TR
@@ -122,4 +117,4 @@ export interface WitsRecord {
 }
 
 // ─── UI Tab State ──────────────────────────────────────────────────
-export type TabId = 'table' | 'scatter';
+export type TabId = 'table' | 'scatter' | 'depthTrack';

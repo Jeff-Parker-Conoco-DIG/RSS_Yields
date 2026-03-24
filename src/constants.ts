@@ -31,6 +31,7 @@ export const WELL_SECTIONS: { value: WellSection; label: string }[] = [
 export const TABS: { id: TabId; label: string }[] = [
   { id: 'table', label: 'Readings' },
   { id: 'scatter', label: 'Yield Plot' },
+  { id: 'depthTrack', label: 'Depth Track' },
 ];
 
 // ─── DLS Normalization ─────────────────────────────────────────────

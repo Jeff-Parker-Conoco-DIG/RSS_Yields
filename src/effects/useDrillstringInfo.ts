@@ -104,7 +104,6 @@ export function useDrillstringInfo(assetId: number | undefined): UseDrillstringI
               ?? comp.bit_to_survey          // legacy field name
               ?? 0
             );
-            log(`MWD sensor-to-bit: ${mwdBitToSurvey}ft (from BHA component)`);
           }
 
           // Motor (PDM)

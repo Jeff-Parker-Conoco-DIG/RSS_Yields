@@ -1,0 +1,164 @@
+.monitorBar {
+  display: flex;
+  align-items: center;
+  background: #1a1a1a;
+  border-bottom: 1px solid #333;
+  padding: 6px 12px;
+  gap: 16px;
+  min-height: 48px;
+  font-family: 'Roboto Mono', 'Consolas', monospace;
+}
+
+.gauge {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 120px;
+}
+
+.gaugeHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.gaugeLabel {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: #888;
+  letter-spacing: 0.5px;
+}
+
+.gaugeValue {
+  font-size: 13px;
+  font-weight: 700;
+  transition: color 0.3s ease;
+}
+
+.gaugeTrack {
+  height: 6px;
+  background: #2a2a2a;
+  border-radius: 3px;
+  overflow: hidden;
+  position: relative;
+}
+
+.gaugeFill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.5s ease, background-color 0.3s ease;
+  min-width: 2px;
+}
+
+.trendArrow {
+  font-size: 10px;
+  margin-left: 2px;
+  opacity: 0.7;
+}
+
+/* Settings gear button */
+.settingsBtn {
+  background: transparent;
+  border: 1px solid #444;
+  border-radius: 4px;
+  color: #888;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 2px 6px;
+  flex-shrink: 0;
+  transition: color 0.2s, background 0.2s;
+}
+
+.settingsBtn:hover {
+  color: #fff;
+  background: #333;
+}
+
+.settingsBtnActive {
+  color: #fff;
+  background: #333;
+}
+
+/* Threshold settings panel */
+.thresholdPanel {
+  background: #1a1a1a;
+  border-bottom: 1px solid #333;
+  padding: 8px 12px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 8px;
+  font-size: 11px;
+  color: #aaa;
+}
+
+.thresholdRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.thresholdLabel {
+  width: 100px;
+  font-weight: 600;
+  color: #888;
+  text-transform: uppercase;
+  font-size: 10px;
+}
+
+.thresholdInput {
+  width: 54px;
+  background: #222;
+  border: 1px solid #444;
+  border-radius: 3px;
+  color: #ddd;
+  padding: 2px 4px;
+  font-size: 11px;
+  font-family: inherit;
+  text-align: right;
+}
+
+.thresholdInput:focus {
+  outline: none;
+  border-color: #666;
+}
+
+.thresholdTag {
+  font-size: 9px;
+  padding: 1px 4px;
+  border-radius: 2px;
+  font-weight: 600;
+}
+
+.tagYellow {
+  background: rgba(255, 152, 0, 0.2);
+  color: #ff9800;
+}
+
+.tagRed {
+  background: rgba(244, 67, 54, 0.2);
+  color: #f44336;
+}
+
+.tagLow {
+  background: rgba(255, 152, 0, 0.2);
+  color: #ff9800;
+}
+
+.tagCritical {
+  background: rgba(244, 67, 54, 0.2);
+  color: #f44336;
+}
+
+/* Color classes */
+.colorGreen { color: #4caf50; }
+.colorYellow { color: #ff9800; }
+.colorRed { color: #f44336; }
+.colorUnknown { color: #666; }
+
+.fillGreen { background-color: #4caf50; }
+.fillYellow { background-color: #ff9800; }
+.fillRed { background-color: #f44336; }
+.fillUnknown { background-color: #444; }

@@ -111,7 +111,7 @@ export async function fetchCurrentDrillstring(assetId: number): Promise<unknown 
       const d = ds.data as Record<string, unknown> | undefined;
       return { id: Number(d?.id ?? 0), name: d?.name ?? '' };
     });
-    log(`Found ${arr.length} non-planning BHAs: ${bhaList.map(b => `#${b.id} "${b.name}"`).join(', ')}`);
+    log(`Found ${arr.length} non-planning BHAs`);
 
     // Sort by numeric BHA ID descending — handles string or number data.id
     arr.sort((a, b) => {

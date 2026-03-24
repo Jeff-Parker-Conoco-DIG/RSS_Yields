@@ -1,0 +1,43 @@
+.container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: #141414;
+}
+
+.emptyState {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-height: 200px;
+  color: #888;
+  font-size: 13px;
+  font-family: 'Roboto Mono', monospace;
+}
+
+.tooltip {
+  position: fixed;
+  pointer-events: none;
+  background: #222;
+  border: 1px solid #444;
+  border-radius: 4px;
+  padding: 8px 10px;
+  color: #ddd;
+  font-family: 'Roboto Mono', monospace;
+  font-size: 11px;
+  line-height: 1.5;
+  z-index: 20;
+  white-space: nowrap;
+}
+
+.tooltipLabel {
+  color: #888;
+  margin-right: 4px;
+}
+
+.tooltipValue {
+  color: #fff;
+}

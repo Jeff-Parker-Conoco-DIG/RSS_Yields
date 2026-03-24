@@ -40,7 +40,7 @@
 }
 
 .tooltip {
-  position: absolute;
+  position: fixed;
   background: #333;
   border: 1px solid #555;
   border-radius: 4px;
@@ -48,6 +48,6 @@
   color: #ddd;
   font-size: 11px;
   pointer-events: none;
-  z-index: 10;
+  z-index: 1000;
   white-space: nowrap;
 }

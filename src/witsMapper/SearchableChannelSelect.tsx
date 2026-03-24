@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import type { DiscoveredChannel } from '../api/corvaApi';
+import { buildFieldToWitsMap, searchWitsIds } from './witsIdLookup';
+import type { WitsIdEntry } from './witsIdLookup';
 import styles from './SearchableChannelSelect.module.css';
 
 interface SearchableChannelSelectProps {
@@ -30,6 +32,16 @@ function HighlightMatch({ text, query }: { text: string; query: string }) {
   );
 }
 
+/** Format WITS annotation for a channel option */
+function WitsAnnotation({ entry }: { entry: WitsIdEntry }) {
+  const parts: string[] = [];
+  if (entry.witsId > 0) parts.push(`WITS ${entry.witsId}`);
+  if (entry.rigCloudRename) parts.push(entry.rigCloudRename);
+  else if (entry.rigCloudName) parts.push(entry.rigCloudName);
+  if (parts.length === 0) return null;
+  return <span className={styles.witsAnnotation}>[{parts.join(' \u2014 ')}]</span>;
+}
+
 export const SearchableChannelSelect: React.FC<SearchableChannelSelectProps> = ({
   value,
   channels,
@@ -43,6 +55,9 @@ export const SearchableChannelSelect: React.FC<SearchableChannelSelectProps> = (
   const wrapperRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
+
+  // Build reverse lookup: Corva field → WITS entry (stable reference)
+  const fieldToWits = useMemo(() => buildFieldToWitsMap(), []);
 
   // Close on click outside
   useEffect(() => {
@@ -61,21 +76,52 @@ export const SearchableChannelSelect: React.FC<SearchableChannelSelectProps> = (
     if (open) {
       setSearch('');
       setHighlightIdx(-1);
-      // Defer to let the DOM render first
       requestAnimationFrame(() => searchRef.current?.focus());
     }
   }, [open]);
 
-  // Build searchable text for each channel: "field_name (value)"
+  // Filter channels: match field name, value, OR WITS ID/name/rename
   const filtered = useMemo(() => {
     const q = search.toLowerCase().trim();
     if (!q) return channels;
+
+    // Pre-compute WITS search matches (fields that match via the WITS table)
+    const witsMatches = searchWitsIds(q);
+    const witsMatchedFields = new Set<string>();
+    for (const entry of witsMatches) {
+      for (const f of entry.knownCorvaFields) witsMatchedFields.add(f);
+    }
+
     return channels.filter((ch) => {
+      // Match field name
+      if (ch.field.toLowerCase().includes(q)) return true;
+      // Match value
       const valStr = formatValue(ch.lastValue);
-      const combined = `${ch.field} ${valStr}`.toLowerCase();
-      return combined.includes(q);
+      if (valStr && valStr.includes(q)) return true;
+      // Match via WITS table (field has a known WITS entry matching the query)
+      if (witsMatchedFields.has(ch.field)) return true;
+      // Match WITS entry directly associated with this field
+      const witsEntry = fieldToWits.get(ch.field);
+      if (witsEntry) {
+        if (witsEntry.witsId > 0 && String(witsEntry.witsId).includes(q)) return true;
+        if (witsEntry.rigCloudName.toLowerCase().includes(q)) return true;
+        if (witsEntry.rigCloudRename.toLowerCase().includes(q)) return true;
+      }
+      return false;
     });
-  }, [channels, search]);
+  }, [channels, search, fieldToWits]);
+
+  // Find WITS hints for channels NOT in the discovered list
+  const missingWitsHints = useMemo(() => {
+    const q = search.toLowerCase().trim();
+    if (!q) return [];
+    const witsMatches = searchWitsIds(q);
+    const discoveredFields = new Set(channels.map((ch) => ch.field));
+    return witsMatches.filter((entry) =>
+      entry.knownCorvaFields.length === 0 ||
+      entry.knownCorvaFields.every((f) => !discoveredFields.has(f)),
+    );
+  }, [search, channels]);
 
   const activeFiltered = useMemo(() => filtered.filter((ch) => ch.hasData), [filtered]);
   const inactiveFiltered = useMemo(() => filtered.filter((ch) => !ch.hasData), [filtered]);
@@ -160,7 +206,7 @@ export const SearchableChannelSelect: React.FC<SearchableChannelSelectProps> = (
             className={styles.searchInput}
             value={search}
             onChange={(e) => { setSearch(e.target.value); setHighlightIdx(-1); }}
-            placeholder="Search channels..."
+            placeholder="Search by name, value, or WITS ID..."
             onKeyDown={handleKeyDown}
           />
           <div className={styles.optionsList} ref={listRef}>
@@ -189,10 +235,10 @@ export const SearchableChannelSelect: React.FC<SearchableChannelSelectProps> = (
               <>
                 <div className={styles.groupHeader}>Active Channels ({activeFiltered.length})</div>
                 {activeFiltered.map((ch) => {
-                  // Offset: 1 for clear + (1 for warning if present)
                   const idx = 1 + (value && !currentInList ? 1 : 0) + itemIdx;
                   itemIdx++;
                   const isSelected = ch.field === value;
+                  const witsEntry = fieldToWits.get(ch.field);
                   return (
                     <div
                       key={ch.field}
@@ -208,6 +254,7 @@ export const SearchableChannelSelect: React.FC<SearchableChannelSelectProps> = (
                           (<HighlightMatch text={formatValue(ch.lastValue)} query={search} />)
                         </span>
                       )}
+                      {witsEntry && <WitsAnnotation entry={witsEntry} />}
                     </div>
                   );
                 })}
@@ -222,6 +269,7 @@ export const SearchableChannelSelect: React.FC<SearchableChannelSelectProps> = (
                   const idx = 1 + (value && !currentInList ? 1 : 0) + itemIdx;
                   itemIdx++;
                   const isSelected = ch.field === value;
+                  const witsEntry = fieldToWits.get(ch.field);
                   return (
                     <div
                       key={ch.field}
@@ -232,15 +280,34 @@ export const SearchableChannelSelect: React.FC<SearchableChannelSelectProps> = (
                       <span className={styles.optionField}>
                         <HighlightMatch text={ch.field} query={search} />
                       </span>
+                      {witsEntry && <WitsAnnotation entry={witsEntry} />}
                     </div>
                   );
                 })}
               </>
             )}
 
+            {/* Missing channel hints from WITS table */}
+            {missingWitsHints.length > 0 && (
+              <>
+                <div className={styles.groupHeader}>Not Found on Well</div>
+                {missingWitsHints.map((entry) => (
+                  <div key={`hint-${entry.witsId}-${entry.rigCloudRename}`} className={styles.witsHint}>
+                    <span className={styles.witsHintName}>
+                      {entry.witsId > 0 ? `WITS ${entry.witsId}: ` : ''}{entry.rigCloudName}
+                      {entry.rigCloudRename ? ` (${entry.rigCloudRename})` : ''}
+                    </span>
+                    <span className={styles.witsHintWarning}>
+                      Not found in WITS data — may not be configured in RigCloud
+                    </span>
+                  </div>
+                ))}
+              </>
+            )}
+
             {/* No results */}
-            {activeFiltered.length === 0 && inactiveFiltered.length === 0 && search && (
-              <div className={styles.noResults}>No channels matching "{search}"</div>
+            {activeFiltered.length === 0 && inactiveFiltered.length === 0 && missingWitsHints.length === 0 && search && (
+              <div className={styles.noResults}>No channels matching &ldquo;{search}&rdquo;</div>
             )}
           </div>
         </div>
