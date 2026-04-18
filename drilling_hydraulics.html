@@ -1,0 +1,1829 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rig Hydraulics — Drilling Hydraulics Calculator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0b0f14;
+    --bg-2: #11161e;
+    --panel: #141a23;
+    --panel-2: #1a2230;
+    --border: #243142;
+    --border-hot: #384b66;
+    --text: #e8ecf2;
+    --text-dim: #8a97ab;
+    --text-faint: #5c6778;
+    --amber: #ff9f2e;
+    --amber-dim: #b36c1c;
+    --teal: #4ec9b0;
+    --teal-dim: #2f8a78;
+    --green: #86d97a;
+    --red: #e06c75;
+    --yellow: #e5c07b;
+    --blue: #61afef;
+    --mono: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+    --sans: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+    --display: 'Oswald', 'IBM Plex Sans', sans-serif;
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;line-height:1.5}
+  body{
+    min-height:100vh;
+    background-image:
+      radial-gradient(ellipse at top, rgba(255,159,46,0.04), transparent 55%),
+      radial-gradient(ellipse at bottom right, rgba(78,201,176,0.03), transparent 50%),
+      linear-gradient(180deg, #0b0f14 0%, #0a0d12 100%);
+    background-attachment: fixed;
+  }
+
+  /* Subtle scanline texture */
+  body::before{
+    content:"";
+    position:fixed; inset:0;
+    pointer-events:none;
+    background-image: repeating-linear-gradient(0deg, rgba(255,255,255,0.012) 0 1px, transparent 1px 3px);
+    z-index:0;
+  }
+
+  /* Header */
+  header{
+    position:sticky; top:0; z-index:10;
+    background: rgba(11,15,20,0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 24px;
+  }
+  .header-inner{
+    display:flex; align-items:center; justify-content:space-between; gap:24px;
+    max-width: 1800px; margin: 0 auto;
+  }
+  .brand{display:flex; align-items:center; gap:14px}
+  .brand-mark{
+    width:38px; height:38px;
+    background: linear-gradient(135deg, var(--amber) 0%, var(--amber-dim) 100%);
+    display:flex; align-items:center; justify-content:center;
+    color:#0b0f14; font-family:var(--display); font-weight:700; font-size:18px;
+    letter-spacing:.05em;
+    clip-path: polygon(14% 0, 100% 0, 100% 86%, 86% 100%, 0 100%, 0 14%);
+  }
+  .brand-text h1{
+    font-family: var(--display);
+    font-size: 22px; font-weight:600; letter-spacing: .12em;
+    color: var(--text); text-transform: uppercase;
+  }
+  .brand-text .sub{
+    font-family: var(--mono); font-size: 10px; color: var(--text-dim);
+    letter-spacing: .2em; text-transform: uppercase; margin-top: 2px;
+  }
+  .header-controls{display:flex; align-items:center; gap:12px; flex-wrap:wrap}
+  .status-chip{
+    display:inline-flex; align-items:center; gap:8px;
+    background: var(--panel); border:1px solid var(--border);
+    padding: 6px 12px; font-family: var(--mono); font-size: 11px;
+    color: var(--text-dim); text-transform: uppercase; letter-spacing: .1em;
+  }
+  .led{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green)}
+  .led.warn{background:var(--yellow);box-shadow:0 0 8px var(--yellow)}
+  .led.err{background:var(--red);box-shadow:0 0 8px var(--red)}
+
+  /* Layout */
+  main{
+    max-width: 1800px; margin: 0 auto;
+    padding: 24px;
+    display: grid;
+    grid-template-columns: minmax(420px, 520px) 1fr;
+    gap: 24px;
+    position:relative; z-index:1;
+  }
+  @media (max-width: 1100px){
+    main{grid-template-columns: 1fr}
+  }
+
+  /* Panel */
+  .panel{
+    background: var(--panel);
+    border: 1px solid var(--border);
+    position: relative;
+  }
+  /* Targeting brackets */
+  .panel::before, .panel::after{
+    content:""; position:absolute; width:10px; height:10px;
+    border: 1px solid var(--amber); opacity:.7;
+    pointer-events: none;
+  }
+  .panel::before{top:-1px; left:-1px; border-right:none; border-bottom:none}
+  .panel::after{bottom:-1px; right:-1px; border-left:none; border-top:none}
+
+  .panel-header{
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(90deg, rgba(255,159,46,0.06), transparent 60%);
+  }
+  .panel-title{
+    font-family: var(--display);
+    font-size: 13px; font-weight: 600; letter-spacing: .16em;
+    color: var(--text); text-transform: uppercase;
+    display:flex; align-items:center; gap:10px;
+  }
+  .panel-title::before{
+    content:""; width: 3px; height: 14px; background: var(--amber);
+  }
+  .panel-body{padding: 16px}
+
+  /* Groups / sections */
+  .section{margin-bottom: 18px}
+  .section:last-child{margin-bottom:0}
+  .section-label{
+    font-family: var(--mono); font-size: 10px;
+    color: var(--text-dim); letter-spacing: .2em; text-transform: uppercase;
+    margin-bottom: 8px;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+
+  /* Inputs */
+  .grid{display:grid; gap: 8px}
+  .grid-2{grid-template-columns: 1fr 1fr}
+  .grid-3{grid-template-columns: 1fr 1fr 1fr}
+  .grid-4{grid-template-columns: repeat(4, 1fr)}
+  .grid-6{grid-template-columns: repeat(6, 1fr)}
+
+  .field{display:flex; flex-direction:column; gap:4px}
+  .field label{
+    font-family: var(--mono); font-size: 10px;
+    color: var(--text-dim); letter-spacing: .12em; text-transform: uppercase;
+    display:flex; justify-content:space-between; align-items:center;
+  }
+  .field label .unit{color: var(--text-faint)}
+  .field input, .field select{
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 8px 10px;
+    font-family: var(--mono); font-size: 13px; font-weight: 500;
+    outline: none;
+    transition: border-color .15s, background .15s;
+    width: 100%;
+  }
+  .field input:focus, .field select:focus{
+    border-color: var(--amber);
+    background: #0e141d;
+  }
+  .field input:hover, .field select:hover{border-color: var(--border-hot)}
+  .field input[readonly]{
+    color: var(--teal);
+    background: rgba(78,201,176,0.04);
+    border-color: rgba(78,201,176,0.2);
+  }
+
+  /* Inline unit chip */
+  .with-unit{position:relative}
+  .with-unit .u{
+    position:absolute; right:10px; top:50%; transform:translateY(-50%);
+    font-family: var(--mono); font-size: 10px; color: var(--text-faint);
+    letter-spacing:.1em; pointer-events:none;
+  }
+  .with-unit input{padding-right: 42px}
+
+  /* Buttons */
+  .btn{
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    font-family: var(--mono); font-size: 11px; font-weight: 500;
+    letter-spacing: .1em; text-transform: uppercase;
+    padding: 7px 12px;
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .btn:hover{border-color: var(--amber); color: var(--amber); background: rgba(255,159,46,0.05)}
+  .btn.primary{border-color: var(--amber); color: var(--amber); background: rgba(255,159,46,0.08)}
+  .btn.primary:hover{background: rgba(255,159,46,0.14)}
+  .btn.danger:hover{border-color: var(--red); color: var(--red); background: rgba(224,108,117,0.05)}
+  .btn.small{padding: 4px 8px; font-size: 10px}
+
+  /* Tables */
+  .tbl{
+    width:100%; border-collapse: collapse;
+    font-family: var(--mono); font-size: 12px;
+  }
+  .tbl th{
+    background: var(--bg-2);
+    color: var(--text-dim);
+    font-weight: 500; font-size: 10px;
+    letter-spacing: .14em; text-transform: uppercase;
+    padding: 8px 10px;
+    text-align: right;
+    border-bottom: 1px solid var(--border);
+    border-top: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  .tbl th:first-child{text-align:left}
+  .tbl td{
+    padding: 6px 10px;
+    border-bottom: 1px solid rgba(36,49,66,.5);
+    text-align: right;
+    color: var(--text);
+    white-space: nowrap;
+  }
+  .tbl td:first-child{text-align:left; color: var(--text-dim)}
+  .tbl tbody tr:hover{background: rgba(255,255,255,.02)}
+  .tbl .num{color: var(--teal); font-weight: 500}
+  .tbl .num-hot{color: var(--amber); font-weight: 600}
+  .tbl .num-warn{color: var(--yellow); font-weight: 500}
+  .tbl .num-err{color: var(--red); font-weight: 500}
+  .tbl tfoot td{
+    background: var(--bg-2);
+    font-weight: 600; color: var(--text);
+    border-top: 1px solid var(--border);
+    border-bottom: none;
+  }
+  .tbl input{
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--text);
+    font-family: var(--mono); font-size: 12px;
+    padding: 4px 6px;
+    width: 100%; text-align: right;
+    outline: none;
+  }
+  .tbl input:hover{border-color: var(--border)}
+  .tbl input:focus{border-color: var(--amber); background: var(--bg-2)}
+  .tbl input.text-in{text-align:left}
+  .tbl .row-actions{text-align:center}
+  .tbl .row-actions button{
+    background:transparent; border:none; color: var(--text-faint);
+    cursor:pointer; font-family: var(--mono); font-size: 14px; padding: 2px 6px;
+  }
+  .tbl .row-actions button:hover{color: var(--red)}
+
+  /* KPI grid for results */
+  .kpi-grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+  }
+  .kpi{
+    background: var(--panel);
+    padding: 14px 16px;
+    display:flex; flex-direction:column; gap:4px;
+  }
+  .kpi-label{
+    font-family: var(--mono); font-size: 10px;
+    color: var(--text-dim); letter-spacing: .14em; text-transform: uppercase;
+  }
+  .kpi-value{
+    font-family: var(--mono); font-size: 22px; font-weight: 600;
+    color: var(--teal); letter-spacing: .02em;
+  }
+  .kpi-value.hot{color: var(--amber)}
+  .kpi-value.warn{color: var(--yellow)}
+  .kpi-value.err{color: var(--red)}
+  .kpi-sub{
+    font-family: var(--mono); font-size: 11px; color: var(--text-faint);
+  }
+  .kpi.big .kpi-value{font-size: 28px}
+
+  /* Flow regime pill */
+  .pill{
+    display:inline-block; padding: 2px 8px;
+    font-family: var(--mono); font-size: 10px;
+    letter-spacing: .1em; text-transform: uppercase;
+    border: 1px solid currentColor;
+  }
+  .pill.lam{color: var(--blue)}
+  .pill.trans{color: var(--yellow)}
+  .pill.turb{color: var(--amber)}
+
+  /* Toolbar above tables */
+  .tbl-tools{
+    display:flex; justify-content:space-between; align-items:center;
+    margin-bottom: 6px;
+  }
+
+  /* Formula drawer */
+  details.formulas{
+    margin-top: 16px;
+    border: 1px solid var(--border);
+    background: var(--bg-2);
+  }
+  details.formulas summary{
+    padding: 10px 14px;
+    font-family: var(--mono); font-size: 11px;
+    color: var(--text-dim); letter-spacing: .14em; text-transform: uppercase;
+    cursor: pointer;
+    list-style: none;
+    display:flex; justify-content:space-between; align-items:center;
+  }
+  details.formulas summary::before{content: "▸"; margin-right: 8px; color: var(--amber)}
+  details.formulas[open] summary::before{content: "▾"}
+  details.formulas summary::-webkit-details-marker{display:none}
+  details.formulas .formula-body{
+    padding: 14px;
+    border-top: 1px solid var(--border);
+    font-family: var(--mono); font-size: 12px;
+    color: var(--text-dim);
+    line-height: 1.8;
+  }
+  details.formulas .formula-body code{
+    display:block; color: var(--text);
+    padding: 2px 0;
+  }
+  details.formulas .formula-body h4{
+    font-family: var(--display); font-size: 11px;
+    color: var(--amber); letter-spacing: .16em; text-transform: uppercase;
+    margin-top: 12px; margin-bottom: 6px;
+  }
+  details.formulas .formula-body h4:first-child{margin-top:0}
+
+  /* ECD gauge / progress */
+  .bar{
+    height: 6px;
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    position: relative;
+  }
+  .bar-fill{
+    height: 100%;
+    background: linear-gradient(90deg, var(--teal), var(--amber));
+    transition: width .3s;
+  }
+
+  /* Notes area */
+  .notes{
+    font-family: var(--mono); font-size: 11px;
+    color: var(--text-faint); line-height: 1.7;
+    padding: 10px 14px;
+    border-left: 2px solid var(--amber);
+    background: rgba(255,159,46,0.03);
+    margin-top: 12px;
+  }
+
+  /* Responsive tweaks */
+  @media (max-width: 640px){
+    .grid-2, .grid-3, .grid-4, .grid-6{grid-template-columns: 1fr 1fr}
+    main{padding: 12px}
+    .panel-body{padding: 12px}
+  }
+
+  /* Print */
+  @media print{
+    body{background:white; color:black}
+    body::before{display:none}
+    header{position:static}
+    .panel{break-inside: avoid}
+    .btn{display:none}
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar{width:10px; height:10px}
+  ::-webkit-scrollbar-track{background: var(--bg)}
+  ::-webkit-scrollbar-thumb{background: var(--border); border:2px solid var(--bg)}
+  ::-webkit-scrollbar-thumb:hover{background: var(--border-hot)}
+
+  /* Tab controls */
+  .tabs{display:flex; gap:2px; margin-bottom:12px}
+  .tab{
+    flex:1; padding: 8px 10px;
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    font-family: var(--mono); font-size: 10px;
+    letter-spacing: .12em; text-transform: uppercase;
+    cursor: pointer;
+    text-align:center;
+    transition: all .15s;
+  }
+  .tab.active{color: var(--amber); border-color: var(--amber); background: rgba(255,159,46,0.05)}
+
+  .tab-content{display:none}
+  .tab-content.active{display:block}
+
+  /* Scrolling tables */
+  .tbl-wrap{overflow-x: auto; margin: 0 -16px; padding: 0 16px}
+
+  .footer-note{
+    font-family: var(--mono); font-size: 10px;
+    color: var(--text-faint); letter-spacing:.1em;
+    padding: 24px; text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="brand">
+      <div class="brand-mark">RH</div>
+      <div class="brand-text">
+        <h1>Rig Hydraulics</h1>
+        <div class="sub">Drilling Fluid Circulation Analysis</div>
+      </div>
+    </div>
+    <div class="header-controls">
+      <div class="status-chip"><span class="led" id="statusLed"></span><span id="statusText">Solved</span></div>
+      <button class="btn" onclick="saveCase()">Save JSON</button>
+      <button class="btn" onclick="document.getElementById('loadInput').click()">Load</button>
+      <input type="file" id="loadInput" accept=".json" style="display:none" onchange="loadCase(event)">
+      <button class="btn" onclick="window.print()">Print</button>
+      <button class="btn primary" onclick="loadExample()">Example Case</button>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- LEFT COLUMN: INPUTS -->
+  <div class="inputs-col">
+
+    <!-- Fluid Properties -->
+    <div class="panel" style="margin-bottom:24px">
+      <div class="panel-header">
+        <div class="panel-title">Fluid Properties</div>
+        <select id="rheoModel" class="btn small" style="padding:4px 8px;background:var(--bg-2);color:var(--text);letter-spacing:.05em">
+          <option value="powerlaw">Power Law (API RP 13D)</option>
+          <option value="herschel">Herschel-Bulkley</option>
+          <option value="bingham">Bingham Plastic</option>
+        </select>
+      </div>
+      <div class="panel-body">
+        <div class="section">
+          <div class="section-label">Mud Weight & Temperature</div>
+          <div class="grid grid-3">
+            <div class="field">
+              <label>Mud Weight <span class="unit">ppg</span></label>
+              <input type="number" id="mw" value="10.5" step="0.1" min="8">
+            </div>
+            <div class="field">
+              <label>Mud Temp <span class="unit">°F</span></label>
+              <input type="number" id="mudTemp" value="120" step="1">
+            </div>
+            <div class="field">
+              <label>Surface Eqpt <span class="unit">case</span></label>
+              <select id="surfCase">
+                <option value="1">Case 1 — Older rigs</option>
+                <option value="2" selected>Case 2 — Average</option>
+                <option value="3">Case 3 — New rigs</option>
+                <option value="4">Case 4 — HP rigs</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-label">Fann 35 Viscometer Readings <span>°</span></div>
+          <div class="grid grid-6">
+            <div class="field"><label>R600</label><input type="number" id="r600" value="62" step="1" min="0"></div>
+            <div class="field"><label>R300</label><input type="number" id="r300" value="38" step="1" min="0"></div>
+            <div class="field"><label>R200</label><input type="number" id="r200" value="28" step="1" min="0"></div>
+            <div class="field"><label>R100</label><input type="number" id="r100" value="18" step="1" min="0"></div>
+            <div class="field"><label>R6</label><input type="number" id="r6" value="6" step="0.1" min="0"></div>
+            <div class="field"><label>R3</label><input type="number" id="r3" value="5" step="0.1" min="0"></div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-label">Computed Rheology (Read-Only)</div>
+          <div class="grid grid-4">
+            <div class="field"><label>PV <span class="unit">cp</span></label><input type="text" id="pv" readonly></div>
+            <div class="field"><label>YP <span class="unit">lbf/100ft²</span></label><input type="text" id="yp" readonly></div>
+            <div class="field"><label>n <span class="unit">pipe</span></label><input type="text" id="npipe" readonly></div>
+            <div class="field"><label>K <span class="unit">pipe</span></label><input type="text" id="kpipe" readonly></div>
+            <div class="field"><label>n <span class="unit">ann</span></label><input type="text" id="nann" readonly></div>
+            <div class="field"><label>K <span class="unit">ann</span></label><input type="text" id="kann" readonly></div>
+            <div class="field"><label>τy <span class="unit">HB</span></label><input type="text" id="tauy" readonly></div>
+            <div class="field"><label>n <span class="unit">HB</span></label><input type="text" id="nhb" readonly></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pump / Flow -->
+    <div class="panel" style="margin-bottom:24px">
+      <div class="panel-header">
+        <div class="panel-title">Pump & Flow</div>
+      </div>
+      <div class="panel-body">
+        <div class="grid grid-3">
+          <div class="field">
+            <label>Flow Rate <span class="unit">gpm</span></label>
+            <input type="number" id="gpm" value="450" step="10" min="0">
+          </div>
+          <div class="field">
+            <label>Pump Efficiency <span class="unit">%</span></label>
+            <input type="number" id="pumpEff" value="95" step="1" min="1" max="100">
+          </div>
+          <div class="field">
+            <label>Pump Rated HHP <span class="unit">hp</span></label>
+            <input type="number" id="pumpRated" value="1600" step="50" min="0">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Wellbore Geometry -->
+    <div class="panel" style="margin-bottom:24px">
+      <div class="panel-header">
+        <div class="panel-title">Wellbore Geometry</div>
+        <button class="btn small" onclick="addHoleSection()">+ Section</button>
+      </div>
+      <div class="panel-body">
+        <div class="tbl-wrap">
+          <table class="tbl" id="holeTable">
+            <thead>
+              <tr>
+                <th style="width:22%">Description</th>
+                <th>ID (in)</th>
+                <th>MD Top (ft)</th>
+                <th>MD Btm (ft)</th>
+                <th>TVD Btm (ft)</th>
+                <th>Cased</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="holeBody"></tbody>
+          </table>
+        </div>
+        <div class="notes">
+          Ordered surface → bottom. Enter casing IDs for cased sections and hole diameter for open hole. TVD at bottom is used for ECD at each section.
+        </div>
+      </div>
+    </div>
+
+    <!-- Drillstring -->
+    <div class="panel" style="margin-bottom:24px">
+      <div class="panel-header">
+        <div class="panel-title">Drillstring</div>
+        <button class="btn small" onclick="addStringComp()">+ Component</button>
+      </div>
+      <div class="panel-body">
+        <div class="tbl-wrap">
+          <table class="tbl" id="stringTable">
+            <thead>
+              <tr>
+                <th style="width:22%">Description</th>
+                <th>OD (in)</th>
+                <th>ID (in)</th>
+                <th>Length (ft)</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="stringBody"></tbody>
+          </table>
+        </div>
+        <div class="notes">
+          Ordered top → bottom. Σ length should equal total MD (bit depth).
+        </div>
+      </div>
+    </div>
+
+    <!-- Bit -->
+    <div class="panel" style="margin-bottom:24px">
+      <div class="panel-header">
+        <div class="panel-title">Bit</div>
+      </div>
+      <div class="panel-body">
+        <div class="section">
+          <div class="grid grid-3">
+            <div class="field">
+              <label>Bit Size <span class="unit">in</span></label>
+              <input type="number" id="bitSize" value="8.75" step="0.125" min="0">
+            </div>
+            <div class="field">
+              <label>Discharge Coef <span class="unit">Cd</span></label>
+              <input type="number" id="bitCd" value="0.95" step="0.01" min="0.1" max="1">
+            </div>
+            <div class="field">
+              <label>TFA <span class="unit">in²</span></label>
+              <input type="text" id="bitTFA" readonly>
+            </div>
+          </div>
+        </div>
+        <div class="section">
+          <div class="section-label">Nozzles <span>sizes in 32nds — set to 0 to disable</span></div>
+          <div class="grid grid-6">
+            <div class="field"><label>Nozzle 1</label><input type="number" id="n1" value="14" step="1" min="0"></div>
+            <div class="field"><label>Nozzle 2</label><input type="number" id="n2" value="14" step="1" min="0"></div>
+            <div class="field"><label>Nozzle 3</label><input type="number" id="n3" value="14" step="1" min="0"></div>
+            <div class="field"><label>Nozzle 4</label><input type="number" id="n4" value="0" step="1" min="0"></div>
+            <div class="field"><label>Nozzle 5</label><input type="number" id="n5" value="0" step="1" min="0"></div>
+            <div class="field"><label>Nozzle 6</label><input type="number" id="n6" value="0" step="1" min="0"></div>
+            <div class="field"><label>Nozzle 7</label><input type="number" id="n7" value="0" step="1" min="0"></div>
+            <div class="field"><label>Nozzle 8</label><input type="number" id="n8" value="0" step="1" min="0"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Downhole Tool Losses -->
+    <div class="panel" style="margin-bottom:24px">
+      <div class="panel-header">
+        <div class="panel-title">Downhole Tool Pressure Drops</div>
+        <button class="btn small" onclick="addTool()">+ Tool</button>
+      </div>
+      <div class="panel-body">
+        <div class="tbl-wrap">
+          <table class="tbl" id="toolTable">
+            <thead>
+              <tr>
+                <th style="width:60%">Tool / Description</th>
+                <th>ΔP (psi)</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="toolBody"></tbody>
+          </table>
+        </div>
+        <div class="notes">
+          Vendor-spec pressure drops at current flow rate (motor power section, MWD pulser, RSS, circulating subs, etc). Reference vendor charts.
+        </div>
+      </div>
+    </div>
+
+    <!-- Cuttings -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">Hole Cleaning Inputs</div>
+      </div>
+      <div class="panel-body">
+        <div class="grid grid-3">
+          <div class="field">
+            <label>Cuttings Density <span class="unit">ppg / g/cc</span></label>
+            <input type="number" id="cutDens" value="21.0" step="0.1" min="5">
+          </div>
+          <div class="field">
+            <label>Cuttings Size <span class="unit">in</span></label>
+            <input type="number" id="cutSize" value="0.25" step="0.05" min="0.01">
+          </div>
+          <div class="field">
+            <label>ROP <span class="unit">ft/hr</span></label>
+            <input type="number" id="ropInput" value="80" step="5" min="0">
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- RIGHT COLUMN: RESULTS -->
+  <div class="results-col">
+
+    <!-- Top-line KPIs -->
+    <div class="panel" style="margin-bottom:24px">
+      <div class="panel-header">
+        <div class="panel-title">System Overview</div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--text-dim);letter-spacing:.1em">LIVE CALC</div>
+      </div>
+      <div class="panel-body" style="padding:0">
+        <div class="kpi-grid">
+          <div class="kpi big">
+            <div class="kpi-label">System Pressure</div>
+            <div class="kpi-value hot" id="kpiSysP">—</div>
+            <div class="kpi-sub" id="kpiSysPSub">psi</div>
+          </div>
+          <div class="kpi big">
+            <div class="kpi-label">Pump HHP Used</div>
+            <div class="kpi-value" id="kpiPumpHHP">—</div>
+            <div class="kpi-sub" id="kpiPumpHHPSub">hp @ flow</div>
+          </div>
+          <div class="kpi big">
+            <div class="kpi-label">Bit HHP</div>
+            <div class="kpi-value" id="kpiBitHHP">—</div>
+            <div class="kpi-sub" id="kpiBitHHPSub">hp / % of system</div>
+          </div>
+          <div class="kpi big">
+            <div class="kpi-label">HSI</div>
+            <div class="kpi-value" id="kpiHSI">—</div>
+            <div class="kpi-sub">hp/in² at bit</div>
+          </div>
+          <div class="kpi big">
+            <div class="kpi-label">Jet Impact Force</div>
+            <div class="kpi-value" id="kpiIF">—</div>
+            <div class="kpi-sub">lbf</div>
+          </div>
+          <div class="kpi big">
+            <div class="kpi-label">ECD @ TD</div>
+            <div class="kpi-value" id="kpiECD">—</div>
+            <div class="kpi-sub" id="kpiECDSub">ppg</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pressure Loss Breakdown -->
+    <div class="panel" style="margin-bottom:24px">
+      <div class="panel-header">
+        <div class="panel-title">Pressure Loss Breakdown</div>
+      </div>
+      <div class="panel-body">
+        <div class="tbl-wrap">
+          <table class="tbl" id="breakdownTable">
+            <thead>
+              <tr>
+                <th>Component</th>
+                <th>Length (ft)</th>
+                <th>Vel (ft/s)</th>
+                <th>Re</th>
+                <th>Regime</th>
+                <th>ΔP (psi)</th>
+                <th>% Sys</th>
+              </tr>
+            </thead>
+            <tbody id="breakdownBody"></tbody>
+            <tfoot>
+              <tr><td colspan="5">Total System</td><td id="totalP">—</td><td>100%</td></tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bit Hydraulics -->
+    <div class="panel" style="margin-bottom:24px">
+      <div class="panel-header">
+        <div class="panel-title">Bit Hydraulics</div>
+      </div>
+      <div class="panel-body" style="padding:0">
+        <div class="kpi-grid">
+          <div class="kpi">
+            <div class="kpi-label">TFA</div>
+            <div class="kpi-value" id="bTFA">—</div>
+            <div class="kpi-sub">in²</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label">ΔP Bit</div>
+            <div class="kpi-value" id="bdP">—</div>
+            <div class="kpi-sub">psi</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label">Nozzle Velocity</div>
+            <div class="kpi-value" id="bVn">—</div>
+            <div class="kpi-sub">ft/s</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label">HHP at Bit</div>
+            <div class="kpi-value" id="bHHP">—</div>
+            <div class="kpi-sub">hp</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label">HSI</div>
+            <div class="kpi-value" id="bHSI">—</div>
+            <div class="kpi-sub">hp/in²</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label">Jet Impact Force</div>
+            <div class="kpi-value" id="bIF">—</div>
+            <div class="kpi-sub">lbf</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label">% ΔP at Bit</div>
+            <div class="kpi-value" id="bPct">—</div>
+            <div class="kpi-sub">% of system</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label">Impact per Bit Area</div>
+            <div class="kpi-value" id="bIFarea">—</div>
+            <div class="kpi-sub">lbf/in²</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Annular Analysis -->
+    <div class="panel" style="margin-bottom:24px">
+      <div class="panel-header">
+        <div class="panel-title">Annular Flow & ECD</div>
+      </div>
+      <div class="panel-body">
+        <div class="tbl-wrap">
+          <table class="tbl" id="annTable">
+            <thead>
+              <tr>
+                <th>Hole Section × Tubular</th>
+                <th>MD Btm (ft)</th>
+                <th>TVD (ft)</th>
+                <th>Vel (ft/min)</th>
+                <th>Re</th>
+                <th>Regime</th>
+                <th>ΔP (psi)</th>
+                <th>ECD (ppg)</th>
+              </tr>
+            </thead>
+            <tbody id="annBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hole Cleaning -->
+    <div class="panel" style="margin-bottom:24px">
+      <div class="panel-header">
+        <div class="panel-title">Hole Cleaning</div>
+      </div>
+      <div class="panel-body" style="padding:0">
+        <div class="kpi-grid">
+          <div class="kpi">
+            <div class="kpi-label">Min Annular Velocity</div>
+            <div class="kpi-value" id="hcMinAV">—</div>
+            <div class="kpi-sub" id="hcMinAVLoc">ft/min</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label">Slip Velocity (Moore)</div>
+            <div class="kpi-value" id="hcVs">—</div>
+            <div class="kpi-sub">ft/min</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label">Cuttings Transport Ratio</div>
+            <div class="kpi-value" id="hcCTR">—</div>
+            <div class="kpi-sub">(1 − Vs/Va)</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label">Cuttings Concentration</div>
+            <div class="kpi-value" id="hcConc">—</div>
+            <div class="kpi-sub">% by volume</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label">Carrying Capacity Idx</div>
+            <div class="kpi-value" id="hcCCI">—</div>
+            <div class="kpi-sub">CCI (≥1.0 good)</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label">Bit Depth MD / TVD</div>
+            <div class="kpi-value" id="hcDepth">—</div>
+            <div class="kpi-sub">ft</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Optimization Hints -->
+    <div class="panel" style="margin-bottom:24px">
+      <div class="panel-header">
+        <div class="panel-title">Flow Optimization Analysis</div>
+      </div>
+      <div class="panel-body">
+        <div class="tbl-wrap">
+          <table class="tbl" id="optTable">
+            <thead>
+              <tr>
+                <th>Criterion</th>
+                <th>Optimum % ΔP at Bit</th>
+                <th>Current % ΔP at Bit</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Max HHP at Bit (Bourgoyne)</td>
+                <td class="num">65%</td>
+                <td id="optCur1">—</td>
+                <td id="optSt1">—</td>
+              </tr>
+              <tr>
+                <td>Max Jet Impact Force</td>
+                <td class="num">48%</td>
+                <td id="optCur2">—</td>
+                <td id="optSt2">—</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="notes">
+          Based on a parasitic pressure drop exponent m ≈ 1.75. Optimum ΔP<sub>bit</sub> fractions: HHP-max = m/(m+1) ≈ 0.64; IF-max = m/(m+2) ≈ 0.47.
+        </div>
+      </div>
+    </div>
+
+    <!-- Formulas reference -->
+    <details class="formulas">
+      <summary>Equations Used — Click to Expand</summary>
+      <div class="formula-body">
+
+        <h4>Rheology — Power Law (API RP 13D, Dual-Model)</h4>
+        <code>PV = R600 − R300           [cp]</code>
+        <code>YP = R300 − PV             [lbf/100ft²]</code>
+        <code>n_pipe = 3.32 × log10(R600 / R300)</code>
+        <code>K_pipe = 5.11 × R300 / 511^n_pipe       [lbf·sⁿ/100ft²]</code>
+        <code>n_ann  = 0.657 × log10(R100 / R3)</code>
+        <code>K_ann  = 5.11 × R100 / 170.2^n_ann      [lbf·sⁿ/100ft²]</code>
+
+        <h4>Rheology — Herschel-Bulkley (Yield Power Law)</h4>
+        <code>τy = max(0, 2·R3 − R6)                [lbf/100ft²]</code>
+        <code>n_HB = 3.32 × log10((R600−τy)/(R300−τy))</code>
+        <code>K_HB = (R300 − τy) / 511^n_HB</code>
+
+        <h4>Velocities (Q gpm, D in inches)</h4>
+        <code>V_pipe (ft/s)  = Q / (2.448 · D²)</code>
+        <code>V_ann  (ft/s)  = Q / (2.448 · (Dh² − Dp²))</code>
+        <code>V_nozzle (ft/s)= Q / (3.117 · TFA)</code>
+
+        <h4>Reynolds (Generalized)</h4>
+        <code>μ_eff,p (cp) = 100·K·(96·V/D)^(n−1) · [(3n+1)/(4n)]^n</code>
+        <code>μ_eff,a (cp) = 100·K·(144·V/(Dh−Dp))^(n−1) · [(2n+1)/(3n)]^n</code>
+        <code>Re = 928 · ρ · V · D_h / μ_eff        (D_h = D pipe, or Dh−Dp annulus)</code>
+
+        <h4>Flow Regime</h4>
+        <code>Re_c1 = 3470 − 1370·n        (laminar upper)</code>
+        <code>Re_c2 = 4270 − 1370·n        (turbulent lower)</code>
+
+        <h4>Friction Factor / Pressure Loss</h4>
+        <code>Laminar:     f = 16 / Re</code>
+        <code>Turbulent:   f = a / Re^b,  a=(log n + 3.93)/50,  b=(1.75 − log n)/7</code>
+        <code>Trans:       linear interp between laminar f(Re_c1) and turb f(Re_c2)</code>
+        <code>ΔP/L (psi/ft)  pipe    = f · ρ · V² / (25.81 · D)</code>
+        <code>ΔP/L (psi/ft)  annulus = f · ρ · V² / (25.81 · (Dh − Dp))</code>
+
+        <h4>Surface Equipment (Equivalent Pipe Method)</h4>
+        <code>Treat surface eqpt as an equivalent length of 3.826" ID drill pipe</code>
+        <code>Case 1 Le=2600 ft  |  Case 2 Le=946 ft  |  Case 3 Le=610 ft  |  Case 4 Le=424 ft</code>
+        <code>ΔP_s computed using same Power Law pipe equations above</code>
+
+        <h4>Bit</h4>
+        <code>TFA = Σ (π/4) · (nozzle/32)²              [in²]</code>
+        <code>ΔP_bit = ρ · Q² / (10858 · Cd² · TFA²)    [psi]</code>
+        <code>V_n    = Q / (3.117 · TFA)                [ft/s]</code>
+        <code>HHP_bit= ΔP_bit · Q / 1714                [hp]</code>
+        <code>HSI    = HHP_bit / (π/4 · D_bit²)</code>
+        <code>IF     = 0.01823 · Cd · Q · √(ρ · ΔP_bit) [lbf]</code>
+
+        <h4>ECD</h4>
+        <code>ECD (ppg) = MW + ΣΔP_ann (surface→depth) / (0.052 · TVD)</code>
+
+        <h4>Hole Cleaning (Moore slip velocity)</h4>
+        <code>μ_a = PV + 5·YP·(Dh−Dp)/V_ann         [cp, apparent]</code>
+        <code>Laminar (Rep ≤ 3):  Vs = 4980·ds²·(ρc−ρm)/μa</code>
+        <code>Intermediate:       Vs = 174·ds·[(ρc−ρm)/ρm]^0.667 · (ρm/μa)^−0.333</code>
+        <code>Turbulent (Rep ≥ 300): Vs = 113.4·√(ds·(ρc−ρm)/ρm)</code>
+        <code>Transport Ratio = 1 − Vs/V_ann</code>
+        <code>CCI = (MW · K_ann · V_ann) / 400000</code>
+
+        <h4>Flow Optimization</h4>
+        <code>For parasitic ΔP ∝ Q^m with m ≈ 1.75:</code>
+        <code>Max HHP at bit:  ΔP_bit / ΔP_sys = m/(m+1) ≈ 64%</code>
+        <code>Max Impact Force: ΔP_bit / ΔP_sys = m/(m+2) ≈ 47%</code>
+
+      </div>
+    </details>
+
+  </div>
+</main>
+
+<div class="footer-note">
+  RIG HYDRAULICS v1.0 — API RP 13D METHODOLOGY — VERIFY INPUTS AGAINST FIELD DATA
+</div>
+
+<script>
+// =====================================================================
+// RIG HYDRAULICS CALCULATOR
+// Drilling fluid circulation analysis - API RP 13D methodology
+// =====================================================================
+
+// ---------- State ----------
+let holeSections = [];
+let stringComps  = [];
+let tools        = [];
+
+// ---------- Helpers ----------
+const $ = (id) => document.getElementById(id);
+const num = (id) => { const v = parseFloat($(id).value); return isFinite(v) ? v : 0; };
+const fmt = (v, dec=1) => {
+  if (v === null || v === undefined || !isFinite(v)) return '—';
+  if (Math.abs(v) >= 10000) return v.toExponential(2);
+  return v.toFixed(dec);
+};
+const fmtInt = (v) => (v === null || v === undefined || !isFinite(v)) ? '—' : Math.round(v).toLocaleString();
+
+// =====================================================================
+// RHEOLOGY
+// =====================================================================
+function calcRheology() {
+  const R600 = num('r600'), R300 = num('r300');
+  const R200 = num('r200'), R100 = num('r100');
+  const R6   = num('r6'),   R3   = num('r3');
+
+  const PV = R600 - R300;
+  const YP = R300 - PV;
+
+  // Power Law - pipe (high shear)
+  let npipe = 0, kpipe = 0;
+  if (R300 > 0 && R600 > R300) {
+    npipe = 3.32 * Math.log10(R600 / R300);
+    kpipe = 5.11 * R300 / Math.pow(511, npipe);
+  }
+
+  // Power Law - annulus (low shear)
+  let nann = 0, kann = 0;
+  if (R3 > 0 && R100 > R3) {
+    nann = 0.657 * Math.log10(R100 / R3);
+    kann = 5.11 * R100 / Math.pow(170.2, nann);
+  }
+
+  // Herschel-Bulkley
+  let tauY = Math.max(0, 2 * R3 - R6);
+  let nhb = 0, khb = 0;
+  if ((R600 - tauY) > 0 && (R300 - tauY) > 0) {
+    nhb = 3.32 * Math.log10((R600 - tauY) / (R300 - tauY));
+    khb = (R300 - tauY) / Math.pow(511, nhb);
+  }
+
+  $('pv').value   = fmt(PV, 1);
+  $('yp').value   = fmt(YP, 1);
+  $('npipe').value= fmt(npipe, 4);
+  $('kpipe').value= fmt(kpipe, 5);
+  $('nann').value = fmt(nann, 4);
+  $('kann').value = fmt(kann, 5);
+  $('tauy').value = fmt(tauY, 2);
+  $('nhb').value  = fmt(nhb, 4);
+
+  return { PV, YP, npipe, kpipe, nann, kann, tauY, nhb, khb, R600, R300, R6, R3, R100, R200 };
+}
+
+// =====================================================================
+// FLOW REGIME / FRICTION FACTOR
+// =====================================================================
+function frictionFactor(Re, n) {
+  // Guard rails
+  if (n <= 0) n = 0.01;
+  if (Re <= 0) return 0;
+  const Re_c1 = 3470 - 1370 * n;
+  const Re_c2 = 4270 - 1370 * n;
+
+  if (Re <= Re_c1) {
+    // Laminar
+    return { f: 16 / Re, regime: 'LAMINAR' };
+  }
+  const a = (Math.log10(n) + 3.93) / 50;
+  const b = (1.75 - Math.log10(n)) / 7;
+  const f_turb = a / Math.pow(Re, b);
+
+  if (Re >= Re_c2) {
+    return { f: f_turb, regime: 'TURBULENT' };
+  }
+  // Transitional - interpolate
+  const f_lam = 16 / Re_c1;
+  const f_turb_at_c2 = a / Math.pow(Re_c2, b);
+  const frac = (Re - Re_c1) / (Re_c2 - Re_c1);
+  const f = f_lam + frac * (f_turb_at_c2 - f_lam);
+  return { f, regime: 'TRANSITIONAL' };
+}
+
+// =====================================================================
+// PIPE FLOW
+// =====================================================================
+// Q: gpm, Di: inside dia in
+// Returns ΔP (psi) over length L (ft), Re, regime, velocity ft/s
+function pipeFlow(Q, Di, L, rho, n, K) {
+  if (Di <= 0 || L <= 0 || Q <= 0) return { dP: 0, Re: 0, regime: '—', V: 0 };
+  const V = Q / (2.448 * Di * Di); // ft/s
+
+  // Effective wall viscosity (cp) from Power Law
+  // μ_eff = 100·K·(96·V/D)^(n-1) · [(3n+1)/(4n)]^n
+  const shearRate = 96 * V / Di; // 1/s nominal Newtonian wall shear rate
+  // Guard against shearRate = 0
+  let mu_eff;
+  if (shearRate <= 0 || K <= 0 || n <= 0) {
+    mu_eff = 1;
+  } else {
+    mu_eff = 100 * K * Math.pow(shearRate, n - 1) * Math.pow((3 * n + 1) / (4 * n), n);
+  }
+  const Re = 928 * rho * V * Di / mu_eff;
+  const { f, regime } = frictionFactor(Re, n);
+  const dPdL = f * rho * V * V / (25.81 * Di); // psi/ft
+  return { dP: dPdL * L, Re, regime, V, mu_eff };
+}
+
+// =====================================================================
+// ANNULAR FLOW
+// =====================================================================
+function annFlow(Q, Dh, Dp, L, rho, n, K) {
+  if (Dh <= Dp || L <= 0 || Q <= 0) return { dP: 0, Re: 0, regime: '—', V: 0 };
+  const gap = Dh - Dp;
+  const V = Q / (2.448 * (Dh * Dh - Dp * Dp)); // ft/s
+
+  // Effective wall viscosity - annulus formulation
+  const shearRate = 144 * V / gap;
+  let mu_eff;
+  if (shearRate <= 0 || K <= 0 || n <= 0) {
+    mu_eff = 1;
+  } else {
+    mu_eff = 100 * K * Math.pow(shearRate, n - 1) * Math.pow((2 * n + 1) / (3 * n), n);
+  }
+  const Re = 928 * rho * V * gap / mu_eff;
+  const { f, regime } = frictionFactor(Re, n);
+  const dPdL = f * rho * V * V / (25.81 * gap); // psi/ft
+  return { dP: dPdL * L, Re, regime, V, mu_eff, gap };
+}
+
+// =====================================================================
+// SURFACE EQUIPMENT (Equivalent Pipe Method)
+// Surface equipment (standpipe, hose, swivel, kelly) represented as
+// equivalent length of 3.826" ID drill pipe. API RP 13D / industry values.
+// =====================================================================
+function surfaceDP(Q, rho, nP, kP, caseNum) {
+  const Le = { 1: 2600, 2: 946, 3: 610, 4: 424 }[caseNum] || 946; // ft
+  const De = 3.826; // in — equivalent pipe ID
+  const r = pipeFlow(Q, De, Le, rho, nP, kP);
+  return r.dP;
+}
+
+// =====================================================================
+// BIT HYDRAULICS
+// =====================================================================
+function bitHydraulics(Q, rho, Cd, nozzles, Dbit, dP_total) {
+  // TFA in in²
+  let TFA = 0;
+  nozzles.forEach(n32 => {
+    if (n32 > 0) {
+      const d = n32 / 32;
+      TFA += Math.PI / 4 * d * d;
+    }
+  });
+
+  if (TFA <= 0 || Q <= 0) return { TFA: 0, dP: 0, Vn: 0, HHP: 0, HSI: 0, IF: 0, pct: 0 };
+
+  const dP = (rho * Q * Q) / (10858 * Cd * Cd * TFA * TFA); // psi
+  const Vn = Q / (3.117 * TFA); // ft/s
+  const HHP = dP * Q / 1714;
+  const bitArea = Math.PI / 4 * Dbit * Dbit;
+  const HSI = bitArea > 0 ? HHP / bitArea : 0;
+  const IF = 0.01823 * Cd * Q * Math.sqrt(rho * dP);
+  const pct = dP_total > 0 ? dP / dP_total * 100 : 0;
+  const IFarea = bitArea > 0 ? IF / bitArea : 0;
+  return { TFA, dP, Vn, HHP, HSI, IF, pct, IFarea };
+}
+
+// =====================================================================
+// SLIP VELOCITY (MOORE)
+// =====================================================================
+// Iterative. ρm, ρc in ppg. ds in inches. Va in ft/min. gap in inches.
+function slipVelocity(rho_m, rho_c, ds, PV, YP, Va_fpm, gap) {
+  if (rho_c <= rho_m || ds <= 0) return { Vs: 0, Rep: 0, regime: 'none' };
+  // Apparent annular viscosity
+  const Va_fps = Va_fpm / 60;
+  const mu_a = Va_fps > 0
+    ? PV + 5 * YP * gap / Va_fpm
+    : PV + 5 * YP;
+
+  // Iterate - start with turbulent guess
+  let Vs_prev = 113.4 * Math.sqrt(ds * (rho_c - rho_m) / rho_m); // ft/min
+  let Vs = Vs_prev;
+  let Rep = 0;
+  let regime = 'turbulent';
+
+  for (let i = 0; i < 25; i++) {
+    Rep = 15.47 * rho_m * (Vs / 60) * ds / mu_a; // Vs in ft/s
+    let Vs_new;
+    if (Rep <= 3) {
+      regime = 'laminar';
+      Vs_new = 4980 * ds * ds * (rho_c - rho_m) / mu_a; // ft/min
+    } else if (Rep >= 300) {
+      regime = 'turbulent';
+      Vs_new = 113.4 * Math.sqrt(ds * (rho_c - rho_m) / rho_m);
+    } else {
+      regime = 'intermediate';
+      // Moore intermediate: Vs = 174·ds·(ρc−ρm)^0.667 / (μa^0.333 · ρm^0.333)
+      Vs_new = 174 * ds * Math.pow(rho_c - rho_m, 0.667) / (Math.pow(mu_a, 0.333) * Math.pow(rho_m, 0.333));
+    }
+    if (Math.abs(Vs_new - Vs) / Math.max(Vs_new, 1e-6) < 0.001) { Vs = Vs_new; break; }
+    Vs = 0.5 * (Vs_new + Vs_prev);
+    Vs_prev = Vs;
+  }
+  return { Vs, Rep, regime, mu_a };
+}
+
+// =====================================================================
+// MAIN SOLVE
+// =====================================================================
+function solve() {
+  try {
+    const R = calcRheology();
+    const rho = num('mw');
+    const Q   = num('gpm');
+    const caseNum = parseInt($('surfCase').value);
+    const Dbit = num('bitSize');
+    const Cd   = num('bitCd');
+    const nozzles = [num('n1'),num('n2'),num('n3'),num('n4'),num('n5'),num('n6'),num('n7'),num('n8')];
+    const cutDens = num('cutDens');
+    const cutSize = num('cutSize');
+
+    // Use Power Law model - pipe params for pipe flow, annular params for annular
+    const nP = R.npipe, kP = R.kpipe;
+    const nA = R.nann,  kA = R.kann;
+
+    // =========================
+    // Read wellbore & string
+    // =========================
+    readHoleFromTable();
+    readStringFromTable();
+    readToolsFromTable();
+
+    // Bit depth MD = sum of string lengths
+    const bitMD = stringComps.reduce((s, c) => s + c.length, 0);
+    // Bit TVD = find the hole section whose MD-bottom ≥ bitMD
+    const bitTVD = tvdAtMD(bitMD);
+
+    // =========================
+    // Surface pressure drop (equivalent-pipe method)
+    // =========================
+    const dP_surf = surfaceDP(Q, rho, nP, kP, caseNum);
+
+    // =========================
+    // Drillstring (internal) pressure losses - iterate components top→bottom
+    // =========================
+    const stringResults = []; // { name, length, Di, V, Re, regime, dP }
+    let dP_string = 0;
+    stringComps.forEach(c => {
+      const r = pipeFlow(Q, c.id, c.length, rho, nP, kP);
+      stringResults.push({ name: c.name, length: c.length, V: r.V, Re: r.Re, regime: r.regime, dP: r.dP });
+      dP_string += r.dP;
+    });
+
+    // =========================
+    // Tool pressure drops
+    // =========================
+    const dP_tools = tools.reduce((s,t) => s + (t.dp || 0), 0);
+
+    // =========================
+    // Annular sections — for each drillstring OD, find which hole section(s) it crosses
+    // =========================
+    // We compute: for each hole section (sorted top→bottom), for each string component that overlaps it (by MD), compute an annular pressure drop.
+    // Simpler approach: build a full depth axis and for each MD interval identify (Dh, Dp).
+
+    // Build list of string MD intervals (top-down) from component order
+    const stringIntervals = []; // { name, OD, ID, mdTop, mdBot }
+    let runMD = 0;
+    stringComps.forEach(c => {
+      stringIntervals.push({ name: c.name, OD: c.od, ID: c.id, mdTop: runMD, mdBot: runMD + c.length });
+      runMD += c.length;
+    });
+
+    // For each hole section (sorted by mdBot ascending), clip against string intervals.
+    const holeSorted = [...holeSections].filter(h => h.idHole > 0 && h.mdBot > h.mdTop).sort((a,b) => a.mdBot - b.mdBot);
+
+    const annResults = []; // per hole-section × tubular crossing
+    let dP_ann_total = 0;
+
+    // We'll also track cumulative annular ΔP from surface to each section bottom for ECD
+    let dP_ann_cumul = 0;
+    const annCumulAtMD = []; // { md, tvd, dP_cumul }
+
+    holeSorted.forEach(h => {
+      // TVD gradient within this section
+      const tvdPerMD = (h.tvdBot - h.tvdTop) / Math.max(h.mdBot - h.mdTop, 1e-6);
+
+      stringIntervals.forEach(si => {
+        const mdTop = Math.max(h.mdTop, si.mdTop);
+        const mdBot = Math.min(h.mdBot, si.mdBot);
+        if (mdBot > mdTop) {
+          const L = mdBot - mdTop;
+          const r = annFlow(Q, h.idHole, si.OD, L, rho, nA, kA);
+          const tvdBotHere = h.tvdTop + (mdBot - h.mdTop) * tvdPerMD;
+          annResults.push({
+            holeName: h.name, holeId: h.idHole,
+            tubName: si.name, tubOD: si.OD,
+            mdTop, mdBot, tvdBot: tvdBotHere,
+            L, V: r.V, Re: r.Re, regime: r.regime, dP: r.dP
+          });
+          dP_ann_total += r.dP;
+        }
+      });
+    });
+
+    // Sort annResults by MD-bottom and build cumulative
+    annResults.sort((a,b) => a.mdBot - b.mdBot);
+    let runAnn = 0;
+    annResults.forEach(a => {
+      runAnn += a.dP;
+      a.dP_cumul = runAnn;
+      a.ECD = rho + (a.dP_cumul) / (0.052 * Math.max(a.tvdBot, 1e-6));
+    });
+
+    // =========================
+    // Bit hydraulics (need dP_total first)
+    // =========================
+    // Rearrange: dP_total = dP_surf + dP_string + dP_tools + dP_bit + dP_ann_total
+    // First compute dP_bit (not dependent on total), then sum
+    const nozArr = nozzles;
+    let TFA = 0;
+    nozArr.forEach(n32 => { if (n32 > 0) TFA += Math.PI / 4 * (n32 / 32) * (n32 / 32); });
+
+    let dP_bit = 0, Vn = 0, HHP_bit = 0, HSI = 0, IF = 0, IFarea = 0;
+    if (TFA > 0 && Q > 0) {
+      dP_bit = (rho * Q * Q) / (10858 * Cd * Cd * TFA * TFA);
+      Vn = Q / (3.117 * TFA);
+      HHP_bit = dP_bit * Q / 1714;
+      const bitArea = Math.PI / 4 * Dbit * Dbit;
+      HSI = bitArea > 0 ? HHP_bit / bitArea : 0;
+      IF = 0.01823 * Cd * Q * Math.sqrt(rho * dP_bit);
+      IFarea = bitArea > 0 ? IF / bitArea : 0;
+    }
+
+    const dP_total = dP_surf + dP_string + dP_tools + dP_bit + dP_ann_total;
+    const pct_bit = dP_total > 0 ? dP_bit / dP_total * 100 : 0;
+    const pumpHHP_used = dP_total * Q / 1714;
+    const ECD_TD = bitTVD > 0 ? rho + dP_ann_total / (0.052 * bitTVD) : rho;
+
+    // =========================
+    // Hole cleaning — analyze only OPEN HOLE sections (cased flag = false)
+    // =========================
+    const ohSectionNames = new Set(
+      holeSections.filter(h => !h.cased).map(h => h.name)
+    );
+    let ohResults = annResults.filter(a => ohSectionNames.has(a.holeName));
+    // Fall back to smallest-ID sections if user hasn't flagged any as open
+    if (ohResults.length === 0) {
+      const minID = Math.min(...annResults.map(a => a.holeId));
+      ohResults = annResults.filter(a => Math.abs(a.holeId - minID) < 0.05);
+    }
+
+    let minAV = Infinity, minAVLoc = '';
+    let minAVgap = 0;
+    ohResults.forEach(a => {
+      const Va_fpm = a.V * 60;
+      if (Va_fpm > 0 && Va_fpm < minAV) {
+        minAV = Va_fpm;
+        minAVLoc = `${a.holeName} / ${a.tubName}`;
+        minAVgap = a.holeId - a.tubOD;
+      }
+    });
+    if (!isFinite(minAV)) minAV = 0;
+
+    // Cuttings transport at largest-gap section (worst case for slip vs velocity)
+    // Use the minAV section for hole cleaning evaluation
+    const slip = minAVgap > 0 ?
+      slipVelocity(rho, cutDens, cutSize, R.PV, R.YP, minAV, minAVgap) :
+      { Vs: 0, Rep: 0, regime: 'none', mu_a: 0 };
+    const CTR = minAV > 0 ? 1 - (slip.Vs / minAV) : 0;
+
+    // Cuttings concentration
+    const ROP = num('ropInput');
+    const A_ann = minAVgap > 0 ? (Math.PI / 4) * (Math.pow(Dbit, 2) - 0) : 0; // approx - use bit area as cuttings source
+    // Cuttings volume flow into annulus (in³/min) = (π/4)·Dbit² × ROP(ft/hr × 12/60) 
+    const cuttingsRate_in3min = (Math.PI / 4) * Dbit * Dbit * (ROP * 12 / 60);
+    // Mud volume flow in annulus at minAV section (in³/min) = Q gpm × 231 in³/gal = Q*231
+    const mudRate_in3min = Q * 231;
+    // Actual cuttings vel = Va - Vs, so concentration = cuttings_in / ((Va-Vs)/Va × Q_volume)
+    const effectiveTransportVel = Math.max(minAV - slip.Vs, 1e-6);
+    const conc = (cuttingsRate_in3min / (mudRate_in3min * (effectiveTransportVel / Math.max(minAV, 1e-6)))) * 100;
+    // CCI
+    const CCI = (rho * kA * minAV) / 400000;
+
+    // =========================
+    // Render
+    // =========================
+    $('bitTFA').value = fmt(TFA, 3);
+
+    // Top KPIs
+    $('kpiSysP').textContent = fmtInt(dP_total);
+    $('kpiSysPSub').textContent = `psi @ ${fmt(Q,0)} gpm`;
+    $('kpiPumpHHP').textContent = fmtInt(pumpHHP_used);
+    const pumpRated = num('pumpRated');
+    const pumpEff = num('pumpEff') / 100;
+    const pumpAvail = pumpRated * pumpEff;
+    const pctPumpUse = pumpAvail > 0 ? (pumpHHP_used / pumpAvail) * 100 : 0;
+    $('kpiPumpHHPSub').textContent = `${fmt(pctPumpUse,0)}% of ${fmtInt(pumpAvail)} hp available`;
+    $('kpiBitHHP').textContent = fmtInt(HHP_bit);
+    $('kpiBitHHPSub').textContent = `${fmt(pct_bit,1)}% of system`;
+    $('kpiHSI').textContent = fmt(HSI, 2);
+    $('kpiIF').textContent = fmtInt(IF);
+    $('kpiECD').textContent = fmt(ECD_TD, 2);
+    $('kpiECDSub').textContent = `ppg @ TVD ${fmtInt(bitTVD)} ft`;
+
+    // Color coding on pump utilization
+    const pumpKpi = $('kpiPumpHHP');
+    pumpKpi.classList.remove('hot','warn','err');
+    if (pctPumpUse > 95) pumpKpi.classList.add('err');
+    else if (pctPumpUse > 85) pumpKpi.classList.add('warn');
+
+    // Breakdown table
+    const bbody = $('breakdownBody');
+    bbody.innerHTML = '';
+    const addBreakdown = (name, L, V, Re, regime, dP) => {
+      const pct = dP_total > 0 ? dP / dP_total * 100 : 0;
+      const regClass = regime === 'LAMINAR' ? 'lam' : regime === 'TRANSITIONAL' ? 'trans' : 'turb';
+      bbody.innerHTML += `<tr>
+        <td>${name}</td>
+        <td>${L > 0 ? fmtInt(L) : '—'}</td>
+        <td class="num">${V > 0 ? fmt(V, 2) : '—'}</td>
+        <td class="num">${Re > 0 ? fmtInt(Re) : '—'}</td>
+        <td>${regime === '—' ? '—' : `<span class="pill ${regClass}">${regime}</span>`}</td>
+        <td class="num-hot">${fmtInt(dP)}</td>
+        <td class="num">${fmt(pct,1)}%</td>
+      </tr>`;
+    };
+    addBreakdown('Surface Equipment', 0, 0, 0, '—', dP_surf);
+    stringResults.forEach(r => addBreakdown(r.name, r.length, r.V, r.Re, r.regime, r.dP));
+    tools.forEach(t => addBreakdown(`Tool: ${t.name}`, 0, 0, 0, '—', t.dp));
+    addBreakdown('Bit', 0, Vn, 0, '—', dP_bit);
+    // Aggregated annular
+    annResults.forEach(a => {
+      const name = `Ann: ${a.holeName} × ${a.tubName}`;
+      addBreakdown(name, a.L, a.V, a.Re, a.regime, a.dP);
+    });
+    $('totalP').textContent = fmtInt(dP_total);
+
+    // Bit hydraulics KPIs
+    $('bTFA').textContent = fmt(TFA, 3);
+    $('bdP').textContent  = fmtInt(dP_bit);
+    $('bVn').textContent  = fmt(Vn, 0);
+    $('bHHP').textContent = fmtInt(HHP_bit);
+    $('bHSI').textContent = fmt(HSI, 2);
+    $('bIF').textContent  = fmtInt(IF);
+    $('bPct').textContent = fmt(pct_bit, 1);
+    $('bIFarea').textContent = fmt(IFarea, 1);
+
+    // Annular table
+    const abody = $('annBody');
+    abody.innerHTML = '';
+    annResults.forEach(a => {
+      const regClass = a.regime === 'LAMINAR' ? 'lam' : a.regime === 'TRANSITIONAL' ? 'trans' : 'turb';
+      abody.innerHTML += `<tr>
+        <td>${a.holeName} × ${a.tubName}</td>
+        <td>${fmtInt(a.mdBot)}</td>
+        <td>${fmtInt(a.tvdBot)}</td>
+        <td class="num">${fmt(a.V*60, 0)}</td>
+        <td class="num">${fmtInt(a.Re)}</td>
+        <td>${a.regime === '—' ? '—' : `<span class="pill ${regClass}">${a.regime}</span>`}</td>
+        <td class="num-hot">${fmt(a.dP, 1)}</td>
+        <td class="num">${fmt(a.ECD, 2)}</td>
+      </tr>`;
+    });
+    if (annResults.length === 0) {
+      abody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:var(--text-faint)">No annular sections — define hole geometry and drillstring</td></tr>`;
+    }
+
+    // Hole cleaning KPIs
+    $('hcMinAV').textContent = fmt(minAV, 0);
+    $('hcMinAVLoc').textContent = minAVLoc || 'ft/min';
+    $('hcVs').textContent = fmt(slip.Vs, 0);
+    const ctrEl = $('hcCTR');
+    ctrEl.textContent = fmt(CTR * 100, 1) + '%';
+    ctrEl.classList.remove('hot','warn','err');
+    if (CTR < 0.5) ctrEl.classList.add('err');
+    else if (CTR < 0.7) ctrEl.classList.add('warn');
+
+    const concEl = $('hcConc');
+    concEl.textContent = fmt(conc, 2) + '%';
+    concEl.classList.remove('hot','warn','err');
+    if (conc > 5) concEl.classList.add('err');
+    else if (conc > 3) concEl.classList.add('warn');
+
+    const cciEl = $('hcCCI');
+    cciEl.textContent = fmt(CCI, 2);
+    cciEl.classList.remove('hot','warn','err');
+    if (CCI < 0.5) cciEl.classList.add('err');
+    else if (CCI < 1.0) cciEl.classList.add('warn');
+
+    $('hcDepth').textContent = `${fmtInt(bitMD)} / ${fmtInt(bitTVD)}`;
+
+    // Optimization
+    $('optCur1').textContent = fmt(pct_bit,1) + '%';
+    $('optCur2').textContent = fmt(pct_bit,1) + '%';
+    $('optSt1').innerHTML = statusPill(pct_bit, 64);
+    $('optSt2').innerHTML = statusPill(pct_bit, 47);
+
+    // Status indicator
+    let status = 'Solved';
+    let ledClass = '';
+    const pumpOverload = pctPumpUse > 100;
+    if (pumpOverload) { status = 'Pump HHP Exceeded'; ledClass = 'err'; }
+    else if (pctPumpUse > 90) { status = 'High Pump Utilization'; ledClass = 'warn'; }
+    else if (CTR < 0.5 && minAV > 0) { status = 'Poor Hole Cleaning'; ledClass = 'warn'; }
+
+    $('statusText').textContent = status;
+    $('statusLed').className = 'led ' + ledClass;
+
+  } catch (err) {
+    console.error(err);
+    $('statusText').textContent = 'Calc Error: ' + err.message;
+    $('statusLed').className = 'led err';
+  }
+}
+
+function statusPill(current, target) {
+  const diff = current - target;
+  if (Math.abs(diff) <= 5) return `<span class="pill" style="color:var(--teal)">OPTIMAL</span>`;
+  if (diff < -5)  return `<span class="pill" style="color:var(--yellow)">BELOW — INCREASE FLOW OR REDUCE TFA</span>`;
+  return `<span class="pill" style="color:var(--amber)">ABOVE — DECREASE FLOW OR INCREASE TFA</span>`;
+}
+
+// =====================================================================
+// TVD INTERPOLATION
+// =====================================================================
+function tvdAtMD(md) {
+  if (holeSections.length === 0) return md; // assume vertical
+  const sorted = [...holeSections].sort((a,b) => a.mdBot - b.mdBot);
+  for (const h of sorted) {
+    if (md <= h.mdBot) {
+      const frac = (md - h.mdTop) / Math.max(h.mdBot - h.mdTop, 1e-6);
+      return h.tvdTop + frac * (h.tvdBot - h.tvdTop);
+    }
+  }
+  // Below last section — extrapolate using last section's TVD/MD ratio
+  const last = sorted[sorted.length - 1];
+  const ratio = last.mdBot > 0 ? last.tvdBot / last.mdBot : 1;
+  return md * ratio;
+}
+
+// =====================================================================
+// WELLBORE GEOMETRY TABLE
+// =====================================================================
+function renderHoleTable() {
+  const body = $('holeBody');
+  body.innerHTML = '';
+  holeSections.forEach((h, idx) => {
+    const cased = h.cased ? 'checked' : '';
+    body.innerHTML += `<tr>
+      <td><input class="text-in" type="text" value="${h.name}" oninput="updateHole(${idx},'name',this.value)"></td>
+      <td><input type="number" step="0.01" value="${h.idHole}" oninput="updateHole(${idx},'idHole',parseFloat(this.value)||0)"></td>
+      <td><input type="number" step="100" value="${h.mdTop}" oninput="updateHole(${idx},'mdTop',parseFloat(this.value)||0)"></td>
+      <td><input type="number" step="100" value="${h.mdBot}" oninput="updateHole(${idx},'mdBot',parseFloat(this.value)||0)"></td>
+      <td><input type="number" step="100" value="${h.tvdBot}" oninput="updateHole(${idx},'tvdBot',parseFloat(this.value)||0)"></td>
+      <td style="text-align:center"><input type="checkbox" ${cased} onchange="updateHole(${idx},'cased',this.checked)"></td>
+      <td class="row-actions"><button onclick="deleteHole(${idx})">×</button></td>
+    </tr>`;
+  });
+  // Auto-compute tvdTop from previous section's tvdBot
+  syncTvdTops();
+}
+
+function syncTvdTops() {
+  const sorted = [...holeSections].sort((a,b) => a.mdTop - b.mdTop);
+  for (let i = 1; i < sorted.length; i++) {
+    sorted[i].tvdTop = sorted[i-1].tvdBot;
+  }
+  if (sorted.length > 0) sorted[0].tvdTop = 0;
+}
+
+function addHoleSection() {
+  const last = holeSections[holeSections.length - 1];
+  const mdTop = last ? last.mdBot : 0;
+  const tvdTop = last ? last.tvdBot : 0;
+  const isFirst = holeSections.length === 0;
+  holeSections.push({
+    name: isFirst ? 'Surface Csg' : 'Open Hole',
+    idHole: isFirst ? 12.615 : 8.75,
+    mdTop, mdBot: mdTop + 2000,
+    tvdTop, tvdBot: tvdTop + 2000,
+    cased: isFirst
+  });
+  renderHoleTable();
+  solve();
+}
+
+function deleteHole(idx) {
+  holeSections.splice(idx, 1);
+  renderHoleTable();
+  solve();
+}
+
+function updateHole(idx, field, val) {
+  holeSections[idx][field] = val;
+  syncTvdTops();
+  solve();
+}
+
+function readHoleFromTable() { /* state is already synced on input */ }
+
+// =====================================================================
+// DRILLSTRING TABLE
+// =====================================================================
+function renderStringTable() {
+  const body = $('stringBody');
+  body.innerHTML = '';
+  stringComps.forEach((c, idx) => {
+    body.innerHTML += `<tr>
+      <td><input class="text-in" type="text" value="${c.name}" oninput="updateString(${idx},'name',this.value)"></td>
+      <td><input type="number" step="0.01" value="${c.od}" oninput="updateString(${idx},'od',parseFloat(this.value)||0)"></td>
+      <td><input type="number" step="0.01" value="${c.id}" oninput="updateString(${idx},'id',parseFloat(this.value)||0)"></td>
+      <td><input type="number" step="100" value="${c.length}" oninput="updateString(${idx},'length',parseFloat(this.value)||0)"></td>
+      <td class="row-actions"><button onclick="deleteString(${idx})">×</button></td>
+    </tr>`;
+  });
+}
+
+function addStringComp() {
+  stringComps.push({ name: 'Drill Pipe', od: 5.0, id: 4.276, length: 1000 });
+  renderStringTable();
+  solve();
+}
+
+function deleteString(idx) {
+  stringComps.splice(idx, 1);
+  renderStringTable();
+  solve();
+}
+
+function updateString(idx, field, val) {
+  stringComps[idx][field] = val;
+  solve();
+}
+
+function readStringFromTable() { /* state synced */ }
+
+// =====================================================================
+// TOOLS TABLE
+// =====================================================================
+function renderToolsTable() {
+  const body = $('toolBody');
+  body.innerHTML = '';
+  tools.forEach((t, idx) => {
+    body.innerHTML += `<tr>
+      <td><input class="text-in" type="text" value="${t.name}" oninput="updateTool(${idx},'name',this.value)"></td>
+      <td><input type="number" step="10" value="${t.dp}" oninput="updateTool(${idx},'dp',parseFloat(this.value)||0)"></td>
+      <td class="row-actions"><button onclick="deleteTool(${idx})">×</button></td>
+    </tr>`;
+  });
+}
+
+function addTool() {
+  tools.push({ name: 'Mud Motor', dp: 300 });
+  renderToolsTable();
+  solve();
+}
+
+function deleteTool(idx) {
+  tools.splice(idx, 1);
+  renderToolsTable();
+  solve();
+}
+
+function updateTool(idx, field, val) {
+  tools[idx][field] = val;
+  solve();
+}
+
+function readToolsFromTable() { /* synced */ }
+
+// =====================================================================
+// SAVE / LOAD
+// =====================================================================
+function saveCase() {
+  const data = {
+    version: 1,
+    fluid: {
+      mw: num('mw'), temp: num('mudTemp'), surfCase: parseInt($('surfCase').value),
+      r600: num('r600'), r300: num('r300'), r200: num('r200'), r100: num('r100'),
+      r6: num('r6'), r3: num('r3'),
+      rheoModel: $('rheoModel').value
+    },
+    pump: { gpm: num('gpm'), eff: num('pumpEff'), rated: num('pumpRated') },
+    bit: {
+      size: num('bitSize'), cd: num('bitCd'),
+      nozzles: [num('n1'),num('n2'),num('n3'),num('n4'),num('n5'),num('n6'),num('n7'),num('n8')]
+    },
+    hole: holeSections, string: stringComps, tools: tools,
+    cut: { dens: num('cutDens'), size: num('cutSize'), rop: num('ropInput') }
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  const ts = new Date().toISOString().replace(/[:.]/g,'-').slice(0,19);
+  a.href = URL.createObjectURL(blob);
+  a.download = `hydraulics-${ts}.json`;
+  a.click();
+}
+
+function loadCase(ev) {
+  const file = ev.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const d = JSON.parse(e.target.result);
+      if (d.fluid) {
+        $('mw').value = d.fluid.mw;
+        $('mudTemp').value = d.fluid.temp;
+        $('surfCase').value = d.fluid.surfCase;
+        $('r600').value = d.fluid.r600; $('r300').value = d.fluid.r300;
+        $('r200').value = d.fluid.r200; $('r100').value = d.fluid.r100;
+        $('r6').value = d.fluid.r6;   $('r3').value = d.fluid.r3;
+        if (d.fluid.rheoModel) $('rheoModel').value = d.fluid.rheoModel;
+      }
+      if (d.pump) {
+        $('gpm').value = d.pump.gpm;
+        $('pumpEff').value = d.pump.eff;
+        $('pumpRated').value = d.pump.rated;
+      }
+      if (d.bit) {
+        $('bitSize').value = d.bit.size;
+        $('bitCd').value = d.bit.cd;
+        ['n1','n2','n3','n4','n5','n6','n7','n8'].forEach((id,i) => $(id).value = d.bit.nozzles[i] || 0);
+      }
+      if (d.cut) {
+        $('cutDens').value = d.cut.dens;
+        $('cutSize').value = d.cut.size;
+        $('ropInput').value = d.cut.rop;
+      }
+      holeSections = d.hole || [];
+      stringComps = d.string || [];
+      tools = d.tools || [];
+      renderHoleTable();
+      renderStringTable();
+      renderToolsTable();
+      solve();
+    } catch (err) {
+      alert('Failed to parse file: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+}
+
+// =====================================================================
+// EXAMPLE CASE
+// =====================================================================
+function loadExample() {
+  // Permian Basin lateral example
+  $('mw').value = 10.5;
+  $('mudTemp').value = 180;
+  $('surfCase').value = 3;
+  $('r600').value = 62; $('r300').value = 38;
+  $('r200').value = 28; $('r100').value = 18;
+  $('r6').value = 6;    $('r3').value = 5;
+  $('gpm').value = 450;
+  $('pumpEff').value = 95;
+  $('pumpRated').value = 1600;
+  $('bitSize').value = 8.75;
+  $('bitCd').value = 0.95;
+  $('n1').value = 14; $('n2').value = 14; $('n3').value = 14;
+  $('n4').value = 0;  $('n5').value = 0;  $('n6').value = 0;
+  $('n7').value = 0;  $('n8').value = 0;
+  $('cutDens').value = 21;
+  $('cutSize').value = 0.25;
+  $('ropInput').value = 80;
+
+  holeSections = [
+    { name: 'Surface Csg',       idHole: 12.615, mdTop: 0,     mdBot: 2500,  tvdTop: 0,     tvdBot: 2500,  cased: true  },
+    { name: 'Intermediate Csg',  idHole: 8.835,  mdTop: 2500,  mdBot: 10500, tvdTop: 2500,  tvdBot: 10500, cased: true  },
+    { name: 'Open Hole Curve',   idHole: 8.75,   mdTop: 10500, mdBot: 11500, tvdTop: 10500, tvdBot: 11000, cased: false },
+    { name: 'Open Hole Lateral', idHole: 8.75,   mdTop: 11500, mdBot: 20500, tvdTop: 11000, tvdBot: 11000, cased: false }
+  ];
+
+  stringComps = [
+    { name: 'Drill Pipe 5"',      od: 5.0,   id: 4.276, length: 18500 },
+    { name: 'HWDP',               od: 5.0,   id: 3.0,   length: 900 },
+    { name: 'Drill Collars',      od: 6.5,   id: 2.8125,length: 300 },
+    { name: 'Jars / Subs',        od: 6.5,   id: 2.75,  length: 60 },
+    { name: 'MWD / PWD',          od: 6.75,  id: 3.25,  length: 35 },
+    { name: 'RSS (iCruise)',      od: 6.75,  id: 3.0,   length: 15 },
+    { name: 'Bit Sub',            od: 6.75,  id: 2.8125,length: 3 }
+  ];
+
+  tools = [
+    { name: 'MWD Pulser',   dp: 150 },
+    { name: 'RSS',          dp: 450 }
+  ];
+
+  renderHoleTable();
+  renderStringTable();
+  renderToolsTable();
+  solve();
+}
+
+// =====================================================================
+// INITIALIZATION
+// =====================================================================
+function init() {
+  // Default case
+  holeSections = [
+    { name: 'Surface Csg',  idHole: 12.615, mdTop: 0,    mdBot: 2500,  tvdTop: 0,    tvdBot: 2500,  cased: true  },
+    { name: 'Intermediate', idHole: 8.835,  mdTop: 2500, mdBot: 10500, tvdTop: 2500, tvdBot: 10500, cased: false }
+  ];
+  stringComps = [
+    { name: 'Drill Pipe 5"', od: 5.0, id: 4.276, length: 9500 },
+    { name: 'HWDP',          od: 5.0, id: 3.0, length: 600 },
+    { name: 'Drill Collars', od: 6.5, id: 2.8125, length: 400 }
+  ];
+  tools = [];
+
+  renderHoleTable();
+  renderStringTable();
+  renderToolsTable();
+
+  // Wire up inputs
+  const inputIds = ['mw','mudTemp','surfCase','r600','r300','r200','r100','r6','r3',
+                    'gpm','pumpEff','pumpRated','bitSize','bitCd',
+                    'n1','n2','n3','n4','n5','n6','n7','n8',
+                    'cutDens','cutSize','ropInput','rheoModel'];
+  inputIds.forEach(id => {
+    const el = $(id);
+    if (el) el.addEventListener('input', solve);
+    if (el) el.addEventListener('change', solve);
+  });
+
+  solve();
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>

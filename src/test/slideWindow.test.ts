@@ -14,6 +14,9 @@ function slide(
     buildRateSlide: null,
     effectiveToolface: null,
     tfoAccuracy,
+    startTimestamp: null,
+    slideSeenLen: null,
+    slideAheadLen: null,
   };
 }
 

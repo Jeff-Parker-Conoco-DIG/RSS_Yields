@@ -8,6 +8,8 @@ interface RssToolInfoProps {
   lastSurveyDepth: number | null;
   wsConnected: boolean;
   loading: boolean;
+  /** Well name from Corva app props (e.g., "MABEE DDA E29 412JH"). */
+  wellName?: string | null;
 }
 
 export const RssToolInfo: React.FC<RssToolInfoProps> = ({
@@ -16,6 +18,7 @@ export const RssToolInfo: React.FC<RssToolInfoProps> = ({
   lastSurveyDepth,
   wsConnected,
   loading,
+  wellName,
 }) => {
   const isMotorProfile = profile.toolType === 'motor';
 
@@ -40,6 +43,16 @@ export const RssToolInfo: React.FC<RssToolInfoProps> = ({
         color: '#aaa',
       }}
     >
+      {/* Well name — so the user knows which well they're looking at. */}
+      {wellName && (
+        <span
+          title="Well name (from Corva asset)"
+          style={{ fontWeight: 700, color: '#4db8ff', fontSize: 14 }}
+        >
+          {wellName}
+        </span>
+      )}
+
       {/* Tool name — driven by the active profile */}
       <span style={{ fontWeight: 600, color: '#ddd' }}>
         {loading ? 'Loading...' : profileLabel}

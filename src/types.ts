@@ -37,6 +37,13 @@ export interface SlideInterval {
   buildRateSlide: number | null;
   effectiveToolface: number | null;
   tfoAccuracy: number | null;
+  /** Corva slide's start_timestamp — unique per physical slide. Used for
+   *  dedup across progress snapshots and post-completion re-emissions. */
+  startTimestamp: number | null;
+  /** Corva's slide_seen field: footage of the slide the sensor has passed. */
+  slideSeenLen: number | null;
+  /** Corva's slide_ahead field: footage ahead of sensor within the slide. */
+  slideAheadLen: number | null;
 }
 
 export interface TrackingConfig {
@@ -56,9 +63,19 @@ export interface YieldReading {
   // Identity
   id: string;                     // UUID
   assetId: number;
+  /** Well name at time of capture (denormalized onto record for downstream
+   *  consumers that don't want a second asset-API hop). Nullable for legacy
+   *  records saved before this field existed. */
+  wellName: string | null;
 
   // Depth & Survey snapshot
-  depth: number;                  // Bit depth at time of reading (ft)
+  depth: number;                  // Bit depth at time of reading (ft, Measured Depth)
+  /** True Vertical Depth at bit depth, interpolated from the nearest two
+   *  MWD survey stations using minimum curvature. Null if survey coverage
+   *  doesn't bracket the bit depth (e.g., first reading, or surveys
+   *  unavailable). Used for formation alignment with `td` field on
+   *  formation records. */
+  tvd: number | null;
   inc: number;                    // Inclination (degrees)
   az: number;                     // Azimuth (degrees)
 
@@ -111,6 +128,11 @@ export interface YieldReading {
   normalizedBr: number | null;
   normalizedTr: number | null;
 
+  /** True when the reading's DLS exceeds DLS_OUTLIER_THRESHOLD. Outliers
+   *  are kept in the table (with a visual flag) but are excluded from
+   *  MY APP and from the yield regression. */
+  dlsOutlier: boolean;
+
   // Steering parameters — averaged over interval from prev depth to this depth
   dutyCycle: number | null;       // 0-100%
   toolFaceSet: number | null;     // Commanded gravity TF (degrees)
@@ -132,6 +154,13 @@ export interface YieldReading {
   section: WellSection;
   timestamp: number;              // Unix epoch ms when reading was taken
   source: 'auto' | 'manual';
+
+  /** Soft-delete tombstone. When set (unix ms), the reading is hidden from
+   *  the UI but remains in the DB pending hard-delete by a backend cleanup
+   *  app. Null means the record is live. This is the pattern we use
+   *  because the Corva data API's DELETE endpoint can't be called directly
+   *  from a UI app without backend auth. */
+  deletedAt: number | null;
 }
 
 // ─── Yield Regression ──────────────────────────────────────────────

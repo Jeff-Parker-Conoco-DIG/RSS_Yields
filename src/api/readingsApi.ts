@@ -77,7 +77,13 @@ export async function fetchReadings(assetId: number): Promise<YieldReading[]> {
       },
     );
     const records = Array.isArray(data) ? data : [];
-    const parsed = records.map(docToReading).filter((r): r is YieldReading => r !== null);
+    const parsed = records
+      .map(docToReading)
+      .filter((r): r is YieldReading => r !== null)
+      // Hide soft-deleted rows from the UI. A backend cleanup app will
+      // hard-delete these from the dataset; until then the record exists
+      // but we don't show it.
+      .filter((r) => r.deletedAt == null);
     return sortReadingsByTimestamp(parsed);
   } catch (e) {
     if (isDatasetMissing(e)) {
@@ -128,16 +134,15 @@ export async function saveReading(reading: YieldReading): Promise<boolean> {
   }
 }
 
-// ─── Update notes on a reading ─────────────────────────────────────
+// ─── Update helpers: find doc + PATCH partial fields ───────────────
 
-export async function updateReadingNotes(
-  assetId: number,
-  readingId: string,
-  notes: string,
-): Promise<boolean> {
-  if (!corvaDataAPI || datasetMissingLogged) return false;
+/**
+ * Locate a reading's Corva document _id by asset + reading id.
+ * Returns null if not found or on error.
+ */
+async function findDocId(assetId: number, readingId: string): Promise<string | null> {
+  if (!corvaDataAPI) return null;
   try {
-    // Find the record by reading ID, then update
     const data = await corvaDataAPI.get(
       `/api/v1/data/${READINGS_DATASET}/`,
       {
@@ -146,22 +151,94 @@ export async function updateReadingNotes(
       },
     );
     const records = Array.isArray(data) ? data : [];
-    if (records.length === 0) return false;
-
+    if (records.length === 0) return null;
     const doc = records[0] as Record<string, unknown>;
-    const docId = doc._id as string;
+    return typeof doc._id === 'string' ? doc._id : null;
+  } catch (e) {
+    if (isDatasetMissing(e)) return null;
+    error('findDocId failed:', e);
+    return null;
+  }
+}
 
-    // PATCH the notes field
-    await corvaDataAPI.post(
-      `/api/v1/data/${READINGS_DATASET}/${docId}`,
-      { 'data.notes': notes },
-    );
-    log(`Updated notes for reading ${readingId}`);
+/**
+ * PATCH a subset of `data.*` fields on an existing record.
+ *
+ * Corva's data API supports MongoDB-style partial updates via PATCH with
+ * dot-paths in the body. We send these as `{ "data.fieldName": value }`
+ * pairs so only the listed fields mutate; everything else on the record
+ * is untouched.
+ *
+ * Falls back to raw `fetch` because the Corva SDK client exposed in the
+ * iframe only has `get` / `post` methods — PATCH goes through the ambient
+ * session cookie inside the Corva shell, or an API-key header in dev.
+ */
+async function patchReadingData(
+  docId: string,
+  partialData: Record<string, unknown>,
+): Promise<boolean> {
+  // Build dot-path body: { "data.notes": "...", "data.deleted_at": 123, ... }
+  const body: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(partialData)) {
+    body[`data.${k}`] = v;
+  }
+  const url = new URL(
+    `/api/v1/data/${READINGS_DATASET}/${docId}`,
+    'https://data.corva.ai',
+  );
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  const apiKey = process.env.CORVA_API_KEY ?? process.env.REACT_APP_CORVA_API_KEY;
+  if (apiKey) headers['Authorization'] = `API ${apiKey}`;
+  try {
+    const res = await fetch(url.toString(), {
+      method: 'PATCH',
+      credentials: 'include', // use ambient session cookie inside Corva iframe
+      headers,
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) {
+      error(`patchReadingData ${docId} → ${res.status} ${res.statusText}`);
+      return false;
+    }
     return true;
   } catch (e) {
-    error('updateReadingNotes failed:', e);
+    error('patchReadingData failed:', e);
     return false;
   }
+}
+
+// ─── Update notes on a reading ─────────────────────────────────────
+
+export async function updateReadingNotes(
+  assetId: number,
+  readingId: string,
+  notes: string,
+): Promise<boolean> {
+  if (!corvaDataAPI || datasetMissingLogged) return false;
+  const docId = await findDocId(assetId, readingId);
+  if (!docId) return false;
+  const ok = await patchReadingData(docId, { notes });
+  if (ok) log(`Updated notes for reading ${readingId}`);
+  return ok;
+}
+
+// ─── Soft-delete a reading (tombstone for backend cleanup) ─────────
+//
+// Stamps `data.deleted_at` (unix ms) on the record. The frontend filters
+// records where `deleted_at != null` out of the loaded list, so the row
+// disappears from the UI but persists in the dataset until a backend
+// cleanup app hard-deletes it.
+export async function softDeleteReading(
+  assetId: number,
+  readingId: string,
+  deletedAtMs: number = Date.now(),
+): Promise<boolean> {
+  if (!corvaDataAPI || datasetMissingLogged) return false;
+  const docId = await findDocId(assetId, readingId);
+  if (!docId) return false;
+  const ok = await patchReadingData(docId, { deleted_at: deletedAtMs });
+  if (ok) log(`Tombstoned reading ${readingId} at ${deletedAtMs}`);
+  return ok;
 }
 
 // ─── Delete a reading ──────────────────────────────────────────────
@@ -204,7 +281,12 @@ export async function deleteReading(assetId: number, readingId: string): Promise
 function readingToData(r: YieldReading): Record<string, unknown> {
   return {
     id: r.id,
+    // Denormalized identity for downstream consumers
+    well_name: r.wellName,
+    well_asset_id: r.assetId,
     depth: r.depth,
+    /** True Vertical Depth at bit (ft), interpolated from MWD surveys. */
+    tvd: r.tvd,
     inc: r.inc,
     az: r.az,
     mwdInc: r.mwdInc,
@@ -245,6 +327,9 @@ function readingToData(r: YieldReading): Record<string, unknown> {
     notes: r.notes,
     section: r.section,
     source: r.source,
+    dls_outlier: r.dlsOutlier,
+    /** Soft-delete tombstone (unix ms). Null on live records. */
+    deleted_at: r.deletedAt,
   };
 }
 
@@ -262,7 +347,9 @@ function docToReading(doc: unknown): YieldReading | null {
     return {
       id: String(data.id),
       assetId: Number(d.asset_id),
+      wellName: typeof data.well_name === 'string' ? data.well_name : null,
       depth: Number(data.depth ?? 0),
+      tvd: n(data.tvd),
       inc: Number(data.inc ?? 0),
       az: Number(data.az ?? 0),
       mwdInc: n(data.mwdInc),
@@ -290,6 +377,13 @@ function docToReading(doc: unknown): YieldReading | null {
       normalizedDls: n(data.normalizedDls),
       normalizedBr: n(data.normalizedBr),
       normalizedTr: n(data.normalizedTr),
+      // Derive dlsOutlier if missing (legacy readings pre-dating this field).
+      dlsOutlier: typeof data.dlsOutlier === 'boolean'
+        ? data.dlsOutlier
+        : (() => {
+            const d = n(data.mwdDls) ?? n(data.dls);
+            return d != null && Math.abs(d) > 30;
+          })(),
 
       dutyCycle: n(data.dutyCycle),
       toolFaceSet: n(data.toolFaceSet),
@@ -304,6 +398,7 @@ function docToReading(doc: unknown): YieldReading | null {
       section: (data.section as YieldReading['section']) ?? 'curve',
       timestamp: Number(d.timestamp ?? 0) * 1000, // Corva stores seconds, we use ms
       source: (data.source as 'auto' | 'manual') ?? 'manual',
+      deletedAt: n(data.deleted_at),
     };
   } catch {
     return null;

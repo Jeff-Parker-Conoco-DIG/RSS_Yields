@@ -62,6 +62,37 @@ export function dls(
   return (theta / DEG / courseLengthFt) * 100;
 }
 
+/**
+ * Compute ΔTVD (change in true vertical depth) between two survey stations
+ * using the minimum curvature method.
+ *
+ *   RF = tan(θ/2) × 2/θ           (ratio factor, = 1 when θ ≈ 0)
+ *   ΔTVD = (ΔMD / 2) × (cos(I1) + cos(I2)) × RF
+ *
+ * This is the industry-standard formula used by every survey package.
+ * `θ` is the dogleg angle in radians (not DLS, the rate).
+ */
+export function deltaTvd(
+  inc1Deg: number,
+  inc2Deg: number,
+  az1Deg: number,
+  az2Deg: number,
+  deltaMd: number,
+): number {
+  if (deltaMd === 0) return 0;
+
+  const i1 = inc1Deg * DEG;
+  const i2 = inc2Deg * DEG;
+  const dAz = azimuthDelta(az1Deg, az2Deg) * DEG;
+
+  const cosTheta = Math.cos(i2 - i1) - Math.sin(i1) * Math.sin(i2) * (1 - Math.cos(dAz));
+  const clamped = Math.max(-1, Math.min(1, cosTheta));
+  const theta = Math.acos(clamped);
+
+  const rf = theta > 1e-6 ? (2 / theta) * Math.tan(theta / 2) : 1;
+  return (deltaMd / 2) * (Math.cos(i1) + Math.cos(i2)) * rf;
+}
+
 // ─── Toolface Decomposition ────────────────────────────────────────
 //
 // An RSS steers by applying curvature in a direction defined by the

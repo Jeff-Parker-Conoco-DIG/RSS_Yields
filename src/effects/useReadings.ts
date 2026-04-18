@@ -1,13 +1,14 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import type { YieldReading, TrackingConfig, FormationTop, SlideInterval } from '../types';
 import type { ResolvedChannelMap } from '../witsMapper/types';
-import { fetchReadings, saveReading, updateReadingNotes, deleteReading } from '../api/readingsApi';
+import { fetchReadings, saveReading, updateReadingNotes, deleteReading, softDeleteReading } from '../api/readingsApi';
 import { fetchLatestWitsRecord, fetchRecentWitsRecords, fetchSlideSheet, fetchAllSurveyStations } from '../api/corvaApi';
 import { buildRate, turnRate, dls, decomposeSteeringCommand, effectiveToolface, azimuthDelta } from '../calculations/surveyMath';
-import { MIN_COURSE_LENGTH_FOR_RATES } from '../constants';
+import { MIN_COURSE_LENGTH_FOR_RATES, DLS_OUTLIER_THRESHOLD } from '../constants';
 import { log, error } from '../utils/logger';
 import { computeSlideWindow } from '../utils/slideWindow';
 import { getFormationNameAtDepth } from '../utils/formations';
+import { interpolateTvdAtMd, parseStation, type SurveyStation } from '../utils/tvd';
 
 // --- Generate a simple UUID ----------------------------------------
 function uuid(): string {
@@ -190,9 +191,24 @@ function sortReadingsByTime(readings: YieldReading[]): YieldReading[] {
   });
 }
 
+// Standard motor yield formula (at 100% slide):
+//   MY (°/100ft) = rate × (courseLength / slideInInterval)
+//
+// Derivation:
+//   • rate (DLS) is °/100ft over the survey interval of length CL
+//   • total curvature over interval = rate × CL / 100  (degrees)
+//   • if only `slide` ft of that interval was sliding, the motor's per-ft
+//     yield = total_curvature / slide
+//   • expressed per 100 ft of slide: × 100
+//   • => MY = (rate × CL / 100) / slide × 100 = rate × CL / slide
+//
+// slideInInterval must be footage of slide in the SAME survey interval as
+// rate was measured (from getWeightedSlideYield queried over that range).
+// Using window.slideSeen (cumulative active-slide footage past the sensor)
+// mixes intervals and yields inflated numbers for short surveys.
 function computeNormalizedYield(
   courseLength: number | null,
-  slideFt: number | null,
+  slideInInterval: number | null,
   dlsRate: number | null,
   brRate: number | null,
   trRate: number | null,
@@ -201,11 +217,27 @@ function computeNormalizedYield(
   normalizedBr: number | null;
   normalizedTr: number | null;
 } {
-  if (courseLength == null || slideFt == null || slideFt <= 0) {
+  if (
+    courseLength == null || courseLength <= 0 ||
+    slideInInterval == null || slideInInterval <= 0
+  ) {
     return { normalizedDls: null, normalizedBr: null, normalizedTr: null };
   }
-  const factor = courseLength / slideFt;
+  const factor = courseLength / slideInInterval;
   if (!isFinite(factor) || factor <= 0) {
+    return { normalizedDls: null, normalizedBr: null, normalizedTr: null };
+  }
+  // Sanity guard: very small slide footage relative to CL blows up the
+  // extrapolation. >5× amplification is unreliable — suppress rather than
+  // show a fantasy number. (Equivalent to requiring slide ≥ 20% of CL.)
+  if (factor > 5) {
+    return { normalizedDls: null, normalizedBr: null, normalizedTr: null };
+  }
+  // DLS outlier guard: if the measured DLS itself is physically implausible
+  // (almost always a transient survey spike), don't propagate it through the
+  // normalized-yield formula — would produce numbers like 168 °/100ft that
+  // have no meaning and would pollute the yield regression.
+  if (dlsRate != null && Math.abs(dlsRate) > DLS_OUTLIER_THRESHOLD) {
     return { normalizedDls: null, normalizedBr: null, normalizedTr: null };
   }
   return {
@@ -245,6 +277,8 @@ export function useReadings(
   /** MWD bit-to-survey distance in feet (from BHA). 0 = not available. */
   mwdOffset: number = 0,
   formations: FormationTop[] = [],
+  /** Well name for denormalization onto each record. Null when unknown. */
+  wellName: string | null = null,
 ): UseReadingsResult {
   const [readings, setReadings] = useState<YieldReading[]>([]);
   const [loading, setLoading] = useState(false);
@@ -264,6 +298,13 @@ export function useReadings(
 
   const formationsRef = useRef<FormationTop[]>(formations);
   formationsRef.current = formations;
+
+  const wellNameRef = useRef<string | null>(wellName);
+  wellNameRef.current = wellName;
+
+  /** Cache of MWD survey stations (sorted by MD ascending). Used to
+   *  interpolate TVD at a given bit depth when taking a reading. */
+  const surveyStationsRef = useRef<SurveyStation[]>([]);
 
   // Track the last watched channel value we saw from WITS
   const lastSeenWatchValueRef = useRef<number | null>(null);
@@ -288,6 +329,10 @@ export function useReadings(
   useEffect(() => {
     if (!assetId) return;
     let cancelled = false;
+    // Clear prior well's readings so the table doesn't briefly show stale
+    // rows while the new well's data is fetched (and stays empty-correct
+    // when the new well has zero readings).
+    setReadings([]);
     setLoading(true);
 
     (async () => {
@@ -379,6 +424,8 @@ export function useReadings(
       const intervals: SlideInterval[] = [];
       let skipped = 0;
       let totalSlidesExtracted = 0;
+      let progressSnapshotsSkipped = 0;
+      let formationKeys: Set<string> | null = null;
       const parseField = (v: unknown): number | null => {
         if (v == null) return null;
         const raw = typeof v === 'string' ? v.replace(/[%,$\s]/g, '') : v;
@@ -399,6 +446,14 @@ export function useReadings(
         //   { start_measured_depth, end_measured_depth, length, motor_yield,
         //     build_rate, dls, effective_toolface, ... }
         if (Array.isArray(d.slides)) {
+          // One-time: dump the keys of the first slide so we can see what
+          // fields are available (formation_name, etc.) to use downstream.
+          if (!formationKeys && d.slides.length > 0) {
+            const first = d.slides[0] as Record<string, unknown>;
+            formationKeys = new Set(Object.keys(first));
+            log(`SlideSheet: slide record fields = [${Array.from(formationKeys).join(', ')}]`);
+          }
+
           for (const slide of d.slides as Array<Record<string, unknown>>) {
             const fromDepth = Number(slide.start_measured_depth ?? 0);
             const toDepth   = Number(slide.end_measured_depth   ?? 0);
@@ -420,6 +475,9 @@ export function useReadings(
                 buildRateSlide:    parseField(slide.build_rate),
                 effectiveToolface: parseField(slide.effective_toolface ?? slide.tfo),
                 tfoAccuracy:       parseField(slide.tfo_accuracy),
+                startTimestamp:    parseField(slide.start_timestamp),
+                slideSeenLen:      parseField(slide.slide_seen),
+                slideAheadLen:     parseField(slide.slide_ahead),
               });
               totalSlidesExtracted++;
             } else {
@@ -451,6 +509,9 @@ export function useReadings(
             buildRateSlide: parseField(d.build_rate ?? d.buildRate),
             effectiveToolface: parseField(d.effective_toolface ?? d.tfo ?? d.toolface),
             tfoAccuracy: parseField(d.tfo_accuracy ?? d.tf_accuracy ?? d.toolface_accuracy),
+            startTimestamp: parseField(d.start_timestamp),
+            slideSeenLen: parseField(d.slide_seen),
+            slideAheadLen: parseField(d.slide_ahead),
           });
         } else {
           skipped++;
@@ -459,12 +520,154 @@ export function useReadings(
       }
 
       if (totalSlidesExtracted > 0) {
-        log(`SlideSheet: extracted ${totalSlidesExtracted} slide events from nested 'slides[]' arrays`);
+        log(
+          `SlideSheet: extracted ${totalSlidesExtracted} slide events from nested 'slides[]' arrays`,
+        );
+      }
+      void progressSnapshotsSkipped; // retained for symmetry; always 0 now
+
+      // Deduplicate by start_timestamp: Corva emits one record per WITS update
+      // both during AND after a slide. The same physical slide can appear
+      // 200+ times with identical start_timestamp but slightly varying
+      // start/end depths and slide_ahead/slide_seen. We keep one record per
+      // start_timestamp — the one with the largest slide_seen (most complete
+      // view of the slide) and motor_yield populated where possible.
+      //
+      // Records without start_timestamp (unusual) fall back to rounded
+      // fromDepth so they still dedup against themselves.
+      const dedupKey = (iv: SlideInterval): string =>
+        iv.startTimestamp != null
+          ? `ts:${iv.startTimestamp}`
+          : `d:${Math.round(iv.fromDepth)}`;
+
+      const isMoreComplete = (a: SlideInterval, b: SlideInterval): boolean => {
+        // Prefer record with larger slide_seen (more of the slide observed)
+        const aSeen = a.slideSeenLen ?? 0;
+        const bSeen = b.slideSeenLen ?? 0;
+        if (aSeen !== bSeen) return aSeen > bSeen;
+        // Tiebreak: prefer one with motor_yield populated
+        if ((a.motorYield != null) !== (b.motorYield != null)) {
+          return a.motorYield != null;
+        }
+        // Final tiebreak: larger toDepth (longer span)
+        return a.toDepth > b.toDepth;
+      };
+
+      const deduped = new Map<string, SlideInterval>();
+      let duplicatesRemoved = 0;
+      for (const iv of intervals) {
+        const key = dedupKey(iv);
+        const existing = deduped.get(key);
+        if (!existing) {
+          deduped.set(key, iv);
+          continue;
+        }
+        duplicatesRemoved++;
+        // Merge: keep whichever is "more complete"; backfill missing fields.
+        const [winner, loser] = isMoreComplete(iv, existing)
+          ? [iv, existing]
+          : [existing, iv];
+        deduped.set(key, {
+          ...winner,
+          motorYield: winner.motorYield ?? loser.motorYield,
+          buildRateSlide: winner.buildRateSlide ?? loser.buildRateSlide,
+          effectiveToolface: winner.effectiveToolface ?? loser.effectiveToolface,
+          tfoAccuracy: winner.tfoAccuracy ?? loser.tfoAccuracy,
+        });
+      }
+      const dedupedIntervals = Array.from(deduped.values());
+      if (duplicatesRemoved > 0) {
+        log(
+          `SlideSheet: deduped ${intervals.length} → ${dedupedIntervals.length} ` +
+          `unique slides by start_timestamp (${duplicatesRemoved} redundant records merged)`,
+        );
+      }
+      intervals.length = 0;
+      intervals.push(...dedupedIntervals);
+
+      intervals.sort((a, b) => a.fromDepth - b.fromDepth);
+
+      // Step 2: remove aggregate/session records. The Corva slide-sheet emits
+      // both a "session" record spanning multiple survey slices AND the
+      // individual per-survey slices. The session record's depth range
+      // equals the concatenation of its slice records' ranges. Keeping the
+      // aggregate causes triple-counting (slice + slice + aggregate).
+      // An aggregate is a record [a, c] for which there exist two OTHER
+      // records [a, b] and [b, c] (± 0.5 ft tolerance for precision drift).
+      const EPS = 0.5;
+      const beforeAgg = intervals.length;
+      const aggregateSet = new Set<SlideInterval>();
+      for (const iv of intervals) {
+        for (const left of intervals) {
+          if (left === iv) continue;
+          if (Math.abs(left.fromDepth - iv.fromDepth) > EPS) continue;
+          if (left.toDepth > iv.toDepth - EPS) continue;
+          const split = left.toDepth;
+          const rightFound = intervals.some((right) =>
+            right !== iv && right !== left &&
+            Math.abs(right.fromDepth - split) < EPS &&
+            Math.abs(right.toDepth - iv.toDepth) < EPS
+          );
+          if (rightFound) {
+            aggregateSet.add(iv);
+            break;
+          }
+        }
+      }
+      if (aggregateSet.size > 0) {
+        const remaining = intervals.filter((iv) => !aggregateSet.has(iv));
+        intervals.length = 0;
+        intervals.push(...remaining);
+        log(`SlideSheet: removed ${aggregateSet.size} aggregate records (${beforeAgg} → ${intervals.length})`);
       }
 
-      // Sort by depth so getSlideBreakdown can rely on ordering (though it doesn't
-      // currently require it, this makes future binary-search optimisation easy).
+      // Step 3: resolve twin records. Corva emits duplicate records for the
+      // same physical slide with ~0.1 ft offset on fromDepth and different
+      // motor_yields. Observed pattern: the EARLIER start_timestamp carries
+      // the correct per-slide motor_yield; the later twin inherits a stale
+      // value from a neighboring slide's context. Drop the later twin.
+      const twinLosers = new Set<SlideInterval>();
+      for (let i = 0; i < intervals.length; i++) {
+        const a = intervals[i];
+        if (twinLosers.has(a)) continue;
+        for (let j = i + 1; j < intervals.length; j++) {
+          const b = intervals[j];
+          if (twinLosers.has(b)) continue;
+          if (
+            Math.abs(a.fromDepth - b.fromDepth) < EPS &&
+            Math.abs(a.toDepth - b.toDepth) < EPS
+          ) {
+            const aTs = a.startTimestamp ?? Number.POSITIVE_INFINITY;
+            const bTs = b.startTimestamp ?? Number.POSITIVE_INFINITY;
+            twinLosers.add(aTs <= bTs ? b : a);
+          }
+        }
+      }
+      if (twinLosers.size > 0) {
+        const beforeTwins = intervals.length;
+        const remaining = intervals.filter((iv) => !twinLosers.has(iv));
+        intervals.length = 0;
+        intervals.push(...remaining);
+        log(`SlideSheet: dropped ${twinLosers.size} twin records (kept earlier-timestamp copy) (${beforeTwins} → ${intervals.length})`);
+      }
+
+      // Resort (though not strictly necessary — filter preserves order)
       intervals.sort((a, b) => a.fromDepth - b.fromDepth);
+
+      // One-time dump of the deepest ~25 slides so we can compare them against
+      // the Corva Slide Sheet UI and diagnose which records look right/wrong.
+      const deepest = intervals.slice(-25);
+      console.group(
+        `%c[YieldTracker] 🛷 Deduped slide cache (deepest ${deepest.length} of ${intervals.length})`,
+        'color:#81ecec;font-weight:bold',
+      );
+      for (const iv of deepest) {
+        const my = iv.motorYield != null ? iv.motorYield.toFixed(2) : 'null';
+        const tf = iv.effectiveToolface != null ? iv.effectiveToolface.toFixed(0) + '°' : 'null';
+        const ts = iv.startTimestamp ?? '-';
+        console.log(`  [${iv.fromDepth.toFixed(1)}–${iv.toDepth.toFixed(1)} ft] len=${(iv.toDepth - iv.fromDepth).toFixed(1)} ft | motor_yield=${my} | TFO=${tf} | ts=${ts}`);
+      }
+      console.groupEnd();
 
       // -- Cache update ------------------------------------------------
       // We always fetch all records (no depth filter), so a successful
@@ -529,19 +732,32 @@ export function useReadings(
           sheetTrYield = wy.weightedTrYield;
         }
 
-        const appDls = r.mwdDls ?? r.dls;
-        const appBr = r.mwdBr ?? r.br;
-        const appTr = r.mwdTr ?? r.tr;
-        const norm = computeNormalizedYield(r.courseLength, slideFt, appDls, appBr, appTr);
-        normalizedDls = norm.normalizedDls;
-        normalizedBr = norm.normalizedBr;
-        normalizedTr = norm.normalizedTr;
-
         const mwdOff = mwdOffsetRef.current;
         const sensor = mwdOff > 0 ? r.depth - mwdOff : r.depth;
         const tfWindowFrom = mwdOff > 0 ? sensor : (prevR?.depth ?? r.depth);
         const window = computeSlideWindow(r.depth, sensor, sheets, tfWindowFrom);
-        const formation = getFormationNameAtDepth(r.depth, formationsRef.current);
+
+        const appDls = r.mwdDls ?? r.dls;
+        const appBr = r.mwdBr ?? r.br;
+        const appTr = r.mwdTr ?? r.tr;
+        // Query slide footage over the SENSOR's interval — that's where the
+        // MWD measured its DLS. If mwdOffset is valid, use [prev_sensor,
+        // current_sensor]; otherwise fall back to [ref_bit, current_bit].
+        const prevSensorMd = prevR != null
+          ? (mwdOff > 0 ? prevR.depth - mwdOff : prevR.depth)
+          : null;
+        const sensorSlideFt = (prevSensorMd != null && sensor > prevSensorMd && sheets.length > 0)
+          ? getWeightedSlideYield(prevSensorMd, sensor, sheets).slideFt
+          : slideFt;
+        const norm = computeNormalizedYield(r.courseLength, sensorSlideFt, appDls, appBr, appTr);
+        normalizedDls = norm.normalizedDls;
+        normalizedBr = norm.normalizedBr;
+        normalizedTr = norm.normalizedTr;
+        // Backfill TVD and re-resolve formation if surveys/formations arrived
+        // after the reading was captured. TVD interpolation needs the reading's
+        // own inc/az for extrapolation past the last station.
+        const tvdBackfill = interpolateTvdAtMd(r.depth, surveyStationsRef.current, r.inc, r.az);
+        const formation = getFormationNameAtDepth(r.depth, formationsRef.current, tvdBackfill);
         if (sheetMotorYield == null || sheetBrYield == null || sheetTrYield == null) {
           const fromActive = deriveYieldFromActiveSlide(window.active);
           if (sheetMotorYield == null) sheetMotorYield = fromActive.motorYield;
@@ -564,7 +780,8 @@ export function useReadings(
           normalizedDls !== r.normalizedDls ||
           normalizedBr !== r.normalizedBr ||
           normalizedTr !== r.normalizedTr ||
-          formation !== r.formation
+          formation !== r.formation ||
+          tvdBackfill !== r.tvd
         ) {
           changed = true;
           return {
@@ -583,6 +800,7 @@ export function useReadings(
             normalizedBr,
             normalizedTr,
             formation,
+            tvd: tvdBackfill,
           };
         }
         return r;
@@ -604,6 +822,38 @@ export function useReadings(
     const timer = setInterval(loadSlideSheet, 5 * 60 * 1000);
     return () => clearInterval(timer);
   }, [assetId, loadSlideSheet]);
+
+  // --- Survey stations cache (for TVD interpolation) ---------------
+  // Cached on mount and refreshed on the same cadence as the slide sheet
+  // so new surveys are picked up as drilling progresses.
+  const loadSurveyStations = useCallback(async () => {
+    if (!assetId) return;
+    try {
+      const raw = await fetchAllSurveyStations(assetId);
+      const parsed = raw
+        .map((r) => parseStation(r))
+        .filter((s): s is SurveyStation => s !== null)
+        .sort((a, b) => a.measured_depth - b.measured_depth);
+      surveyStationsRef.current = parsed;
+      const deepest = parsed[parsed.length - 1];
+      log(
+        `SurveyStations: cached ${parsed.length} stations` +
+        (deepest
+          ? ` (deepest @ MD ${deepest.measured_depth.toFixed(0)} ft, ` +
+            `TVD ${Number.isFinite(deepest.tvd ?? deepest.true_vertical_depth ?? NaN) ? (deepest.tvd ?? deepest.true_vertical_depth)!.toFixed(0) : 'n/a'} ft)`
+          : ''),
+      );
+    } catch (e) {
+      error('SurveyStations: load failed:', e);
+    }
+  }, [assetId]);
+
+  useEffect(() => {
+    if (!assetId) return;
+    loadSurveyStations();
+    const timer = setInterval(loadSurveyStations, 5 * 60 * 1000);
+    return () => clearInterval(timer);
+  }, [assetId, loadSurveyStations]);
 
   // --- Take a snapshot (core function) -------------------------
   const takeReading = useCallback(async (source: 'auto' | 'manual' = 'manual') => {
@@ -1017,7 +1267,11 @@ export function useReadings(
       let slideStartDepth_: number | null = null;
       let slideEndDepth_: number | null = null;
       let tfAccuracy_: number | null = null;
-      const formation_: string | null = getFormationNameAtDepth(depth, formationsRef.current);
+      // TVD at bit depth — interpolated from cached MWD survey stations.
+      // Used for formation alignment (deeper formations only have TVD tops)
+      // and exposed in the table/DB for consumer apps.
+      const tvd_ = interpolateTvdAtMd(depth, surveyStationsRef.current, inc, az);
+      const formation_: string | null = getFormationNameAtDepth(depth, formationsRef.current, tvd_);
 
       if (mwdOff > 0) {
         log(
@@ -1064,14 +1318,6 @@ export function useReadings(
             sheetMotorYield_ = wy.weightedMotorYield;
             sheetBrYield_ = wy.weightedBrYield;
             sheetTrYield_ = wy.weightedTrYield;
-
-            const appDls = mwdDls ?? dls_;
-            const appBr = mwdBr ?? br_;
-            const appTr = mwdTr ?? tr_;
-            const norm = computeNormalizedYield(cl, wy.slideFt, appDls, appBr, appTr);
-            normalizedDls_ = norm.normalizedDls;
-            normalizedBr_ = norm.normalizedBr;
-            normalizedTr_ = norm.normalizedTr;
             log(
               `SlideYield [${refDepth.toFixed(1)}–${depth.toFixed(1)}ft]: ` +
               `slide=${wy.slideFt.toFixed(1)}ft rotate=${wy.rotateFt.toFixed(1)}ft ` +
@@ -1087,6 +1333,24 @@ export function useReadings(
         slideStartDepth_ = window.slideStartDepth;
         slideEndDepth_ = window.slideEndDepth;
         tfAccuracy_ = window.tfAccuracy;
+
+        // 3. Normalized (motor) yield: scale rates to 100% slide using slide
+        //    footage in the SAME sensor interval the MWD measured over. This
+        //    is the physically correct motor yield: MY = DLS × CL / slide.
+        const appDls = mwdDls ?? dls_;
+        const appBr = mwdBr ?? br_;
+        const appTr = mwdTr ?? tr_;
+        const prevSensorMd = prev != null
+          ? (mwdOff > 0 ? prev.depth - mwdOff : prev.depth)
+          : null;
+        const sensorSlideFt = (prevSensorMd != null && sensorDepthForWindow > prevSensorMd && sheets.length > 0)
+          ? getWeightedSlideYield(prevSensorMd, sensorDepthForWindow, sheets).slideFt
+          : slideFt_;
+        const norm = computeNormalizedYield(cl, sensorSlideFt, appDls, appBr, appTr);
+        normalizedDls_ = norm.normalizedDls;
+        normalizedBr_ = norm.normalizedBr;
+        normalizedTr_ = norm.normalizedTr;
+
         if (sheetMotorYield_ == null || sheetBrYield_ == null || sheetTrYield_ == null) {
           const fromActive = deriveYieldFromActiveSlide(window.active);
           if (sheetMotorYield_ == null) sheetMotorYield_ = fromActive.motorYield;
@@ -1127,6 +1391,13 @@ export function useReadings(
         normalizedDls: normalizedDls_,
         normalizedBr: normalizedBr_,
         normalizedTr: normalizedTr_,
+        dlsOutlier: (() => {
+          const d = mwdDls ?? dls_;
+          return d != null && Math.abs(d) > DLS_OUTLIER_THRESHOLD;
+        })(),
+        wellName: wellNameRef.current,
+        tvd: tvd_,
+        deletedAt: null,
         dutyCycle: dc,
         toolFaceSet: tfSet,
         toolFaceActual: tfAct,
@@ -1216,24 +1487,47 @@ export function useReadings(
   }, [assetId]);
 
   // --- Delete a reading ----------------------------------------
+  // Soft-delete: stamp `data.deleted_at` via PATCH on the dataset record
+  // so a backend cleanup app can hard-delete later. We can't DELETE
+  // directly from a UI app without backend auth, and we do not want
+  // deleted rows to reappear on reload. Local state is pruned immediately
+  // so the row disappears from the UI.
   const removeReading = useCallback(async (readingId: string) => {
-    // Remove from local state immediately
+    const now = Date.now();
     setReadings((prev) => prev.filter((r) => r.id !== readingId));
-    // Persist deletion
     if (assetId) {
-      await deleteReading(assetId, readingId);
+      try {
+        await softDeleteReading(assetId, readingId, now);
+      } catch (e) {
+        error('softDeleteReading failed:', e);
+      }
+      // Legacy best-effort DELETE for environments where the frontend has
+      // auth (e.g. running outside the iframe shell during dev).
+      deleteReading(assetId, readingId).catch(() => { /* ignore */ });
     }
   }, [assetId]);
 
   // --- Clear all readings ---------------------------------------
+  // Soft-delete every currently-visible reading. localStorage is cleared
+  // so the UI rebuilds cleanly; the dataset records remain tombstoned
+  // for the backend cleanup app to hard-delete.
   const clearAll = useCallback(async () => {
+    const snapshot = readingsRef.current.slice();
     setReadings([]);
     if (assetId) {
-      try {
-        localStorage.removeItem(`yieldtracker_readings_${assetId}`);
-      } catch { /* ignore */ }
+      try { localStorage.removeItem(`yieldtracker_readings_${assetId}`); } catch { /* ignore */ }
+      const now = Date.now();
+      // Fire tombstone PATCHes in parallel but don't block UI — caller
+      // already sees an empty table. Log failures individually.
+      await Promise.all(
+        snapshot.map((r) =>
+          softDeleteReading(assetId, r.id, now).catch((e) => {
+            error(`softDeleteReading failed for ${r.id}:`, e);
+          }),
+        ),
+      );
     }
-    log('Readings cleared');
+    log(`Readings cleared (${snapshot.length} tombstoned)`);
   }, [assetId]);
 
   // --- Section-aware channel watcher -----------------------------

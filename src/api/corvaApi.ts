@@ -420,18 +420,43 @@ export async function fetchFormations(assetId: number): Promise<FormationTop[]> 
     for (const rec of records) {
       const row = rec as Record<string, unknown>;
       const recData = (row.data ?? {}) as Record<string, unknown>;
-      const md = Number(recData.md);
-      const td = Number(recData.td);
-      if (!Number.isFinite(md) || !Number.isFinite(td)) continue;
+      // md and td come as numbers OR null. null → NaN via Number(); we keep
+      // those as NaN so the downstream MD-based lookup can filter them out
+      // (some deep formations only have TVD populated).
+      const rawMd = recData.md;
+      const rawTd = recData.td;
+      const md = rawMd == null ? NaN : Number(rawMd);
+      const td = rawTd == null ? NaN : Number(rawTd);
+      // Skip records with neither md nor td — truly useless.
+      if (!Number.isFinite(md) && !Number.isFinite(td)) continue;
+      const name = String(recData.formation_name ?? '');
+      if (!name) continue;
 
-      formations.push({
-        md,
-        td,
-        name: String(recData.formation_name ?? ''),
-      });
+      formations.push({ md, td, name });
     }
 
-    formations.sort((a, b) => a.md - b.md);
+    // Sort by md ascending. NaN mds sort last (they can't be placed by MD).
+    formations.sort((a, b) => {
+      const aMd = Number.isFinite(a.md) ? a.md : Number.POSITIVE_INFINITY;
+      const bMd = Number.isFinite(b.md) ? b.md : Number.POSITIVE_INFINITY;
+      return aMd - bMd;
+    });
+
+    console.group(
+      `%c[YieldTracker] 🪨 Formations loaded from corva/data.formations (asset=${assetId})`,
+      'color:#fdcb6e;font-weight:bold',
+    );
+    console.log(`Got ${formations.length} formation record(s) (sorted by md ascending):`);
+    for (const f of formations) {
+      const mdStr = Number.isFinite(f.md) ? f.md.toFixed(1) : 'null';
+      const tdStr = Number.isFinite(f.td) ? f.td.toFixed(1) : 'null';
+      console.log(`  ${f.name || '(unnamed)'}  md=${mdStr}  tvd=${tdStr}`);
+    }
+    if (formations.length === 0) {
+      console.warn('  No formations returned — formation column will be null.');
+    }
+    console.groupEnd();
+
     return formations;
   } catch (e) {
     error('fetchFormations failed:', e);

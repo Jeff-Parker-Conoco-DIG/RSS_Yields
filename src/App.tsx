@@ -7,11 +7,13 @@ import { useDrillstringInfo } from './effects/useDrillstringInfo';
 import { useFormations } from './effects/useFormations';
 import { useReadings } from './effects/useReadings';
 import { RssToolInfo } from './components/RssToolInfo';
+import { WellPicker } from './components/WellPicker';
 import { ControlsBar } from './components/ControlsBar';
 import { ReadingsTable } from './components/ReadingsTable';
 import { YieldScatterPlot } from './components/YieldScatterPlot';
 import { AvgsWindow } from './components/AvgsWindow';
 import { computeYieldAnalysis } from './calculations/yieldCalc';
+import { isDlsOutlier } from './utils/formatting';
 import { exportToExcel } from './reports/excelExport';
 import { exportToPdf } from './reports/pdfExport';
 
@@ -150,13 +152,16 @@ const App: React.FC<AppProps> = ({ well, app, appSettings, appHeaderProps }) => 
     resolvedMapFinal,
     toolInfo?.mwdBitToSurveyDistance ?? 0,
     formations,
+    well?.name ?? null,
   );
 
   // Yield analysis for scatter plot — uses MWD-derived rates as ground truth.
   // Falls back to RSS rates for wells/readings where MWD channels aren't mapped yet.
+  // Outlier readings (DLS > DLS_OUTLIER_THRESHOLD, typically survey transients)
+  // are excluded so a single spike doesn't pull the regression line.
   const yieldAnalysis = useMemo(() => {
     const stations = readings
-      .filter((r) => (r.mwdDls ?? r.dls) != null)
+      .filter((r) => (r.mwdDls ?? r.dls) != null && !isDlsOutlier(r))
       .map((r) => ({
         mwdDLS: r.mwdDls ?? r.dls!,        // Ground-truth DLS (prefer MWD)
         mwdBUR: r.mwdBr ?? r.br ?? 0,      // Ground-truth build rate
@@ -190,6 +195,9 @@ const App: React.FC<AppProps> = ({ well, app, appSettings, appHeaderProps }) => 
 
   const content = (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: '#141414', color: '#ddd' }}>
+      {/* Rig + well selector — drives every per-well hook below via well.asset_id */}
+      <WellPicker appHeaderProps={appHeaderProps} />
+
       {/* Tool info header + settings gear */}
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <div style={{ flex: 1 }}>
@@ -199,6 +207,7 @@ const App: React.FC<AppProps> = ({ well, app, appSettings, appHeaderProps }) => 
             lastSurveyDepth={readings.length > 0 ? readings[readings.length - 1].depth : null}
             wsConnected={false}
             loading={dsLoading}
+            wellName={well?.name ?? null}
           />
         </div>
         <button
@@ -287,7 +296,7 @@ const App: React.FC<AppProps> = ({ well, app, appSettings, appHeaderProps }) => 
         )}
         {activeTab === 'scatter' && (
           <YieldScatterPlot
-            stations={readings.filter((r) => (r.mwdDls ?? r.dls) != null).map((r) => ({
+            stations={readings.filter((r) => (r.mwdDls ?? r.dls) != null && !isDlsOutlier(r)).map((r) => ({
               avgDutyCycle: r.dutyCycle,
               mwdDLS: r.mwdDls ?? r.dls!,   // Ground-truth DLS for regression
               mwdBUR: r.mwdBr ?? r.br ?? 0,
@@ -306,10 +315,6 @@ const App: React.FC<AppProps> = ({ well, app, appSettings, appHeaderProps }) => 
     </div>
   );
 
-  // NOTE: We intentionally skip wrapping with @corva/ui's AppContainer/AppHeader here.
-  // The manifest has "use_app_header_v3": true, so the Corva platform renders the header
-  // automatically in production. In local dev, AppHeader's withRouter (react-router-dom v5)
-  // conflicts with dc-platform-shared's react-router v3 shell, causing an invariant error.
   return (
     <>
       {content}

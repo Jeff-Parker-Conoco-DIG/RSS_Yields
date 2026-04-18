@@ -1,7 +1,8 @@
 import React, { useState, useCallback } from 'react';
 import type { YieldReading } from '../../types';
 import type { WitsChannelProfile } from '../../witsMapper/types';
-import { SECTION_COLORS, YIELD_COLORS } from '../../constants';
+import { SECTION_COLORS, YIELD_COLORS, DLS_OUTLIER_THRESHOLD } from '../../constants';
+import { isDlsOutlier } from '../../utils/formatting';
 import styles from './ReadingsTable.module.css';
 
 interface ReadingsTableProps {
@@ -166,7 +167,8 @@ export const ReadingsTable: React.FC<ReadingsTableProps> = ({
           <tr>
             <th className={styles.thSection}>Sec</th>
             <th className={styles.thFormation}>Formation</th>
-            <th>Depth</th>
+            <th title="Measured Depth (ft)">Depth</th>
+            <th title="True Vertical Depth at bit (ft), interpolated from MWD surveys">TVD</th>
             <th>{incLabel}</th>
             <th>{azLabel}</th>
 
@@ -233,6 +235,9 @@ export const ReadingsTable: React.FC<ReadingsTableProps> = ({
 
                 {/* Core survey data */}
                 <td className={styles.depthCell}>{fmt(r.depth, 1)}</td>
+                <td className={styles.depthCell} title="True Vertical Depth (ft)">
+                  {fmt(r.tvd, 1)}
+                </td>
                 <td>{fmt(r.inc, 2)}</td>
                 <td>{fmt(r.az, 2)}</td>
 
@@ -249,8 +254,17 @@ export const ReadingsTable: React.FC<ReadingsTableProps> = ({
                 <td style={{ color: trColor(r.mwdTr ?? r.tr, dlNeeded, r.toolFaceSet) }}>
                   {isFirst ? '\u2014' : fmt(r.mwdTr ?? r.tr, 2)}
                 </td>
-                <td style={{ color: dlsColor(r.mwdDls ?? r.dls, dlNeeded) }}>
-                  {isFirst ? '\u2014' : fmt(r.mwdDls ?? r.dls, 2)}
+                <td
+                  style={{ color: dlsColor(r.mwdDls ?? r.dls, dlNeeded) }}
+                  title={
+                    isDlsOutlier(r)
+                      ? `DLS exceeds ${DLS_OUTLIER_THRESHOLD} °/100ft — likely a survey transient. This reading is excluded from MY APP and the yield regression.`
+                      : undefined
+                  }
+                >
+                  {isFirst
+                    ? '\u2014'
+                    : `${fmt(r.mwdDls ?? r.dls, 2)}${isDlsOutlier(r) ? ' \u26A0' : ''}`}
                 </td>
                 {isMotor && (
                   <td className={styles.motorCell}>{fmt(r.normalizedDls, 2)}</td>

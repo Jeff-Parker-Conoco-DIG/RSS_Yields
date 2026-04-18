@@ -65,6 +65,14 @@ export const MIN_COURSE_LENGTH_FT = 5;
  *  Set low (0.5ft) since the DD controls the actual interval. */
 export const MIN_COURSE_LENGTH_FOR_RATES = 0.5;
 
+/** Upper sanity threshold for DLS (°/100ft). No RSS/PDM realistically builds
+ *  above this. Values above this are almost certainly survey transients
+ *  (stick-slip, vibration, single bad continuous-inc sample captured by an
+ *  auto-triggered reading). Readings over threshold get flagged as outliers:
+ *  MY APP is suppressed (formula would propagate the garbage) and the row is
+ *  excluded from yield regression so the fit isn't pulled by a spike. */
+export const DLS_OUTLIER_THRESHOLD = 30;
+
 // ─── RSS Vendor IDs ────────────────────────────────────────────────
 export const RSS_VENDORS = ['icruise', 'powerdrive', 'custom', 'bentmotor_curve', 'rss_curve'] as const;
 export type RssVendorId = (typeof RSS_VENDORS)[number];

@@ -1,7 +1,21 @@
+import type { YieldReading } from '../types';
+import { DLS_OUTLIER_THRESHOLD } from '../constants';
+
 /** Format a number to N decimal places */
 export function toFixed(value: number | null | undefined, decimals: number = 2): string {
   if (value == null || isNaN(value)) return '—';
   return value.toFixed(decimals);
+}
+
+/** Whether a reading's DLS exceeds the outlier threshold. Reads the stored
+ *  `dlsOutlier` flag if present, otherwise derives from the reading's DLS
+ *  so legacy readings (saved before this field existed) still work. */
+export function isDlsOutlier(
+  r: Pick<YieldReading, 'dlsOutlier' | 'mwdDls' | 'dls'>,
+): boolean {
+  if (typeof r.dlsOutlier === 'boolean') return r.dlsOutlier;
+  const d = r.mwdDls ?? r.dls;
+  return d != null && Math.abs(d) > DLS_OUTLIER_THRESHOLD;
 }
 
 /** Format an angle in degrees with ° suffix */
