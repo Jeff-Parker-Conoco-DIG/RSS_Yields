@@ -1,0 +1,692 @@
+react refresh:6 [webpack-dev-server] Server started: Hot Module Replacement enabled, Live Reloading enabled, Progress disabled, Overlay enabled.
+react refresh:6 [HMR] Waiting for update signal from WDS...
+react refresh:6 Material-UI: The `css` function is deprecated. Use the `styleFunctionSx` instead.
+css @ styleFunctionSx.js:61
+./node_modules/@material-ui/core/esm/Box/Box.js @ Box.js:3
+options.factory @ react refresh:6
+__webpack_require__ @ bootstrap:22
+fn @ hot module replacement:61
+./node_modules/@corva/ui/components/DevCenter/AppHeader/AppHeader.js @ AppHeader.css.js:2
+options.factory @ react refresh:6
+__webpack_require__ @ bootstrap:22
+fn @ hot module replacement:61
+./node_modules/@corva/ui/components/index.js @ utils.js:2
+options.factory @ react refresh:6
+__webpack_require__ @ bootstrap:22
+fn @ hot module replacement:61
+./node_modules/@corva/ui/index.js @ index.js:2
+options.factory @ react refresh:6
+__webpack_require__ @ bootstrap:22
+fn @ hot module replacement:61
+./node_modules/@corva/dc-platform-shared/CLI/hocs/withCorvaMagicHOC.js @ withCLIAppSettingsHOC.js:1
+options.factory @ react refresh:6
+__webpack_require__ @ bootstrap:22
+fn @ hot module replacement:61
+./node_modules/@corva/dc-platform-shared/cjs/devcenter/webpack/DevServerEntryPoint.js @ index.js:1
+options.factory @ react refresh:6
+__webpack_require__ @ bootstrap:22
+(anonymous) @ devApp.js:568867
+(anonymous) @ devApp.js:568869
+
+corvaApi.ts:11 [YieldTracker] Corva SDK clients loaded
+react refresh:6 Warning: componentWillMount has been renamed, and is not recommended for use. See https://reactjs.org/link/unsafe-component-lifecycles for details.
+
+* Move code with side effects to componentDidMount, and set initial state in the constructor.
+* Rename componentWillMount to UNSAFE_componentWillMount to suppress this warning in non-strict mode. In React 18.x, only the UNSAFE_ name will work. To rename all deprecated lifecycles to their new names, you can run `npx react-codemod rename-unsafe-lifecycles` in your project source folder.
+
+Please update the following components: Router
+printWarning @ react-dom.development.js:67
+warn @ react-dom.development.js:34
+__webpack_modules__../node_modules/react-dom/cjs/react-dom.development.js.ReactStrictModeWarnings.flushPendingUnsafeLifecycleWarnings @ react-dom.development.js:11524
+flushRenderPhaseStrictModeWarningsInDEV @ react-dom.development.js:23822
+commitRootImpl @ react-dom.development.js:23005
+unstable_runWithPriority @ scheduler.development.js:468
+runWithPriority$1 @ react-dom.development.js:11276
+commitRoot @ react-dom.development.js:22990
+performSyncWorkOnRoot @ react-dom.development.js:22329
+scheduleUpdateOnFiber @ react-dom.development.js:21881
+updateContainer @ react-dom.development.js:25482
+(anonymous) @ react-dom.development.js:26021
+unbatchedUpdates @ react-dom.development.js:22431
+legacyRenderSubtreeIntoContainer @ react-dom.development.js:26020
+render @ react-dom.development.js:26103
+(anonymous) @ DevServerEntryPoint.js:1
+Promise.then
+./node_modules/@corva/dc-platform-shared/cjs/devcenter/webpack/DevServerEntryPoint.js @ DevServerEntryPoint.js:1
+options.factory @ react refresh:6
+__webpack_require__ @ bootstrap:22
+(anonymous) @ devApp.js:568867
+(anonymous) @ devApp.js:568869
+react refresh:6 Warning: componentWillReceiveProps has been renamed, and is not recommended for use. See https://reactjs.org/link/unsafe-component-lifecycles for details.
+
+* Move data fetching code or side effects to componentDidUpdate.
+* If you're updating state whenever props change, refactor your code to use memoization techniques or move it to static getDerivedStateFromProps. Learn more at: https://reactjs.org/link/derived-state
+* Rename componentWillReceiveProps to UNSAFE_componentWillReceiveProps to suppress this warning in non-strict mode. In React 18.x, only the UNSAFE_ name will work. To rename all deprecated lifecycles to their new names, you can run `npx react-codemod rename-unsafe-lifecycles` in your project source folder.
+
+Please update the following components: Router
+printWarning @ react-dom.development.js:67
+warn @ react-dom.development.js:34
+__webpack_modules__../node_modules/react-dom/cjs/react-dom.development.js.ReactStrictModeWarnings.flushPendingUnsafeLifecycleWarnings @ react-dom.development.js:11530
+flushRenderPhaseStrictModeWarningsInDEV @ react-dom.development.js:23822
+commitRootImpl @ react-dom.development.js:23005
+unstable_runWithPriority @ scheduler.development.js:468
+runWithPriority$1 @ react-dom.development.js:11276
+commitRoot @ react-dom.development.js:22990
+performSyncWorkOnRoot @ react-dom.development.js:22329
+scheduleUpdateOnFiber @ react-dom.development.js:21881
+updateContainer @ react-dom.development.js:25482
+(anonymous) @ react-dom.development.js:26021
+unbatchedUpdates @ react-dom.development.js:22431
+legacyRenderSubtreeIntoContainer @ react-dom.development.js:26020
+render @ react-dom.development.js:26103
+(anonymous) @ DevServerEntryPoint.js:1
+Promise.then
+./node_modules/@corva/dc-platform-shared/cjs/devcenter/webpack/DevServerEntryPoint.js @ DevServerEntryPoint.js:1
+options.factory @ react refresh:6
+__webpack_require__ @ bootstrap:22
+(anonymous) @ devApp.js:568867
+(anonymous) @ devApp.js:568869
+react refresh:6 Warning: componentWillMount has been renamed, and is not recommended for use. See https://reactjs.org/link/unsafe-component-lifecycles for details.
+
+* Move code with side effects to componentDidMount, and set initial state in the constructor.
+* Rename componentWillMount to UNSAFE_componentWillMount to suppress this warning in non-strict mode. In React 18.x, only the UNSAFE_ name will work. To rename all deprecated lifecycles to their new names, you can run `npx react-codemod rename-unsafe-lifecycles` in your project source folder.
+
+Please update the following components: RouterContext
+printWarning @ react-dom.development.js:67
+warn @ react-dom.development.js:34
+__webpack_modules__../node_modules/react-dom/cjs/react-dom.development.js.ReactStrictModeWarnings.flushPendingUnsafeLifecycleWarnings @ react-dom.development.js:11524
+flushRenderPhaseStrictModeWarningsInDEV @ react-dom.development.js:23822
+commitRootImpl @ react-dom.development.js:23005
+unstable_runWithPriority @ scheduler.development.js:468
+runWithPriority$1 @ react-dom.development.js:11276
+commitRoot @ react-dom.development.js:22990
+performSyncWorkOnRoot @ react-dom.development.js:22329
+(anonymous) @ react-dom.development.js:11327
+unstable_runWithPriority @ scheduler.development.js:468
+runWithPriority$1 @ react-dom.development.js:11276
+flushSyncCallbackQueueImpl @ react-dom.development.js:11322
+flushSyncCallbackQueue @ react-dom.development.js:11309
+scheduleUpdateOnFiber @ react-dom.development.js:21893
+enqueueSetState @ react-dom.development.js:12467
+__webpack_modules__../node_modules/react/cjs/react.development.js.Component.setState @ react.development.js:365
+(anonymous) @ Router.js:103
+(anonymous) @ createTransitionManager.js:228
+(anonymous) @ createTransitionManager.js:83
+done @ AsyncUtils.js:74
+(anonymous) @ AsyncUtils.js:80
+getComponentsForRoute @ getComponents.js:6
+(anonymous) @ getComponents.js:30
+(anonymous) @ AsyncUtils.js:79
+mapAsync @ AsyncUtils.js:78
+getComponents @ getComponents.js:29
+finishEnterHooks @ createTransitionManager.js:77
+next @ AsyncUtils.js:47
+(anonymous) @ TransitionUtils.js:88
+wrappedNext @ TransitionUtils.js:110
+(anonymous) @ withReactRouterHOC.js:1
+(anonymous) @ regeneratorRuntime.js:52
+(anonymous) @ regenerator.js:52
+(anonymous) @ regeneratorDefine.js:11
+asyncGeneratorStep @ asyncToGenerator.js:3
+_next @ asyncToGenerator.js:17
+Promise.then
+asyncGeneratorStep @ asyncToGenerator.js:8
+_next @ asyncToGenerator.js:17
+(anonymous) @ asyncToGenerator.js:22
+(anonymous) @ asyncToGenerator.js:14
+(anonymous) @ withReactRouterHOC.js:1
+transitionHook @ TransitionUtils.js:43
+(anonymous) @ TransitionUtils.js:114
+(anonymous) @ TransitionUtils.js:84
+next @ AsyncUtils.js:34
+loopAsync @ AsyncUtils.js:51
+runTransitionHooks @ TransitionUtils.js:83
+runEnterHooks @ TransitionUtils.js:107
+(anonymous) @ createTransitionManager.js:70
+runTransitionHooks @ TransitionUtils.js:74
+runChangeHooks @ TransitionUtils.js:131
+finishMatch @ createTransitionManager.js:67
+(anonymous) @ createTransitionManager.js:45
+next @ AsyncUtils.js:41
+loopAsync @ AsyncUtils.js:51
+matchRoutes @ matchRoutes.js:231
+match @ createTransitionManager.js:41
+historyListener @ createTransitionManager.js:222
+listen @ createTransitionManager.js:246
+componentWillMount @ Router.js:96
+callComponentWillMount @ react-dom.development.js:12784
+mountClassInstance @ react-dom.development.js:12878
+updateClassComponent @ react-dom.development.js:17426
+beginWork @ react-dom.development.js:19073
+beginWork$1 @ react-dom.development.js:23940
+performUnitOfWork @ react-dom.development.js:22776
+workLoopSync @ react-dom.development.js:22707
+renderRootSync @ react-dom.development.js:22670
+performSyncWorkOnRoot @ react-dom.development.js:22293
+scheduleUpdateOnFiber @ react-dom.development.js:21881
+updateContainer @ react-dom.development.js:25482
+(anonymous) @ react-dom.development.js:26021
+unbatchedUpdates @ react-dom.development.js:22431
+legacyRenderSubtreeIntoContainer @ react-dom.development.js:26020
+render @ react-dom.development.js:26103
+(anonymous) @ DevServerEntryPoint.js:1
+Promise.then
+./node_modules/@corva/dc-platform-shared/cjs/devcenter/webpack/DevServerEntryPoint.js @ DevServerEntryPoint.js:1
+options.factory @ react refresh:6
+__webpack_require__ @ bootstrap:22
+(anonymous) @ devApp.js:568867
+(anonymous) @ devApp.js:568869
+react refresh:6 Warning: componentWillReceiveProps has been renamed, and is not recommended for use. See https://reactjs.org/link/unsafe-component-lifecycles for details.
+
+* Move data fetching code or side effects to componentDidUpdate.
+* If you're updating state whenever props change, refactor your code to use memoization techniques or move it to static getDerivedStateFromProps. Learn more at: https://reactjs.org/link/derived-state
+* Rename componentWillReceiveProps to UNSAFE_componentWillReceiveProps to suppress this warning in non-strict mode. In React 18.x, only the UNSAFE_ name will work. To rename all deprecated lifecycles to their new names, you can run `npx react-codemod rename-unsafe-lifecycles` in your project source folder.
+
+Please update the following components: RouterContext
+printWarning @ react-dom.development.js:67
+warn @ react-dom.development.js:34
+__webpack_modules__../node_modules/react-dom/cjs/react-dom.development.js.ReactStrictModeWarnings.flushPendingUnsafeLifecycleWarnings @ react-dom.development.js:11530
+flushRenderPhaseStrictModeWarningsInDEV @ react-dom.development.js:23822
+commitRootImpl @ react-dom.development.js:23005
+unstable_runWithPriority @ scheduler.development.js:468
+runWithPriority$1 @ react-dom.development.js:11276
+commitRoot @ react-dom.development.js:22990
+performSyncWorkOnRoot @ react-dom.development.js:22329
+(anonymous) @ react-dom.development.js:11327
+unstable_runWithPriority @ scheduler.development.js:468
+runWithPriority$1 @ react-dom.development.js:11276
+flushSyncCallbackQueueImpl @ react-dom.development.js:11322
+flushSyncCallbackQueue @ react-dom.development.js:11309
+scheduleUpdateOnFiber @ react-dom.development.js:21893
+enqueueSetState @ react-dom.development.js:12467
+__webpack_modules__../node_modules/react/cjs/react.development.js.Component.setState @ react.development.js:365
+(anonymous) @ Router.js:103
+(anonymous) @ createTransitionManager.js:228
+(anonymous) @ createTransitionManager.js:83
+done @ AsyncUtils.js:74
+(anonymous) @ AsyncUtils.js:80
+getComponentsForRoute @ getComponents.js:6
+(anonymous) @ getComponents.js:30
+(anonymous) @ AsyncUtils.js:79
+mapAsync @ AsyncUtils.js:78
+getComponents @ getComponents.js:29
+finishEnterHooks @ createTransitionManager.js:77
+next @ AsyncUtils.js:47
+(anonymous) @ TransitionUtils.js:88
+wrappedNext @ TransitionUtils.js:110
+(anonymous) @ withReactRouterHOC.js:1
+(anonymous) @ regeneratorRuntime.js:52
+(anonymous) @ regenerator.js:52
+(anonymous) @ regeneratorDefine.js:11
+asyncGeneratorStep @ asyncToGenerator.js:3
+_next @ asyncToGenerator.js:17
+Promise.then
+asyncGeneratorStep @ asyncToGenerator.js:8
+_next @ asyncToGenerator.js:17
+(anonymous) @ asyncToGenerator.js:22
+(anonymous) @ asyncToGenerator.js:14
+(anonymous) @ withReactRouterHOC.js:1
+transitionHook @ TransitionUtils.js:43
+(anonymous) @ TransitionUtils.js:114
+(anonymous) @ TransitionUtils.js:84
+next @ AsyncUtils.js:34
+loopAsync @ AsyncUtils.js:51
+runTransitionHooks @ TransitionUtils.js:83
+runEnterHooks @ TransitionUtils.js:107
+(anonymous) @ createTransitionManager.js:70
+runTransitionHooks @ TransitionUtils.js:74
+runChangeHooks @ TransitionUtils.js:131
+finishMatch @ createTransitionManager.js:67
+(anonymous) @ createTransitionManager.js:45
+next @ AsyncUtils.js:41
+loopAsync @ AsyncUtils.js:51
+matchRoutes @ matchRoutes.js:231
+match @ createTransitionManager.js:41
+historyListener @ createTransitionManager.js:222
+listen @ createTransitionManager.js:246
+componentWillMount @ Router.js:96
+callComponentWillMount @ react-dom.development.js:12784
+mountClassInstance @ react-dom.development.js:12878
+updateClassComponent @ react-dom.development.js:17426
+beginWork @ react-dom.development.js:19073
+beginWork$1 @ react-dom.development.js:23940
+performUnitOfWork @ react-dom.development.js:22776
+workLoopSync @ react-dom.development.js:22707
+renderRootSync @ react-dom.development.js:22670
+performSyncWorkOnRoot @ react-dom.development.js:22293
+scheduleUpdateOnFiber @ react-dom.development.js:21881
+updateContainer @ react-dom.development.js:25482
+(anonymous) @ react-dom.development.js:26021
+unbatchedUpdates @ react-dom.development.js:22431
+legacyRenderSubtreeIntoContainer @ react-dom.development.js:26020
+render @ react-dom.development.js:26103
+(anonymous) @ DevServerEntryPoint.js:1
+Promise.then
+./node_modules/@corva/dc-platform-shared/cjs/devcenter/webpack/DevServerEntryPoint.js @ DevServerEntryPoint.js:1
+options.factory @ react refresh:6
+__webpack_require__ @ bootstrap:22
+(anonymous) @ devApp.js:568867
+(anonymous) @ devApp.js:568869
+react-dom.development.js:67 Warning: componentWillReceiveProps has been renamed, and is not recommended for use. See https://reactjs.org/link/unsafe-component-lifecycles for details.
+
+* Move data fetching code or side effects to componentDidUpdate.
+* If you're updating state whenever props change, refactor your code to use memoization techniques or move it to static getDerivedStateFromProps. Learn more at: https://reactjs.org/link/derived-state
+* Rename componentWillReceiveProps to UNSAFE_componentWillReceiveProps to suppress this warning in non-strict mode. In React 18.x, only the UNSAFE_ name will work. To rename all deprecated lifecycles to their new names, you can run `npx react-codemod rename-unsafe-lifecycles` in your project source folder.
+
+Please update the following components: SizeMe(Component)
+printWarning @ react-dom.development.js:67
+warn @ react-dom.development.js:34
+__webpack_modules__../node_modules/react-dom/cjs/react-dom.development.js.ReactStrictModeWarnings.flushPendingUnsafeLifecycleWarnings @ react-dom.development.js:11530
+flushRenderPhaseStrictModeWarningsInDEV @ react-dom.development.js:23822
+commitRootImpl @ react-dom.development.js:23005
+unstable_runWithPriority @ scheduler.development.js:468
+runWithPriority$1 @ react-dom.development.js:11276
+commitRoot @ react-dom.development.js:22990
+performSyncWorkOnRoot @ react-dom.development.js:22329
+(anonymous) @ react-dom.development.js:11327
+unstable_runWithPriority @ scheduler.development.js:468
+runWithPriority$1 @ react-dom.development.js:11276
+flushSyncCallbackQueueImpl @ react-dom.development.js:11322
+flushSyncCallbackQueue @ react-dom.development.js:11309
+scheduleUpdateOnFiber @ react-dom.development.js:21893
+dispatchAction @ react-dom.development.js:16139
+(anonymous) @ useProvideAuth.js:1
+(anonymous) @ regeneratorRuntime.js:52
+(anonymous) @ regenerator.js:52
+(anonymous) @ regeneratorDefine.js:11
+asyncGeneratorStep @ asyncToGenerator.js:3
+_next @ asyncToGenerator.js:17
+Promise.then
+asyncGeneratorStep @ asyncToGenerator.js:8
+_next @ asyncToGenerator.js:17
+(anonymous) @ asyncToGenerator.js:22
+(anonymous) @ asyncToGenerator.js:14
+O @ useProvideAuth.js:1
+k @ useProvideAuth.js:1
+(anonymous) @ useProvideAuth.js:1
+invokePassiveEffectCreate @ react-dom.development.js:23487
+callCallback @ react-dom.development.js:3945
+invokeGuardedCallbackDev @ react-dom.development.js:3994
+invokeGuardedCallback @ react-dom.development.js:4056
+flushPassiveEffectsImpl @ react-dom.development.js:23574
+unstable_runWithPriority @ scheduler.development.js:468
+runWithPriority$1 @ react-dom.development.js:11276
+flushPassiveEffects @ react-dom.development.js:23447
+(anonymous) @ react-dom.development.js:23324
+workLoop @ scheduler.development.js:417
+flushWork @ scheduler.development.js:390
+performWorkUntilDeadline @ scheduler.development.js:157
+react-dom.development.js:67 Warning: componentWillReceiveProps has been renamed, and is not recommended for use. See https://reactjs.org/link/unsafe-component-lifecycles for details.
+
+* Move data fetching code or side effects to componentDidUpdate.
+* If you're updating state whenever props change, refactor your code to use memoization techniques or move it to static getDerivedStateFromProps. Learn more at: https://reactjs.org/link/derived-state
+* Rename componentWillReceiveProps to UNSAFE_componentWillReceiveProps to suppress this warning in non-strict mode. In React 18.x, only the UNSAFE_ name will work. To rename all deprecated lifecycles to their new names, you can run `npx react-codemod rename-unsafe-lifecycles` in your project source folder.
+
+Please update the following components: withRouter(E)
+printWarning @ react-dom.development.js:67
+warn @ react-dom.development.js:34
+__webpack_modules__../node_modules/react-dom/cjs/react-dom.development.js.ReactStrictModeWarnings.flushPendingUnsafeLifecycleWarnings @ react-dom.development.js:11530
+flushRenderPhaseStrictModeWarningsInDEV @ react-dom.development.js:23822
+commitRootImpl @ react-dom.development.js:23005
+unstable_runWithPriority @ scheduler.development.js:468
+runWithPriority$1 @ react-dom.development.js:11276
+commitRoot @ react-dom.development.js:22990
+performSyncWorkOnRoot @ react-dom.development.js:22329
+(anonymous) @ react-dom.development.js:11327
+unstable_runWithPriority @ scheduler.development.js:468
+runWithPriority$1 @ react-dom.development.js:11276
+flushSyncCallbackQueueImpl @ react-dom.development.js:11322
+flushSyncCallbackQueue @ react-dom.development.js:11309
+scheduleUpdateOnFiber @ react-dom.development.js:21893
+enqueueSetState @ react-dom.development.js:12467
+__webpack_modules__../node_modules/react/cjs/react.development.js.Component.setState @ react.development.js:365
+SizeAwareComponent._this2.strategisedSetState @ react-sizeme.js:308
+(anonymous) @ react-sizeme.js:336
+invokeFunc @ index.js:160
+leadingEdge @ index.js:170
+debounced @ index.js:235
+addListener @ element-resize-detector.js:163
+onElementDetectable @ element-resize-detector.js:238
+ready @ scroll.js:611
+process @ batch-processor.js:124
+processBatch @ batch-processor.js:37
+setTimeout
+raf @ batch-processor.js:82
+requestFrame @ batch-processor.js:83
+processBatchAsync @ batch-processor.js:64
+addFunction @ batch-processor.js:24
+install @ scroll.js:619
+makeDetectable @ scroll.js:640
+attachListenerToElement @ element-resize-detector.js:231
+__webpack_modules__../node_modules/element-resize-detector/src/collection-utils.js.utils.forEach @ collection-utils.js:14
+listenTo @ element-resize-detector.js:199
+handleDOMNode @ react-sizeme.js:395
+componentDidMount @ react-sizeme.js:346
+commitLifeCycles @ react-dom.development.js:20663
+commitLayoutEffects @ react-dom.development.js:23426
+callCallback @ react-dom.development.js:3945
+invokeGuardedCallbackDev @ react-dom.development.js:3994
+invokeGuardedCallback @ react-dom.development.js:4056
+commitRootImpl @ react-dom.development.js:23151
+unstable_runWithPriority @ scheduler.development.js:468
+runWithPriority$1 @ react-dom.development.js:11276
+commitRoot @ react-dom.development.js:22990
+performSyncWorkOnRoot @ react-dom.development.js:22329
+(anonymous) @ react-dom.development.js:11327
+unstable_runWithPriority @ scheduler.development.js:468
+runWithPriority$1 @ react-dom.development.js:11276
+flushSyncCallbackQueueImpl @ react-dom.development.js:11322
+flushSyncCallbackQueue @ react-dom.development.js:11309
+scheduleUpdateOnFiber @ react-dom.development.js:21893
+dispatchAction @ react-dom.development.js:16139
+(anonymous) @ useProvideAuth.js:1
+(anonymous) @ regeneratorRuntime.js:52
+(anonymous) @ regenerator.js:52
+(anonymous) @ regeneratorDefine.js:11
+asyncGeneratorStep @ asyncToGenerator.js:3
+_next @ asyncToGenerator.js:17
+Promise.then
+asyncGeneratorStep @ asyncToGenerator.js:8
+_next @ asyncToGenerator.js:17
+(anonymous) @ asyncToGenerator.js:22
+(anonymous) @ asyncToGenerator.js:14
+O @ useProvideAuth.js:1
+k @ useProvideAuth.js:1
+(anonymous) @ useProvideAuth.js:1
+invokePassiveEffectCreate @ react-dom.development.js:23487
+callCallback @ react-dom.development.js:3945
+invokeGuardedCallbackDev @ react-dom.development.js:3994
+invokeGuardedCallback @ react-dom.development.js:4056
+flushPassiveEffectsImpl @ react-dom.development.js:23574
+unstable_runWithPriority @ scheduler.development.js:468
+runWithPriority$1 @ react-dom.development.js:11276
+flushPassiveEffects @ react-dom.development.js:23447
+(anonymous) @ react-dom.development.js:23324
+workLoop @ scheduler.development.js:417
+flushWork @ scheduler.development.js:390
+performWorkUntilDeadline @ scheduler.development.js:157
+react refresh:6 [webpack-dev-server] Server started: Hot Module Replacement enabled, Live Reloading enabled, Progress disabled, Overlay enabled.
+react refresh:6 [HMR] Waiting for update signal from WDS...
+react refresh:6 Material-UI: The `css` function is deprecated. Use the `styleFunctionSx` instead.
+css @ styleFunctionSx.js:61
+./node_modules/@material-ui/core/esm/Box/Box.js @ Box.js:3
+options.factory @ react refresh:6
+__webpack_require__ @ bootstrap:22
+fn @ hot module replacement:61
+./node_modules/@corva/ui/components/DevCenter/AppHeader/AppHeader.js @ AppHeader.css.js:2
+options.factory @ react refresh:6
+__webpack_require__ @ bootstrap:22
+fn @ hot module replacement:61
+./node_modules/@corva/ui/components/index.js @ utils.js:2
+options.factory @ react refresh:6
+__webpack_require__ @ bootstrap:22
+fn @ hot module replacement:61
+./node_modules/@corva/ui/index.js @ index.js:2
+options.factory @ react refresh:6
+__webpack_require__ @ bootstrap:22
+fn @ hot module replacement:61
+./node_modules/@corva/dc-platform-shared/cjs/devcenter/webpack/DevServerIsolatedAppEntryPoint.js @ isolatedApp.js:27
+options.factory @ react refresh:6
+__webpack_require__ @ bootstrap:22
+(anonymous) @ startup:8
+(anonymous) @ startup:8
+corvaApi.ts:11 [YieldTracker] Corva SDK clients loaded
+useReadings.ts:228 [YieldTracker] SlideSheet: fetching all records for asset 35074563
+useReadings.ts:927 [YieldTracker] Channel watcher started: watching 'continuous_inclination' for curve section, interval=1ft
+readingsApi.ts:55  GET https://data.corva.ai/api/v1/data/copca.yieldtracker.readings/?limit=5000&query=%7B%22asset_id%22%3A35074563%7D&sort=%7B%22data.depth%22%3A1%7D 404 (Not Found)
+(anonymous) @ apiCore.js:1
+(anonymous) @ regeneratorRuntime.js:52
+(anonymous) @ regenerator.js:52
+(anonymous) @ regeneratorDefine.js:11
+asyncGeneratorStep @ asyncToGenerator.js:3
+_next @ asyncToGenerator.js:17
+(anonymous) @ asyncToGenerator.js:22
+(anonymous) @ asyncToGenerator.js:14
+k @ apiCore.js:1
+(anonymous) @ apiCore.js:1
+(anonymous) @ regeneratorRuntime.js:52
+(anonymous) @ regenerator.js:52
+(anonymous) @ regeneratorDefine.js:11
+asyncGeneratorStep @ asyncToGenerator.js:3
+_next @ asyncToGenerator.js:17
+(anonymous) @ asyncToGenerator.js:22
+(anonymous) @ asyncToGenerator.js:14
+(anonymous) @ apiCore.js:1
+(anonymous) @ apiCore.js:1
+(anonymous) @ regeneratorRuntime.js:52
+(anonymous) @ regenerator.js:52
+(anonymous) @ regeneratorDefine.js:11
+asyncGeneratorStep @ asyncToGenerator.js:3
+_next @ asyncToGenerator.js:17
+(anonymous) @ asyncToGenerator.js:22
+(anonymous) @ asyncToGenerator.js:14
+E @ apiCore.js:1
+(anonymous) @ apiCore.js:1
+(anonymous) @ regeneratorRuntime.js:52
+(anonymous) @ regenerator.js:52
+(anonymous) @ regeneratorDefine.js:11
+asyncGeneratorStep @ asyncToGenerator.js:3
+_next @ asyncToGenerator.js:17
+(anonymous) @ asyncToGenerator.js:22
+(anonymous) @ asyncToGenerator.js:14
+C @ apiCore.js:1
+get @ index.js:1
+fetchReadings @ readingsApi.ts:55
+(anonymous) @ useReadings.ts:170
+(anonymous) @ useReadings.ts:199
+invokePassiveEffectCreate @ react-dom.development.js:23487
+callCallback @ react-dom.development.js:3945
+invokeGuardedCallbackDev @ react-dom.development.js:3994
+invokeGuardedCallback @ react-dom.development.js:4056
+flushPassiveEffectsImpl @ react-dom.development.js:23574
+unstable_runWithPriority @ scheduler.development.js:468
+runWithPriority$1 @ react-dom.development.js:11276
+flushPassiveEffects @ react-dom.development.js:23447
+performSyncWorkOnRoot @ react-dom.development.js:22269
+(anonymous) @ react-dom.development.js:11327
+unstable_runWithPriority @ scheduler.development.js:468
+runWithPriority$1 @ react-dom.development.js:11276
+flushSyncCallbackQueueImpl @ react-dom.development.js:11322
+flushSyncCallbackQueue @ react-dom.development.js:11309
+unbatchedUpdates @ react-dom.development.js:22438
+legacyRenderSubtreeIntoContainer @ react-dom.development.js:26020
+render @ react-dom.development.js:26103
+(anonymous) @ DevServerIsolatedAppEntryPoint.js:1
+Promise.then
+./node_modules/@corva/dc-platform-shared/cjs/devcenter/webpack/DevServerIsolatedAppEntryPoint.js @ DevServerIsolatedAppEntryPoint.js:1
+options.factory @ react refresh:6
+__webpack_require__ @ bootstrap:22
+(anonymous) @ startup:8
+(anonymous) @ startup:8
+readingsApi.ts:67 [YieldTracker] Readings dataset "copca.yieldtracker.readings" not found (404). Readings will be stored in local state only.
+useReadings.ts:183 [YieldTracker] Restored 10 readings from localStorage
+corvaApi.ts:104 [YieldTracker] Found 9 non-planning BHAs: #1 "BHA #1 17.5" Surface", #2 "BHA #2 12.25" Intermediate", #3 "BHA #3 12.25" Intermediate", #4 "BHA #4 12.25" Intermediate", #5 "BHA #5 8.75" Intermediate", #6 "BHA #6 8.75" Intermediate", #7 "BHA #7 6.75" Curve", #8 "BHA #8 6.75" Curve", #9 "BHA #9 6.75" Lateral"
+corvaApi.ts:113 [YieldTracker] Selected active BHA: #9 "BHA #9 6.75" Lateral"
+useDrillstringInfo.ts:81 [YieldTracker] MWD sensor-to-bit: 48.85ft (from BHA component)
+useDrillstringInfo.ts:119 [YieldTracker] Bent motor BHA detected: MWD B2S=48.85ft, bend=?°, BHA motor yield=?°/100ft
+useReadings.ts:230 [YieldTracker] SlideSheet: received 500 raw records from API
+useReadings.ts:235 [YieldTracker] SlideSheet: first record sample — keys: [slides, status]
+useReadings.ts:238 [YieldTracker] SlideSheet: first record data (first 400 chars): {"slides":[{"start_timestamp":1774184059,"end_timestamp":1774184324,"start_measured_depth":1517.8842,"end_measured_depth":1528.003,"slide_duration":265,"length":10.1188965,"rop":131,"flow_rate":695.5,"tfo":285.5,"tfo_accuracy":50,"weight_on_bit":15.51,"pdm_differential_pressure":231.1,"pdm_torque":3.76,"slide_seen":10.1188965,"slide_ahead":2.545288,"dls":1.325,"build_rate":0.564,"motor_yield":12.3…
+useReadings.ts:296 [YieldTracker] SlideSheet: extracted 6486 slide events from nested 'slides[]' arrays
+useReadings.ts:317 [YieldTracker] SlideSheet: cached 6486 intervals (6486 slide, 0 rotate, 0 skipped). Motor yield populated: 5969/6486 slides, TFO populated: 5922/6486 slides. Depth range: 1518–13585 ft
+corvaApi.ts:193  GET https://data.corva.ai/api/v1/data/corva/drilling.halliburton.cerebro-raw/?limit=1&query=%7B%22asset_id%22%3A35074563%7D&sort=%7B%22timestamp%22%3A-1%7D 412 (Precondition Failed)
+(anonymous) @ apiCore.js:1
+(anonymous) @ regeneratorRuntime.js:52
+(anonymous) @ regenerator.js:52
+(anonymous) @ regeneratorDefine.js:11
+asyncGeneratorStep @ asyncToGenerator.js:3
+_next @ asyncToGenerator.js:17
+(anonymous) @ asyncToGenerator.js:22
+(anonymous) @ asyncToGenerator.js:14
+k @ apiCore.js:1
+(anonymous) @ apiCore.js:1
+(anonymous) @ regeneratorRuntime.js:52
+(anonymous) @ regenerator.js:52
+(anonymous) @ regeneratorDefine.js:11
+asyncGeneratorStep @ asyncToGenerator.js:3
+_next @ asyncToGenerator.js:17
+(anonymous) @ asyncToGenerator.js:22
+(anonymous) @ asyncToGenerator.js:14
+(anonymous) @ apiCore.js:1
+(anonymous) @ apiCore.js:1
+(anonymous) @ regeneratorRuntime.js:52
+(anonymous) @ regenerator.js:52
+(anonymous) @ regeneratorDefine.js:11
+asyncGeneratorStep @ asyncToGenerator.js:3
+_next @ asyncToGenerator.js:17
+(anonymous) @ asyncToGenerator.js:22
+(anonymous) @ asyncToGenerator.js:14
+E @ apiCore.js:1
+(anonymous) @ apiCore.js:1
+(anonymous) @ regeneratorRuntime.js:52
+(anonymous) @ regenerator.js:52
+(anonymous) @ regeneratorDefine.js:11
+asyncGeneratorStep @ asyncToGenerator.js:3
+_next @ asyncToGenerator.js:17
+(anonymous) @ asyncToGenerator.js:22
+(anonymous) @ asyncToGenerator.js:14
+C @ apiCore.js:1
+get @ index.js:1
+fetchOne @ corvaApi.ts:193
+fetchLatestWitsRecord @ corvaApi.ts:221
+(anonymous) @ useReadings.ts:358
+(anonymous) @ App.tsx:164
+callCallback @ react-dom.development.js:3945
+invokeGuardedCallbackDev @ react-dom.development.js:3994
+invokeGuardedCallback @ react-dom.development.js:4056
+invokeGuardedCallbackAndCatchFirstError @ react-dom.development.js:4070
+executeDispatch @ react-dom.development.js:8243
+processDispatchQueueItemsInOrder @ react-dom.development.js:8275
+processDispatchQueue @ react-dom.development.js:8288
+dispatchEventsForPlugins @ react-dom.development.js:8299
+(anonymous) @ react-dom.development.js:8508
+batchedEventUpdates$1 @ react-dom.development.js:22396
+batchedEventUpdates @ react-dom.development.js:3745
+dispatchEventForPluginEventSystem @ react-dom.development.js:8507
+attemptToDispatchEvent @ react-dom.development.js:6005
+dispatchEvent @ react-dom.development.js:5924
+unstable_runWithPriority @ scheduler.development.js:468
+runWithPriority$1 @ react-dom.development.js:11276
+discreteUpdates$1 @ react-dom.development.js:22413
+discreteUpdates @ react-dom.development.js:3756
+dispatchDiscreteEvent @ react-dom.development.js:5889
+corvaApi.ts:210 [YieldTracker] Cerebro dataset unavailable — disabled for this session
+fetchOne @ corvaApi.ts:210
+await in fetchOne
+fetchLatestWitsRecord @ corvaApi.ts:221
+(anonymous) @ useReadings.ts:358
+(anonymous) @ App.tsx:164
+callCallback @ react-dom.development.js:3945
+invokeGuardedCallbackDev @ react-dom.development.js:3994
+invokeGuardedCallback @ react-dom.development.js:4056
+invokeGuardedCallbackAndCatchFirstError @ react-dom.development.js:4070
+executeDispatch @ react-dom.development.js:8243
+processDispatchQueueItemsInOrder @ react-dom.development.js:8275
+processDispatchQueue @ react-dom.development.js:8288
+dispatchEventsForPlugins @ react-dom.development.js:8299
+(anonymous) @ react-dom.development.js:8508
+batchedEventUpdates$1 @ react-dom.development.js:22396
+batchedEventUpdates @ react-dom.development.js:3745
+dispatchEventForPluginEventSystem @ react-dom.development.js:8507
+attemptToDispatchEvent @ react-dom.development.js:6005
+dispatchEvent @ react-dom.development.js:5924
+unstable_runWithPriority @ scheduler.development.js:468
+runWithPriority$1 @ react-dom.development.js:11276
+discreteUpdates$1 @ react-dom.development.js:22413
+discreteUpdates @ react-dom.development.js:3756
+dispatchDiscreteEvent @ react-dom.development.js:5889
+useReadings.ts:40 [YieldTracker] No change point found in 50 records for continuous_inclination — using latest
+useReadings.ts:370 [YieldTracker] Manual reading: walked back to change point for 'continuous_inclination' (merged with summary-1ft for MWD channels)
+useReadings.ts:228 [YieldTracker] SlideSheet: fetching all records for asset 35074563
+useReadings.ts:420 [YieldTracker] 📡 Raw WITS record at depth=13671.9 ft (manual)
+useReadings.ts:421 Depth fields: {bit_depth: 13671.9326, hole_depth: 13671.9326, bit_depth_max: 13671.467, bit_depth_mean: 13670.974, sta_depth: undefined}
+useReadings.ts:428 All WITS keys: active_pit_volume, active_pit_volume_max, active_pit_volume_mean, active_pit_volume_median, active_pit_volume_min, ad_diff_press_setpoint, ad_diff_press_setpoint_max, ad_diff_press_setpoint_mean, ad_diff_press_setpoint_median, ad_diff_press_setpoint_min, ad_diff_pressure_actual, ad_diff_pressure_actual_max, ad_diff_pressure_actual_mean, ad_diff_pressure_actual_median, ad_diff_pressure_actual_min, ad_diff_pressure_max, ad_diff_pressure_max_max, ad_diff_pressure_max_mean, ad_diff_pressure_max_median, ad_diff_pressure_max_min, ad_diff_pressure_on_off, ad_diff_pressure_on_off_max, ad_diff_pressure_on_off_mean, ad_diff_pressure_on_off_median, ad_diff_pressure_on_off_min, ad_rop_on_off, ad_rop_on_off_max, ad_rop_on_off_mean, ad_rop_on_off_median, ad_rop_on_off_min, ad_rop_setpoint, ad_rop_setpoint_max, ad_rop_setpoint_mean, ad_rop_setpoint_median, ad_rop_setpoint_min, ad_system_on_off, ad_system_on_off_max, ad_system_on_off_mean, ad_system_on_off_median, ad_system_on_off_min, ad_wob_actual, ad_wob_actual_max, ad_wob_actual_mean, ad_wob_actual_median, ad_wob_actual_min, ad_wob_max, ad_wob_max_max, ad_wob_max_mean, ad_wob_max_median, ad_wob_max_min, ad_wob_setpoint, ad_wob_setpoint_max, ad_wob_setpoint_mean, ad_wob_setpoint_median, ad_wob_setpoint_min, adropactual, adropactual_max, adropactual_mean, adropactual_median, adropactual_min, bit_depth, bit_depth_max, bit_depth_mean, bit_depth_median, bit_depth_min, bittonbot, block_height, block_height_max, block_height_mean, block_height_median, block_height_min, btbot, choke_pressure, choke_pressure_max, choke_pressure_mean, choke_pressure_median, choke_pressure_min, continuous_inclination, continuous_inclination_max, continuous_inclination_mean, continuous_inclination_median, continuous_inclination_min, corva_pd_in_control, corva_pd_in_control_max, corva_pd_in_control_mean, corva_pd_in_control_median, corva_pd_in_control_min, deptgr1m, deptgrm, depth_returns_meas, depth_returns_meas_max, depth_returns_meas_mean, depth_returns_meas_median, depth_returns_meas_min, deptsvym, diff_in_control, diff_in_control_max, diff_in_control_mean, diff_in_control_median, diff_in_control_min, diff_press, diff_press_max, diff_press_mean, diff_press_median, diff_press_min, downhole_temp, downhole_temp_max, downhole_temp_mean, downhole_temp_median, downhole_temp_min, downlink_status, downlink_status_max, downlink_status_mean, downlink_status_median, downlink_status_min, entry_at, entry_at_max, entry_at_min, extraction_id, gain_loss, gain_loss_max, gain_loss_mean, gain_loss_median, gain_loss_min, gamma_ray, gamma_ray_max, gamma_ray_mean, gamma_ray_median, gamma_ray_min, gas_total_ml, gas_total_ml_max, gas_total_ml_mean, gas_total_ml_median, gas_total_ml_min, gravity_tool_face, gravity_tool_face_max, gravity_tool_face_mean, gravity_tool_face_median, gravity_tool_face_min, heartbeat, heartbeat_max, heartbeat_mean, heartbeat_median, heartbeat_min, hfto, hilinepwr, hole_depth, hole_depth_max, hole_depth_mean, hole_depth_median, hole_depth_min, hook_load, hook_load_max, hook_load_mean, hook_load_median, hook_load_min, hookload_at_tare, hookload_at_tare_max, hookload_at_tare_mean, hookload_at_tare_median, hookload_at_tare_min, lagdeptgas, magnetic_tool_face, magnetic_tool_face_max, magnetic_tool_face_mean, magnetic_tool_face_median, magnetic_tool_face_min, mpdchkctrlmod, mpdflwin, mud_flow_in, mud_flow_in_max, mud_flow_in_mean, mud_flow_in_median, mud_flow_in_min, mud_flow_out_percent, mud_flow_out_percent_max, mud_flow_out_percent_mean, mud_flow_out_percent_median, mud_flow_out_percent_min, mud_tank_10_volume, mud_tank_10_volume_max, mud_tank_10_volume_mean, mud_tank_10_volume_median, mud_tank_10_volume_min, mud_tank_4_volume, mud_tank_4_volume_max, mud_tank_4_volume_mean, mud_tank_4_volume_median, mud_tank_4_volume_min, mud_tank_5_volume, mud_tank_5_volume_max, mud_tank_5_volume_mean, mud_tank_5_volume_median, mud_tank_5_volume_min, mud_tank_6_volume, mud_tank_6_volume_max, mud_tank_6_volume_mean, mud_tank_6_volume_median, mud_tank_6_volume_min, mud_tank_7_volume, mud_tank_7_volume_max, mud_tank_7_volume_mean, mud_tank_7_volume_median, mud_tank_7_volume_min, mud_tank_8_volume, mud_tank_8_volume_max, mud_tank_8_volume_mean, mud_tank_8_volume_median, mud_tank_8_volume_min, mud_tank_9_volume, mud_tank_9_volume_max, mud_tank_9_volume_mean, mud_tank_9_volume_median, mud_tank_9_volume_min, mwd_axial_peak_shock, mwd_axial_peak_shock_max, mwd_axial_peak_shock_mean, mwd_axial_peak_shock_median, mwd_axial_peak_shock_min, mwd_continuous_azimuth, mwd_continuous_azimuth_max, mwd_continuous_azimuth_mean, mwd_continuous_azimuth_median, mwd_continuous_azimuth_min, mwd_downhole_stick_slip, mwd_downhole_stick_slip_max, mwd_downhole_stick_slip_mean, mwd_downhole_stick_slip_median, mwd_downhole_stick_slip_min, mwd_lateral_peak_shock, mwd_lateral_peak_shock_max, mwd_lateral_peak_shock_mean, mwd_lateral_peak_shock_median, mwd_lateral_peak_shock_min, mwd_srvtldepwits, mwdvibax, mwdviblat, overpull, pit_g_l_co_man, pit_g_l_co_man_max, pit_g_l_co_man_mean, pit_g_l_co_man_median, pit_g_l_co_man_min, pit_volume_1, pit_volume_1_max, pit_volume_1_mean, pit_volume_1_median, pit_volume_1_min, pit_volume_2, pit_volume_2_max, pit_volume_2_mean, pit_volume_2_median, pit_volume_2_min, pit_volume_3, pit_volume_3_max, pit_volume_3_mean, pit_volume_3_median, pit_volume_3_min, plchrtbt, pump_spm_1, pump_spm_1_max, pump_spm_1_mean, pump_spm_1_median, pump_spm_1_min, pump_spm_2, pump_spm_2_max, pump_spm_2_mean, pump_spm_2_median, pump_spm_2_min, pump_spm_3, pump_spm_3_max, pump_spm_3_mean, pump_spm_3_median, pump_spm_3_min, pump_spm_total, pump_spm_total_max, pump_spm_total_mean, pump_spm_total_median, pump_spm_total_min, pump_stroke_count_cum, pump_stroke_count_cum_max, pump_stroke_count_cum_mean, pump_stroke_count_cum_median, pump_stroke_count_cum_min, raaviblat, revit_onoff, revit_onoff_max, revit_onoff_mean, revit_onoff_median, revit_onoff_min, revit_stickslip_value_for_cf, revit_stickslip_value_for_cf_max, revit_stickslip_value_for_cf_mean, revit_stickslip_value_for_cf_median, revit_stickslip_value_for_cf_min, revit_stickslip_value_for_kf, revit_stickslip_value_for_kf_max, revit_stickslip_value_for_kf_mean, revit_stickslip_value_for_kf_median, revit_stickslip_value_for_kf_min, rocker_status, rocker_status_max, rocker_status_mean, rocker_status_median, rocker_status_min, rop, rop_5_x_depth_hour, rop_5_x_depth_hour_max, rop_5_x_depth_hour_mean, rop_5_x_depth_hour_median, rop_5_x_depth_hour_min, rop_in_control, rop_in_control_max, rop_in_control_mean, rop_in_control_median, rop_in_control_min, rop_max, rop_mean, rop_median, rop_min, rop_opt_differential_pressure, rop_opt_differential_pressure_max, rop_opt_differential_pressure_mean, rop_opt_differential_pressure_median, rop_opt_differential_pressure_min, rop_opt_rop, rop_opt_rop_max, rop_opt_rop_mean, rop_opt_rop_median, rop_opt_rop_min, rop_opt_rotary_rpm, rop_opt_rotary_rpm_max, rop_opt_rotary_rpm_mean, rop_opt_rotary_rpm_median, rop_opt_rotary_rpm_min, rop_opt_weight_on_bit, rop_opt_weight_on_bit_max, rop_opt_weight_on_bit_mean, rop_opt_weight_on_bit_median, rop_opt_weight_on_bit_min, ropi, ropmax, ropt, rotary_rpm, rotary_rpm_max, rotary_rpm_mean, rotary_rpm_median, rotary_rpm_min, rotary_torque, rotary_torque_max, rotary_torque_mean, rotary_torque_median, rotary_torque_min, rpma, rsda, rss_continuous_azimuth, rss_continuous_azimuth_max, rss_continuous_azimuth_mean, rss_continuous_azimuth_median, rss_continuous_azimuth_min, rss_continuous_inclination, rss_continuous_inclination_max, rss_continuous_inclination_mean, rss_continuous_inclination_median, rss_continuous_inclination_min, rsslowtorqrpm, rsspsum, rssvibax, rsua, smartdrill_on, smartdrill_on_max, smartdrill_on_mean, smartdrill_on_median, smartdrill_on_min, smartslide_on, smartslide_on_max, smartslide_on_mean, smartslide_on_median, smartslide_on_min, spp_at_tare, spp_at_tare_max, spp_at_tare_mean, spp_at_tare_median, spp_at_tare_min, srvlimtf, standpipe_pressure, standpipe_pressure_max, standpipe_pressure_mean, standpipe_pressure_median, standpipe_pressure_min, state, state_max, status_for_autodriller, status_for_autodriller_max, status_for_autodriller_mean, status_for_autodriller_median, status_for_autodriller_min, statusis, stickslip1, stickslip2, stickslip3, strks_pump_1, strks_pump_1_max, strks_pump_1_mean, strks_pump_1_median, strks_pump_1_min, strks_pump_2, strks_pump_2_max, strks_pump_2_mean, strks_pump_2_median, strks_pump_2_min, strks_pump_3, strks_pump_3_max, strks_pump_3_mean, strks_pump_3_median, strks_pump_3_min, svyazu, svyincu, tank_volume_total, tank_volume_total_max, tank_volume_total_mean, tank_volume_total_median, tank_volume_total_min, time, timestamp_max, timestamp_min, timestamp_ms, top_drive_torque_limit, top_drive_torque_limit_max, top_drive_torque_limit_mean, top_drive_torque_limit_median, top_drive_torque_limit_min, totsyspwr, trip_g_l, trip_g_l_max, trip_g_l_mean, trip_g_l_median, trip_g_l_min, trip_tank_volume_1, trip_tank_volume_1_max, trip_tank_volume_1_mean, trip_tank_volume_1_median, trip_tank_volume_1_min, trip_tank_volume_2, trip_tank_volume_2_max, trip_tank_volume_2_mean, trip_tank_volume_2_median, trip_tank_volume_2_min, true_vertical_depth, true_vertical_depth_max, true_vertical_depth_mean, true_vertical_depth_median, true_vertical_depth_min, ttva, wc_choke_a_pos, wc_choke_a_pos_max, wc_choke_a_pos_mean, wc_choke_a_pos_median, wc_choke_a_pos_min, weight_on_bit, weight_on_bit_max, weight_on_bit_mean, weight_on_bit_median, weight_on_bit_min, wob_in_control, wob_in_control_max, wob_in_control_mean, wob_in_control_median, wob_in_control_min, wobx, ztenabled, ztpipetrq, ztstikslip, ztzvalue
+useReadings.ts:429 Full WITS data snapshot: {timestamp_min: 1775576104, timestamp_max: 1775576118, rop_min: 67.1, rop_max: 207.984, rop_mean: 132.846, …}
+useReadings.ts:444 [YieldTracker] 🔌 Channel Extraction
+useReadings.ts:445 Channel map in use: {nearBitInc: 'continuous_inclination', nearBitAz: '(not mapped)', mwdInc: 'continuous_inclination', mwdAz: 'mwd_continuous_azimuth', dutyCycle: 'duty_cycle', …}
+useReadings.ts:455 Extracted values: {nearBitInc_raw: 87.93, inc_final: 87.93, nearBitAz_raw: '(channel empty)', azRaw: null, az_final: 163.66, …}
+useReadings.ts:472 [YieldTracker] nearBitAz not mapped — az display using MWD fallback (mwdAz=163.66°). Near-bit TR will be null, DLS = |BR|.
+useReadings.ts:505 [YieldTracker] 📐 Rate Calculation (RSS / Near-bit)
+useReadings.ts:510 Inputs: {prev_depth: 13658.6621, curr_depth: 13671.9326, courseLength_ft: 13.270500000000538, prev_inc: 87.93, curr_inc: 87.93, …}
+useReadings.ts:543 Path: Curve-only (nearBitAz is empty) — TR=null, DLS=|BR| {formula_BR: 'buildRate(87.93, 87.93, 13.270500000000538) = 0.0000', BR_result: 0, TR_result: 'null (skipped — no az channel)', DLS_result: 0, DLS_note: 'DLS = |BR| = 0.0000'}
+useReadings.ts:563 [YieldTracker] MWD rates: prevInc=87.93 currInc=87.93 prevAz=163.83 currAz=163.66 CL=13.270500000000538 → BR=0.0000 TR=-1.2810 DLS=1.2802
+useReadings.ts:566 [YieldTracker] 📐 Rate Calculation (MWD survey sensor)
+useReadings.ts:580 MWD Rates: {formula_BR: 'buildRate(87.93, 87.93, 13.270500000000538) = 0.0000', formula_TR: 'turnRate(163.83, 163.66, 13.270500000000538) = -1.2810', formula_DLS: 'dls(87.93, 87.93, 163.83, 163.66, 13.270500000000538) = 1.2802', mwdBr_result: 0, mwdTr_result: -1.281036886326883, …}
+useReadings.ts:597 [YieldTracker] 🧭 Resultant Toolface
+useReadings.ts:602 Skipped — tr_ is null (curve-only profile, nearBitAz='')
+  br_ = 0.0000 °/100ft  →  resultantTF will be stored as null
+  BUG: For curve-only mode, resultantTF could be derived from BR alone (0° = build, 180° = drop)
+(anonymous) @ useReadings.ts:602
+await in (anonymous)
+(anonymous) @ App.tsx:164
+callCallback @ react-dom.development.js:3945
+invokeGuardedCallbackDev @ react-dom.development.js:3994
+invokeGuardedCallback @ react-dom.development.js:4056
+invokeGuardedCallbackAndCatchFirstError @ react-dom.development.js:4070
+executeDispatch @ react-dom.development.js:8243
+processDispatchQueueItemsInOrder @ react-dom.development.js:8275
+processDispatchQueue @ react-dom.development.js:8288
+dispatchEventsForPlugins @ react-dom.development.js:8299
+(anonymous) @ react-dom.development.js:8508
+batchedEventUpdates$1 @ react-dom.development.js:22396
+batchedEventUpdates @ react-dom.development.js:3745
+dispatchEventForPluginEventSystem @ react-dom.development.js:8507
+attemptToDispatchEvent @ react-dom.development.js:6005
+dispatchEvent @ react-dom.development.js:5924
+unstable_runWithPriority @ scheduler.development.js:468
+runWithPriority$1 @ react-dom.development.js:11276
+discreteUpdates$1 @ react-dom.development.js:22413
+discreteUpdates @ react-dom.development.js:3756
+dispatchDiscreteEvent @ react-dom.development.js:5889
+useReadings.ts:636 [YieldTracker] ⚙️ Toolface Decomposition
+useReadings.ts:637 {dutyCycle: null, toolFaceSet: null, toolFaceActual: null, tfUsedForDecomp: null, buildCommand: null, …}
+useReadings.ts:671 [YieldTracker] SensorPos: bit=13671.9ft mwdOffset=48.85ft → sensor=13623.1ft
+useReadings.ts:64 [YieldTracker] 📊 Slide Sheet Query [13658.7 → 13671.9 ft] (13.27 ft total)
+useReadings.ts:65 Searching 6486 cached intervals for overlaps…
+useReadings.ts:110 Summary: 0 intervals matched {totalFt: '13.27', slideFt: '0.00', rotateFt: '13.27', slideRatio_pct: '0.0%', yieldWeight_ft: '0.00', …}
+useReadings.ts:124   No slide intervals overlap this depth range — no slide sheet coverage for this reading interval
+getWeightedSlideYield @ useReadings.ts:124
+(anonymous) @ useReadings.ts:707
+await in (anonymous)
+(anonymous) @ App.tsx:164
+callCallback @ react-dom.development.js:3945
+invokeGuardedCallbackDev @ react-dom.development.js:3994
+invokeGuardedCallback @ react-dom.development.js:4056
+invokeGuardedCallbackAndCatchFirstError @ react-dom.development.js:4070
+executeDispatch @ react-dom.development.js:8243
+processDispatchQueueItemsInOrder @ react-dom.development.js:8275
+processDispatchQueue @ react-dom.development.js:8288
+dispatchEventsForPlugins @ react-dom.development.js:8299
+(anonymous) @ react-dom.development.js:8508
+batchedEventUpdates$1 @ react-dom.development.js:22396
+batchedEventUpdates @ react-dom.development.js:3745
+dispatchEventForPluginEventSystem @ react-dom.development.js:8507
+attemptToDispatchEvent @ react-dom.development.js:6005
+dispatchEvent @ react-dom.development.js:5924
+unstable_runWithPriority @ scheduler.development.js:468
+runWithPriority$1 @ react-dom.development.js:11276
+discreteUpdates$1 @ react-dom.development.js:22413
+discreteUpdates @ react-dom.development.js:3756
+dispatchDiscreteEvent @ react-dom.development.js:5889
+useReadings.ts:711 [YieldTracker] SlideYield [13658.7–13671.9ft]: slide=0.0ft rotate=13.3ft ratio=0% (6486 slide intervals in cache)
+useReadings.ts:64 [YieldTracker] 📊 Slide Sheet Query [13323.1 → 13623.1 ft] (300.00 ft total)
+useReadings.ts:65 Searching 6486 cached intervals for overlaps…
+useReadings.ts:98   ✅ slide [13283.8–13333.5 ft] overlap=10.44 ft | motorYield=7.16 TFO=null (no decomposition)
+useReadings.ts:98   ✅ slide [13542.3–13545.0 ft] overlap=2.63 ft | motorYield=9.72 TFO=null (no decomposition)
+useReadings.ts:98   ✅ slide [13545.0–13585.0 ft] overlap=40.05 ft | motorYield=9.72 TFO=null (no decomposition)
+useReadings.ts:110 Summary: 3 intervals matched {totalFt: '300.00', slideFt: '53.11', rotateFt: '246.89', slideRatio_pct: '17.7%', yieldWeight_ft: '53.11', …}
+useReadings.ts:740 [YieldTracker] ⚙️ Motor Yield (custom ΔInc/SlideFt×100 — last 300 ft)
+useReadings.ts:741 Window: {windowFrom: '13323.1', windowTo: '13623.1', sensorDepth: '13623.1', bitDepth: '13671.9', mwdOffset: 48.85, …}
+useReadings.ts:768 ✅ Motor Yield = (1.6700° ΔInc) / (53.11 ft slide) × 100 = 3.1443 °/100ft {formula: '(mwdInc 87.9300 − refMwdInc 86.2600) / 53.11 ft × 100', deltaInc: '1.6700', windowSlideFt: '53.11', normalizedBr: '3.1443', normalizedDls: '3.1443', …}
+useReadings.ts:825 [YieldTracker] ✅ Reading STORED @ 13671.9 ft  (manual)
+useReadings.ts:826 Survey: {depth: 13671.9326, inc: 87.93, az: 163.66, az_note: '🔄 MWD fallback az=163.66° (nearBitAz not mapped)', mwdInc: 87.93, …}
+useReadings.ts:838 Rates (RSS near-bit): {courseLength: 13.270500000000538, BR_buildRate: 0, TR_turnRate: null, DLS_dogleg: 0}
+useReadings.ts:844 Rates (MWD): {mwdBr: 0, mwdTr: -1.281036886326883, mwdDls: 1.2802009366192704, deltaInc_RSSvsMWD: 0, deltaAz_RSSvsMWD: null}
+useReadings.ts:851 Motor / Slide Yield: {slideFt: 0, rotateFt: 13.270500000000538, slideRatio_pct: '0.0%', normalizedDls: 3.144316600673601, normalizedBr: 3.144316600673601, …}
+useReadings.ts:860 Toolface / Steering: {toolFaceSet: null, toolFaceActual: null, resultantTF: null, resultantTF_note: '⚠️ null — tr_ was null (motor curve-only mode)', dutyCycle: null, …}
+useReadings.ts:878 [YieldTracker] Reading taken at 13671.9326 ft — inc=87.93 az=163.66 (manual)
+useReadings.ts:235 [useReadings.ts:230 [YieldTracker] SlideSheet: received 500 raw records from API
+YieldTracker] SlideSheet: first record sample — keys: [slides, status]
+useReadings.ts:238 [YieldTracker] SlideSheet: first record data (first 400 chars): {"slides":[{"start_timestamp":1774184059,"end_timestamp":1774184324,"start_measured_depth":1517.8842,"end_measured_depth":1528.003,"slide_duration":265,"length":10.1188965,"rop":131,"flow_rate":695.5,"tfo":285.5,"tfo_accuracy":50,"weight_on_bit":15.51,"pdm_differential_pressure":231.1,"pdm_torque":3.76,"slide_seen":10.1188965,"slide_ahead":2.545288,"dls":1.325,"build_rate":0.564,"motor_yield":12.3…
+useReadings.ts:296 [YieldTracker] SlideSheet: extracted 6486 slide events from nested 'slides[]' arrays
+useReadings.ts:317 [YieldTracker] SlideSheet: cached 6486 intervals (6486 slide, 0 rotate, 0 skipped). Motor yield populated: 5969/6486 slides, TFO populated: 5922/6486 slides. Depth range: 1518–13585 ft

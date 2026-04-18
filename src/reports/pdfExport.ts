@@ -11,7 +11,6 @@ export function exportToPdf(
   wellName: string,
 ): void {
   try {
-
     const doc = new jsPDF('landscape', 'mm', 'a4');
 
     // Title
@@ -28,7 +27,7 @@ export function exportToPdf(
     const regression = yieldAnalysis?.overallDLS;
     if (regression) {
       doc.text(
-        `Yield: ${regression.slope.toFixed(3)} °/%DC | R² = ${regression.rSquared.toFixed(3)} | Natural: ${regression.intercept.toFixed(2)} °/100ft`,
+        `Yield: ${regression.slope.toFixed(3)} deg/%DC | R^2 = ${regression.rSquared.toFixed(3)} | Natural: ${regression.intercept.toFixed(2)} deg/100ft`,
         14,
         37,
       );
@@ -42,6 +41,7 @@ export function exportToPdf(
 
     const columns = [
       'Depth',
+      'Formation',
       'RSS Inc',
       'RSS Az',
       'MWD Inc',
@@ -50,20 +50,27 @@ export function exportToPdf(
       'BR',
       'TR',
       'DLS',
+      'MY App',
+      'MY Sheet',
+      'MY Delta',
       'MWD BR',
       'MWD TR',
       'MWD DLS',
       'DC %',
       'TF Set',
       'Res TF',
+      'TF Acc %',
       'Section',
     ];
 
     const fmt = (v: number | null | undefined, d: number): string =>
       v != null ? v.toFixed(d) : '\u2014';
+    const fmtPct = (v: number | null | undefined, d: number): string =>
+      v != null ? `${v.toFixed(d)} %` : '\u2014';
 
     const rows = displayReadings.map((r) => [
       fmt(r.depth, 1),
+      r.formation ?? '\u2014',
       fmt(r.inc, 2),
       fmt(r.az, 2),
       fmt(r.mwdInc, 2),
@@ -72,12 +79,18 @@ export function exportToPdf(
       fmt(r.br, 2),
       fmt(r.tr, 2),
       fmt(r.dls, 2),
+      fmt(r.normalizedDls, 2),
+      fmt(r.sheetMotorYield, 2),
+      (r.normalizedDls != null && r.sheetMotorYield != null)
+        ? (r.normalizedDls - r.sheetMotorYield).toFixed(2)
+        : '\u2014',
       fmt(r.mwdBr, 2),
       fmt(r.mwdTr, 2),
       fmt(r.mwdDls, 2),
       fmt(r.dutyCycle, 1),
       fmt(r.toolFaceSet, 1),
       fmt(r.resultantTF, 1),
+      fmtPct(r.tfAccuracy, 1),
       r.section,
     ]);
 

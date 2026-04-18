@@ -1,6 +1,11 @@
 export interface WitsChannelProfile {
   id: string;
   vendorName: string;
+  /**
+   * 'rss'   — a rotary steerable system is in the BHA (nearBitInc/Az are RSS sensors).
+   * 'motor' — a bent motor + MWD configuration; no separate RSS near-bit sensor.
+   */
+  toolType: 'rss' | 'motor';
   channels: ChannelMapping;
   dataSource: 'wits' | 'cerebro' | 'wits+cerebro';
 }

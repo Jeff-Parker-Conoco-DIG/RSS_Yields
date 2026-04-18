@@ -1,23 +1,30 @@
 import type { YieldReading, YieldAnalysis } from '../types';
 
+type ReadingColumnKey = keyof YieldReading | 'myDelta';
+
 /** Column definitions for the readings export */
-const READING_COLUMNS: { key: keyof YieldReading; label: string; decimals: number }[] = [
+const READING_COLUMNS: { key: ReadingColumnKey; label: string; decimals: number }[] = [
   { key: 'depth', label: 'Depth (ft)', decimals: 1 },
-  { key: 'inc', label: 'RSS Inc (°)', decimals: 2 },
-  { key: 'az', label: 'RSS Az (°)', decimals: 2 },
-  { key: 'mwdInc', label: 'MWD Inc (°)', decimals: 2 },
-  { key: 'mwdAz', label: 'MWD Az (°)', decimals: 2 },
+  { key: 'formation', label: 'Formation', decimals: 0 },
+  { key: 'inc', label: 'RSS Inc (deg)', decimals: 2 },
+  { key: 'az', label: 'RSS Az (deg)', decimals: 2 },
+  { key: 'mwdInc', label: 'MWD Inc (deg)', decimals: 2 },
+  { key: 'mwdAz', label: 'MWD Az (deg)', decimals: 2 },
   { key: 'courseLength', label: 'C.L. (ft)', decimals: 1 },
-  { key: 'br', label: 'BR (°/100ft)', decimals: 2 },
-  { key: 'tr', label: 'TR (°/100ft)', decimals: 2 },
-  { key: 'dls', label: 'DLS (°/100ft)', decimals: 2 },
-  { key: 'mwdBr', label: 'MWD BR (°/100ft)', decimals: 2 },
-  { key: 'mwdTr', label: 'MWD TR (°/100ft)', decimals: 2 },
-  { key: 'mwdDls', label: 'MWD DLS (°/100ft)', decimals: 2 },
+  { key: 'br', label: 'BR (deg/100ft)', decimals: 2 },
+  { key: 'tr', label: 'TR (deg/100ft)', decimals: 2 },
+  { key: 'dls', label: 'DLS (deg/100ft)', decimals: 2 },
+  { key: 'normalizedDls', label: 'MY App (deg/100ft)', decimals: 2 },
+  { key: 'sheetMotorYield', label: 'MY Sheet (deg/100ft)', decimals: 2 },
+  { key: 'myDelta', label: 'MY Delta (deg/100ft)', decimals: 2 },
+  { key: 'mwdBr', label: 'MWD BR (deg/100ft)', decimals: 2 },
+  { key: 'mwdTr', label: 'MWD TR (deg/100ft)', decimals: 2 },
+  { key: 'mwdDls', label: 'MWD DLS (deg/100ft)', decimals: 2 },
   { key: 'dutyCycle', label: 'DC %', decimals: 1 },
-  { key: 'toolFaceSet', label: 'TF Set (°)', decimals: 1 },
-  { key: 'toolFaceActual', label: 'TF Act (°)', decimals: 1 },
-  { key: 'resultantTF', label: 'Res TF (°)', decimals: 1 },
+  { key: 'toolFaceSet', label: 'TF Set (deg)', decimals: 1 },
+  { key: 'toolFaceActual', label: 'TF Act (deg)', decimals: 1 },
+  { key: 'tfAccuracy', label: 'TF Acc %', decimals: 1 },
+  { key: 'resultantTF', label: 'Res TF (deg)', decimals: 1 },
   { key: 'buildCommand', label: 'Build Cmd', decimals: 3 },
   { key: 'turnCommand', label: 'Turn Cmd', decimals: 3 },
   { key: 'section', label: 'Section', decimals: 0 },
@@ -37,11 +44,14 @@ export function exportToExcel(
 
     const wb = XLSX.utils.book_new();
 
-    // ─── Readings Sheet ──────────────────────────────────────
     const headers = READING_COLUMNS.map((c) => c.label);
     const rows = readings.map((reading) =>
       READING_COLUMNS.map((col) => {
-        const val = reading[col.key];
+        const val = col.key === 'myDelta'
+          ? (reading.normalizedDls != null && reading.sheetMotorYield != null
+            ? (reading.normalizedDls - reading.sheetMotorYield)
+            : null)
+          : reading[col.key];
         if (val == null) return null;
         if (typeof val === 'string') return val;
         return Number(val);
@@ -78,7 +88,6 @@ export function exportToExcel(
 
     XLSX.utils.book_append_sheet(wb, ws, 'Readings');
 
-    // ─── Summary Sheet ──────────────────────────────────────
     const summary: (string | number | null)[][] = [
       ['RSS Yield Summary'],
       ['Well', wellName],
@@ -90,9 +99,9 @@ export function exportToExcel(
     if (overall) {
       summary.push(
         ['Overall DLS Yield Regression'],
-        ['Slope (°/%DC)', overall.slope],
+        ['Slope (deg/%DC)', overall.slope],
         ['Intercept (natural tendency)', overall.intercept],
-        ['R²', overall.rSquared],
+        ['R^2', overall.rSquared],
         ['Data Points', overall.n],
         [],
       );
@@ -102,9 +111,9 @@ export function exportToExcel(
     if (buildY) {
       summary.push(
         ['Build Yield Regression'],
-        ['Slope (°/unit build-cmd)', buildY.slope],
+        ['Slope (deg/unit build-cmd)', buildY.slope],
         ['Intercept (natural build)', buildY.intercept],
-        ['R²', buildY.rSquared],
+        ['R^2', buildY.rSquared],
         [],
       );
     }
@@ -113,9 +122,9 @@ export function exportToExcel(
     if (turnY) {
       summary.push(
         ['Turn Yield Regression'],
-        ['Slope (°/unit turn-cmd)', turnY.slope],
+        ['Slope (deg/unit turn-cmd)', turnY.slope],
         ['Intercept (natural walk)', turnY.intercept],
-        ['R²', turnY.rSquared],
+        ['R^2', turnY.rSquared],
       );
     }
 

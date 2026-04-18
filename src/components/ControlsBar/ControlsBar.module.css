@@ -202,3 +202,21 @@
   opacity: 0.3;
   cursor: not-allowed;
 }
+
+
+/* ── AVGs Button ─────────────────────────── */
+.avgBtn {
+  background: #1e2e3e;
+  color: #8cc4ff;
+  border-color: #2a4a6a;
+}
+
+.avgBtn:hover:not(:disabled) {
+  background: #264060;
+}
+
+.avgBtnActive {
+  background: #264060;
+  color: #fff;
+  border-color: #4a8aff;
+}

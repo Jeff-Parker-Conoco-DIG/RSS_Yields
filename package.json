@@ -1,6 +1,6 @@
 {
   "name": "yieldtracker",
-  "version": "2.0.3",
+  "version": "2.3.3",
   "private": true,
   "engines": {
     "node": ">=20",
@@ -15,7 +15,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "@corva/ui": "^3.52.0",
+    "@corva/ui": "^3.53.0",
     "jspdf": "^4.2.0",
     "jspdf-autotable": "^5.0.7",
     "react": "17.0.1",
@@ -23,7 +23,7 @@
     "xlsx-js-style": "^1.2.0"
   },
   "devDependencies": {
-    "@corva/dc-platform-shared": "^0.58.0",
+    "@corva/dc-platform-shared": "0.60.0",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "12",
     "@types/jest": "^30.0.0",

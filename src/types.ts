@@ -23,6 +23,22 @@ export interface AppSettingsData {
 export type IntervalMode = 'depth' | 'time' | 'manual';
 export type WellSection = 'curve' | 'uturn';
 
+export interface FormationTop {
+  md: number;
+  td: number;
+  name: string;
+}
+
+export interface SlideInterval {
+  fromDepth: number;
+  toDepth: number;
+  isSlide: boolean;
+  motorYield: number | null;
+  buildRateSlide: number | null;
+  effectiveToolface: number | null;
+  tfoAccuracy: number | null;
+}
+
 export interface TrackingConfig {
   startDepth: number;
   stopDepth: number | null;      // null = run until stopped
@@ -61,10 +77,45 @@ export interface YieldReading {
   mwdTr: number | null;           // MWD turn rate °/100ft
   mwdDls: number | null;          // MWD DLS °/100ft
 
+  // Sensor comparison (RSS leads MWD by ~B2S gap)
+  deltaInc: number | null;        // RSS Inc − MWD Inc (degrees)
+  deltaAz: number | null;         // RSS Az − MWD Az, wrapped ±180° (degrees)
+
+  // Slide / rotate breakdown — derived from directional.slide-sheet
+  // The sensor depth is bit depth minus the MWD bit-to-survey offset.
+  sensorDepth: number | null;     // Where the MWD survey actually represents (bit − mwdOffset)
+  slideFt: number | null;         // Slide footage in the interval (at bit depth range)
+  rotateFt: number | null;        // Rotate footage in the interval
+  /** Slide footage the MWD sensor has already passed (toDepth ≤ sensorDepth).
+   *  Defined against the active slide selected for this reading. */
+  slideSeen: number | null;
+  /** Slide footage ahead of the sensor within the active slide interval. */
+  slideAhead: number | null;
+  /** Start depth of the active slide interval (for reference display). */
+  slideStartDepth: number | null;
+  /** End depth of the active slide interval (for reference display). */
+  slideEndDepth: number | null;
+  /** Footage-weighted TFO accuracy across slides overlapping the sensor-to-bit window (%). */
+  tfAccuracy: number | null;
+  /** Corva slide-sheet footage-weighted motor yield over this reading interval (deg/100ft at 100% slide). */
+  sheetMotorYield: number | null;
+  /** Corva slide-sheet footage-weighted build-yield component over this reading interval. */
+  sheetBrYield: number | null;
+  /** Corva slide-sheet footage-weighted turn-yield component over this reading interval. */
+  sheetTrYield: number | null;
+  /** Formation name at bit depth. */
+  formation: string | null;
+
+  // Normalized motor yield — DLS/BR/TR at 100% slide (°/100ft)
+  normalizedDls: number | null;
+  normalizedBr: number | null;
+  normalizedTr: number | null;
+
   // Steering parameters — averaged over interval from prev depth to this depth
   dutyCycle: number | null;       // 0-100%
   toolFaceSet: number | null;     // Commanded gravity TF (degrees)
   toolFaceActual: number | null;  // Achieved gravity TF (degrees)
+  toolFaceStdDev: number | null;  // TF consistency (degrees)
   steeringForce: number | null;
 
   // Resultant toolface — back-calculated from actual RSS BR/TR
@@ -117,4 +168,4 @@ export interface WitsRecord {
 }
 
 // ─── UI Tab State ──────────────────────────────────────────────────
-export type TabId = 'table' | 'scatter' | 'depthTrack';
+export type TabId = 'table' | 'scatter';

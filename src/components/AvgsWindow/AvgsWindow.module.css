@@ -1,0 +1,136 @@
+.window {
+  position: fixed;
+  z-index: 9000;
+  min-width: 230px;
+  background: #1a1a1a;
+  border: 1px solid #444;
+  border-radius: 6px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.6);
+  font-family: 'Roboto Mono', monospace;
+  font-size: 13px;
+  color: #ddd;
+  user-select: none;
+}
+
+.titleBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #252525;
+  padding: 6px 10px;
+  border-radius: 6px 6px 0 0;
+  cursor: grab;
+}
+
+.titleBar:active {
+  cursor: grabbing;
+}
+
+.title {
+  font-weight: 700;
+  font-size: 13px;
+  color: #8cc4ff;
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  color: #888;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1;
+}
+
+.closeBtn:hover {
+  color: #fff;
+}
+
+.body {
+  padding: 12px 14px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.label {
+  font-size: 11px;
+  color: #aaa;
+  white-space: nowrap;
+}
+
+.input {
+  background: #2a2a2a;
+  border: 1px solid #555;
+  border-radius: 3px;
+  color: #ddd;
+  font-size: 12px;
+  font-family: 'Roboto Mono', monospace;
+  padding: 4px 6px;
+  width: 90px;
+}
+
+.unit {
+  font-size: 11px;
+  color: #888;
+}
+
+.results {
+  text-align: center;
+}
+
+.info {
+  font-size: 11px;
+  color: #888;
+  margin-bottom: 6px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th {
+  font-size: 11px;
+  font-weight: 600;
+  color: #aaa;
+  padding: 3px 8px;
+  border-bottom: 1px solid #333;
+  text-align: center;
+}
+
+.table td {
+  font-size: 15px;
+  font-weight: 700;
+  padding: 6px 8px;
+  text-align: center;
+}
+
+.val {
+  color: #4caf50;
+}
+
+.nil {
+  color: #666;
+}
+
+.unitLabel {
+  font-size: 10px;
+  color: #666;
+  margin-top: 4px;
+}
+
+.excluded {
+  color: #f39c12;
+  font-size: 10px;
+}
+
+.noData {
+  font-size: 11px;
+  color: #888;
+  font-style: italic;
+}

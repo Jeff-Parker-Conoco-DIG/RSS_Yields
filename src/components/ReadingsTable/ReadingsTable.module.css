@@ -48,9 +48,22 @@
   background: #1a2a1a !important;
 }
 
+.dimmedRow td {
+  opacity: 0.35;
+}
+
 /* Section badge */
 .thSection { width: 40px; text-align: center; }
 .sectionCell { text-align: center; }
+.thFormation {
+  min-width: 120px;
+  text-align: left !important;
+}
+.formationCell {
+  text-align: left !important;
+  color: #c8c8c8 !important;
+  font-weight: 500;
+}
 .sectionBadge {
   display: inline-block;
   padding: 1px 5px;
@@ -72,6 +85,14 @@
 }
 .mwdCell {
   color: #aaa !important;
+}
+
+/* Motor yield columns — highlighted to distinguish from blended rates */
+.thMotor {
+  color: #7ec8e3 !important;   /* light cyan — readable on dark background */
+}
+.motorCell {
+  color: #7ec8e3 !important;
 }
 
 /* Notes column */

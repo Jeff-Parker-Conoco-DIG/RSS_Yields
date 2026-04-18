@@ -4,30 +4,16 @@ import { TABS, DEFAULT_TRACKING } from './constants';
 import { useSettings } from './effects/useSettings';
 import { getProfile, buildResolvedMap, WitsMapperPanel } from './witsMapper';
 import { useDrillstringInfo } from './effects/useDrillstringInfo';
+import { useFormations } from './effects/useFormations';
 import { useReadings } from './effects/useReadings';
-import { useRssMonitor } from './effects/useRssMonitor';
 import { RssToolInfo } from './components/RssToolInfo';
-import { RssMonitorBar } from './components/RssMonitorBar';
 import { ControlsBar } from './components/ControlsBar';
 import { ReadingsTable } from './components/ReadingsTable';
 import { YieldScatterPlot } from './components/YieldScatterPlot';
-import { DepthTrackPlot } from './components/DepthTrackPlot';
-import { AverageRatesModal } from './components/AverageRatesModal';
+import { AvgsWindow } from './components/AvgsWindow';
 import { computeYieldAnalysis } from './calculations/yieldCalc';
 import { exportToExcel } from './reports/excelExport';
 import { exportToPdf } from './reports/pdfExport';
-
-// Corva AppContainer (optional — graceful fallback for standalone dev)
-let AppContainer: React.FC<{ header: React.ReactNode; testId?: string; children: React.ReactNode }> | null = null;
-let AppHeader: React.FC | null = null;
-
-try {
-  const componentsV2 = require('@corva/ui/componentsV2');
-  AppContainer = componentsV2.AppContainer;
-  AppHeader = componentsV2.AppHeader;
-} catch {
-  // Running in standalone dev mode
-}
 
 const App: React.FC<AppProps> = ({ well, app, appSettings, appHeaderProps }) => {
   const [activeTab, setActiveTab] = useState<TabId>('table');
@@ -38,12 +24,10 @@ const App: React.FC<AppProps> = ({ well, app, appSettings, appHeaderProps }) => 
 
   // Drillstring info
   const { toolInfo, loading: dsLoading } = useDrillstringInfo(assetId);
+  const { formations } = useFormations(assetId);
 
   // WITS Mapper panel visibility
   const [showMapper, setShowMapper] = useState(false);
-
-  // Average Rates modal visibility
-  const [showAvgRates, setShowAvgRates] = useState(false);
 
   // RSS profile & channel overrides — managed ONLY via our WITS Mapper panel, not Corva settings
   const [localOverrides, setLocalOverrides] = useState<Record<string, string>>(() => {
@@ -78,7 +62,10 @@ const App: React.FC<AppProps> = ({ well, app, appSettings, appHeaderProps }) => 
 
     const vendor = toolInfo.vendor.toLowerCase();
     const toolName = toolInfo.toolName.toLowerCase();
-    if (toolName.includes('icruise') || vendor.includes('halliburton')) {
+    if (toolName === 'bent motor') {
+      // No RSS — PDM-only BHA; default to bent motor curve profile
+      setLocalProfileId('bentmotor_curve');
+    } else if (toolName.includes('icruise') || vendor.includes('halliburton')) {
       setLocalProfileId('icruise');
     } else if (toolName.includes('powerdrive') || vendor.includes('slb') || vendor.includes('schlumberger')) {
       setLocalProfileId('powerdrive');
@@ -146,9 +133,6 @@ const App: React.FC<AppProps> = ({ well, app, appSettings, appHeaderProps }) => 
     return () => clearTimeout(timer);
   }, [trackingConfig.isRunning, trackingConfig.autoStopHours, trackingConfig.startedAt]);
 
-  // RSS monitor — always-on shock/vibe gauges (independent of tracking state)
-  const { values: monitorValues, thresholds, setThresholds } = useRssMonitor(assetId, true);
-
   // Core data — readings, CRUD, auto-trigger
   const {
     readings,
@@ -160,23 +144,23 @@ const App: React.FC<AppProps> = ({ well, app, appSettings, appHeaderProps }) => 
     removeReading,
     clearAll,
     reload,
-  } = useReadings(assetId, trackingConfig, resolvedMapFinal);
+  } = useReadings(
+    assetId,
+    trackingConfig,
+    resolvedMapFinal,
+    toolInfo?.mwdBitToSurveyDistance ?? 0,
+    formations,
+  );
 
   // Yield analysis for scatter plot — uses MWD-derived rates as ground truth.
   // Falls back to RSS rates for wells/readings where MWD channels aren't mapped yet.
   const yieldAnalysis = useMemo(() => {
     const stations = readings
-      .filter((r) => {
-        const dlsVal = r.mwdDls ?? r.dls;
-        if (dlsVal == null) return false;
-        // Skip zero-DLS readings when DC > 0 — MWD hadn't updated yet (bogus data)
-        if (dlsVal === 0 && r.dutyCycle != null && r.dutyCycle > 0) return false;
-        return true;
-      })
+      .filter((r) => (r.mwdDls ?? r.dls) != null)
       .map((r) => ({
-        mwdDLS: r.mwdDls ?? r.dls!,
-        mwdBUR: r.mwdBr ?? r.br ?? 0,
-        mwdTUR: r.mwdTr ?? r.tr ?? 0,
+        mwdDLS: r.mwdDls ?? r.dls!,        // Ground-truth DLS (prefer MWD)
+        mwdBUR: r.mwdBr ?? r.br ?? 0,      // Ground-truth build rate
+        mwdTUR: r.mwdTr ?? r.tr ?? 0,      // Ground-truth turn rate
         avgDutyCycle: r.dutyCycle,
         buildCommand: r.buildCommand,
         turnCommand: r.turnCommand,
@@ -198,6 +182,11 @@ const App: React.FC<AppProps> = ({ well, app, appSettings, appHeaderProps }) => 
   const handleTakeReading = useCallback(() => {
     takeReading('manual');
   }, [takeReading]);
+
+  // AVGs floating window + min slide filter
+  const [showAvgs, setShowAvgs] = useState(false);
+  const toggleAvgs = useCallback(() => setShowAvgs((v) => !v), []);
+  const [minSlideSeen, setMinSlideSeen] = useState<number>(0);
 
   const content = (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: '#141414', color: '#ddd' }}>
@@ -241,13 +230,6 @@ const App: React.FC<AppProps> = ({ well, app, appSettings, appHeaderProps }) => 
         />
       )}
 
-      {/* RSS Monitor Bar — always visible shock/vibe gauges */}
-      <RssMonitorBar
-        values={monitorValues}
-        thresholds={thresholds}
-        onThresholdsChange={setThresholds}
-      />
-
       {/* Controls bar */}
       <ControlsBar
         config={trackingConfig}
@@ -256,6 +238,8 @@ const App: React.FC<AppProps> = ({ well, app, appSettings, appHeaderProps }) => 
         onExportExcel={handleExportExcel}
         onExportPdf={handleExportPdf}
         onClearAll={clearAll}
+        onToggleAvgs={toggleAvgs}
+        showAvgs={showAvgs}
         currentBitDepth={currentBitDepth}
         readingCount={readings.length}
       />
@@ -280,22 +264,6 @@ const App: React.FC<AppProps> = ({ well, app, appSettings, appHeaderProps }) => 
             {tab.label}
           </button>
         ))}
-        <div style={{ flex: 1 }} />
-        <button
-          onClick={() => setShowAvgRates(true)}
-          style={{
-            background: 'transparent',
-            border: '1px solid #444',
-            borderRadius: 4,
-            color: '#888',
-            padding: '4px 10px',
-            cursor: 'pointer',
-            fontSize: 11,
-          }}
-          title="Average Rates Calculator"
-        >
-          Avg Rates
-        </button>
       </div>
 
       {/* Error state */}
@@ -313,57 +281,48 @@ const App: React.FC<AppProps> = ({ well, app, appSettings, appHeaderProps }) => 
             onSetNotes={setNotes}
             onDelete={removeReading}
             dlNeeded={trackingConfig.dlNeeded ?? null}
+            profile={profile}
+            minSlideSeen={minSlideSeen}
           />
         )}
         {activeTab === 'scatter' && (
           <YieldScatterPlot
-            stations={readings
-              .filter((r) => {
-                // Filter out readings with no rates (first reading) and readings
-                // where MWD hasn't updated (DLS = 0 at non-zero DC is bogus data)
-                const dlsVal = r.dls ?? r.mwdDls;
-                if (dlsVal == null) return false;
-                // Skip zero-DLS readings when DC > 0 — MWD hadn't updated yet
-                if (dlsVal === 0 && r.dutyCycle != null && r.dutyCycle > 0) return false;
-                return true;
-              })
-              .map((r) => ({
-                avgDutyCycle: r.dutyCycle,
-                mwdDLS: r.mwdDls ?? r.dls!,
-                mwdBUR: r.mwdBr ?? r.br ?? 0,
-                mwdTUR: r.mwdTr ?? r.tr ?? 0,
-                rssDLS: r.dls ?? r.mwdDls!,
-                mwdDepth: r.depth,
-                avgToolFaceSet: r.toolFaceSet,
-                buildCommand: r.buildCommand,
-                turnCommand: r.turnCommand,
-                courseLength: r.courseLength ?? 0,
-              }))}
+            stations={readings.filter((r) => (r.mwdDls ?? r.dls) != null).map((r) => ({
+              avgDutyCycle: r.dutyCycle,
+              mwdDLS: r.mwdDls ?? r.dls!,   // Ground-truth DLS for regression
+              mwdBUR: r.mwdBr ?? r.br ?? 0,
+              mwdTUR: r.mwdTr ?? r.tr ?? 0,
+              rssDLS: r.dls ?? r.mwdDls!,   // RSS near-bit DLS for divergence coloring
+              mwdDepth: r.depth,
+              avgToolFaceSet: r.toolFaceSet,
+              buildCommand: r.buildCommand,
+              turnCommand: r.turnCommand,
+              courseLength: r.courseLength ?? 0,
+            }))}
             divergenceThreshold={settings.yieldDivergenceThreshold}
           />
         )}
-        {activeTab === 'depthTrack' && (
-          <DepthTrackPlot readings={readings} />
-        )}
       </div>
-
-      {/* Average Rates Modal */}
-      {showAvgRates && (
-        <AverageRatesModal readings={readings} onClose={() => setShowAvgRates(false)} />
-      )}
     </div>
   );
 
-  // Wrap in Corva AppContainer if available
-  if (AppContainer && AppHeader) {
-    return (
-      <AppContainer header={<AppHeader {...(appHeaderProps ?? {})} />} testId="rss-yields">
-        {content}
-      </AppContainer>
-    );
-  }
-
-  return content;
+  // NOTE: We intentionally skip wrapping with @corva/ui's AppContainer/AppHeader here.
+  // The manifest has "use_app_header_v3": true, so the Corva platform renders the header
+  // automatically in production. In local dev, AppHeader's withRouter (react-router-dom v5)
+  // conflicts with dc-platform-shared's react-router v3 shell, causing an invariant error.
+  return (
+    <>
+      {content}
+      {showAvgs && (
+        <AvgsWindow
+          readings={readings}
+          minSlideSeen={minSlideSeen}
+          onMinSlideSeenChange={setMinSlideSeen}
+          onClose={() => setShowAvgs(false)}
+        />
+      )}
+    </>
+  );
 };
 
 export default App;

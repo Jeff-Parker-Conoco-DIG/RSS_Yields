@@ -18,6 +18,8 @@ interface ControlsBarProps {
   onExportExcel: () => void;
   onExportPdf: () => void;
   onClearAll: () => Promise<void>;
+  onToggleAvgs: () => void;
+  showAvgs: boolean;
   currentBitDepth: number | null;
   readingCount: number;
   takingReading?: boolean;
@@ -30,6 +32,8 @@ export const ControlsBar: React.FC<ControlsBarProps> = ({
   onExportExcel,
   onExportPdf,
   onClearAll,
+  onToggleAvgs,
+  showAvgs,
   currentBitDepth,
   readingCount,
   takingReading,
@@ -180,6 +184,16 @@ export const ControlsBar: React.FC<ControlsBarProps> = ({
           disabled={takingReading}
         >
           {takingReading ? '⏳...' : '📸 Take Reading'}
+        </button>
+
+        {/* AVGs — opens independent floating window */}
+        <button
+          className={`${styles.btn} ${showAvgs ? styles.avgBtnActive : styles.avgBtn}`}
+          onClick={onToggleAvgs}
+          disabled={readingCount === 0}
+          title="Average BR / TR / DLS over a depth range"
+        >
+          AVGs
         </button>
 
         <div className={styles.spacer} />

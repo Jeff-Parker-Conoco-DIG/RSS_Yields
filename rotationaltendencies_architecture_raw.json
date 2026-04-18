@@ -1,0 +1,2216 @@
+{
+  "generated": "2026-04-17T08:17:34.271870",
+  "endpoints": {
+    "bdf684f4eb93": {
+      "method": "GET",
+      "host": "app.beta.corva.ai",
+      "path": "/dashboards/slide-sheet-7400b76fb7",
+      "statuses": [
+        304
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "response_counts": [
+        0,
+        0
+      ],
+      "param_sample": {
+        "rigId": 2135,
+        "wellId": 118012,
+        "rigAssetId": 41655357,
+        "wellAssetId": 44307597
+      },
+      "response_schema": null,
+      "request_body_schema": null
+    },
+    "1a3f5a1d55c5": {
+      "method": "GET",
+      "host": "api.corva.ai",
+      "path": "/v1/users/current",
+      "statuses": [
+        304
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "response_counts": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "param_sample": {},
+      "response_schema": null,
+      "request_body_schema": null
+    },
+    "5136f0f7c949": {
+      "method": "GET",
+      "host": "api.corva.ai",
+      "path": "/v2/ability_check/check_permission",
+      "statuses": [
+        304
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "response_counts": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "param_sample": {
+        "ability": "update",
+        "resource_class": "settings-drillstrings_settings_app"
+      },
+      "response_schema": null,
+      "request_body_schema": null
+    },
+    "d787e1f58ff7": {
+      "method": "GET",
+      "host": "api.corva.ai",
+      "path": "/v2/dashboards",
+      "statuses": [
+        200,
+        304
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "response_counts": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "param_sample": {
+        "layout": "tabs",
+        "segment": "drilling",
+        "type": "asset_dashboard",
+        "visibility": "visible"
+      },
+      "response_schema": null,
+      "request_body_schema": null
+    },
+    "a0792b2580f9": {
+      "method": "GET",
+      "host": "api.corva.ai",
+      "path": "/v2/users/13324/dashboard_folders",
+      "statuses": [
+        304
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "response_counts": [
+        0,
+        0
+      ],
+      "param_sample": {},
+      "response_schema": null,
+      "request_body_schema": null
+    },
+    "bec330b03312": {
+      "method": "GET",
+      "host": "api.corva.ai",
+      "path": "/v2/workflows",
+      "statuses": [
+        304
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "response_counts": [
+        0,
+        0
+      ],
+      "param_sample": {
+        "allow_empty_company": true,
+        "company_id": 25,
+        "visibility": "public"
+      },
+      "response_schema": null,
+      "request_body_schema": null
+    },
+    "d57fbbf06831": {
+      "method": "GET",
+      "host": "api.corva.ai",
+      "path": "/v2/apps/app_categories",
+      "statuses": [
+        304
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "response_counts": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "param_sample": {
+        "category": "wellhub",
+        "fields": "all"
+      },
+      "response_schema": null,
+      "request_body_schema": null
+    },
+    "6b1848d168c0": {
+      "method": "GET",
+      "host": "api.corva.ai",
+      "path": "/v1/notifications/count/unread",
+      "statuses": [
+        304
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "response_counts": [
+        0,
+        0
+      ],
+      "param_sample": {
+        "trigger_type[]": [
+          "activity",
+          "comment",
+          "like",
+          "dashboard_app_annotation",
+          "package_review",
+          "app_purchase",
+          "app_error_alert",
+          "asset",
+          "partial_well_rerun"
+        ]
+      },
+      "response_schema": null,
+      "request_body_schema": null
+    },
+    "5e0366e2f74f": {
+      "method": "GET",
+      "host": "api.corva.ai",
+      "path": "/v1/notifications",
+      "statuses": [
+        304
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "response_counts": [
+        0,
+        0
+      ],
+      "param_sample": {
+        "acknowledged": false,
+        "notification_type": "banner",
+        "order": "desc",
+        "per_page": 20,
+        "sort": "created_at",
+        "trigger_type[]": "alert"
+      },
+      "response_schema": null,
+      "request_body_schema": null
+    },
+    "3d52406ae384": {
+      "method": "GET",
+      "host": "api.corva.ai",
+      "path": "/options/",
+      "statuses": [
+        304
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "response_counts": [
+        0,
+        0
+      ],
+      "param_sample": {
+        "keys[]": [
+          "homepage_marketing_webm_url",
+          "homepage_marketing_mp4_url",
+          "homepage_marketing_image_url",
+          "homepage_marketing_image_redirect_link",
+          "corva_app_logo",
+          "corva_app_logo_3_0",
+          "corva_app_logo_tooltip_text",
+          "corva_app_logo_tooltip_text_3_0",
+          "login_additional_link_text",
+          "login_additional_link_url"
+        ]
+      },
+      "response_schema": null,
+      "request_body_schema": null
+    },
+    "4d451c788470": {
+      "method": "GET",
+      "host": "subscriptions.corva.ai",
+      "path": "/socket.io/",
+      "statuses": [
+        101
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "response_counts": [
+        0,
+        0
+      ],
+      "param_sample": {
+        "EIO": 4,
+        "transport": "websocket"
+      },
+      "response_schema": null,
+      "request_body_schema": null
+    },
+    "982a57615fd7": {
+      "method": "GET",
+      "host": "api.corva.ai",
+      "path": "/v2/dashboard_folder_shares",
+      "statuses": [
+        304
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "response_counts": [
+        0,
+        0
+      ],
+      "param_sample": {
+        "owner_id": 13324,
+        "viewed": false
+      },
+      "response_schema": null,
+      "request_body_schema": null
+    },
+    "47efe5817ab9": {
+      "method": "GET",
+      "host": "api.corva.ai",
+      "path": "/v1/users/13324/dashboards/slide-sheet-7400b76fb7",
+      "statuses": [
+        200
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "response_counts": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "param_sample": {
+        "asset_id": 44307597
+      },
+      "response_schema": null,
+      "request_body_schema": null
+    },
+    "c6de39be1647": {
+      "method": "GET",
+      "host": "api.corva.ai",
+      "path": "/v1/users/13324/dashboards/519411/data_filters",
+      "statuses": [
+        304
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "response_counts": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "param_sample": {},
+      "response_schema": null,
+      "request_body_schema": null
+    },
+    "dc945bc5f0d1": {
+      "method": "GET",
+      "host": "api.corva.ai",
+      "path": "/v2/assets",
+      "statuses": [
+        200,
+        304
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "response_counts": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "param_sample": {
+        "fields[]": [
+          "asset.name",
+          "asset.company_id",
+          "asset.parent_asset_id",
+          "asset.parent_asset_name",
+          "asset.status",
+          "asset.stats",
+          "asset.target_formation",
+          "asset.string_design",
+          "asset.root_asset_name",
+          "asset.basin",
+          "asset.county",
+          "asset.area",
+          "asset.visibility",
+          "asset.top_hole",
+          "asset.settings",
+          "asset.last_active_at",
+          "asset.last_drilling_at"
+        ],
+        "ids[]": 44307597,
+        "page": 1,
+        "per_page": 2000,
+        "sort": "name",
+        "types[]": "well"
+      },
+      "response_schema": null,
+      "request_body_schema": null
+    },
+    "62bd0fc609e6": {
+      "method": "GET",
+      "host": "api.corva.ai",
+      "path": "/v2/favorites",
+      "statuses": [
+        200,
+        304
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "response_counts": [
+        0,
+        0
+      ],
+      "param_sample": {},
+      "response_schema": null,
+      "request_body_schema": null
+    },
+    "58588a079a21": {
+      "method": "GET",
+      "host": "api.corva.ai",
+      "path": "/v2/rigs",
+      "statuses": [
+        200,
+        304
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "response_counts": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "param_sample": {
+        "fields[]": [
+          "rig.id",
+          "rig.name",
+          "rig.asset_id",
+          "rig.active_well",
+          "rig.type"
+        ],
+        "ids[]": 2135
+      },
+      "response_schema": null,
+      "request_body_schema": null
+    },
+    "334201724e82": {
+      "method": "GET",
+      "host": "api.corva.ai",
+      "path": "/v2/wells",
+      "statuses": [
+        200,
+        304
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "response_counts": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "param_sample": {
+        "fields[]": [
+          "well.name",
+          "well.settings",
+          "well.company",
+          "well.asset_id",
+          "well.last_active_at",
+          "well.program",
+          "well.pad",
+          "well.frac_fleet",
+          "well.id",
+          "well.rig",
+          "rig.name",
+          "rig.asset_id",
+          "company.id",
+          "well.status",
+          "well.archivation",
+          "well.lon_lat"
+        ],
+        "ids[]": 118012,
+        "include_arhivation_data": true
+      },
+      "response_schema": null,
+      "request_body_schema": null
+    },
+    "267c9b71872b": {
+      "method": "GET",
+      "host": "api.corva.ai",
+      "path": "/v1/users/13324/settings/offset_well_picker_5_settings_v1",
+      "statuses": [
+        304
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "response_counts": [
+        0,
+        0,
+        0
+      ],
+      "param_sample": {},
+      "response_schema": null,
+      "request_body_schema": null
+    },
+    "7bf1116dcb79": {
+      "method": "GET",
+      "host": "api.corva.ai",
+      "path": "/v2/dashboard_app_annotations/last_annotations",
+      "statuses": [
+        304
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "response_counts": [
+        0,
+        0,
+        0
+      ],
+      "param_sample": {
+        "dashboard_id": 519411
+      },
+      "response_schema": null,
+      "request_body_schema": null
+    },
+    "8204924d75ed": {
+      "method": "GET",
+      "host": "api.corva.ai",
+      "path": "/v2/assets/44307597",
+      "statuses": [
+        200
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "response_counts": [
+        0,
+        0,
+        0
+      ],
+      "param_sample": {
+        "fields[]": "all",
+        "include_rig_id": true
+      },
+      "response_schema": null,
+      "request_body_schema": null
+    },
+    "651939161bcb": {
+      "method": "GET",
+      "host": "api.corva.ai",
+      "path": "/v1/companies",
+      "statuses": [
+        304
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "response_counts": [
+        0,
+        0,
+        0
+      ],
+      "param_sample": {},
+      "response_schema": null,
+      "request_body_schema": null
+    },
+    "b7de62c71df4": {
+      "method": "GET",
+      "host": "data.corva.ai",
+      "path": "/api/v1/data/corva/data.offset_wells/",
+      "statuses": [
+        200
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "response_counts": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "param_sample": {
+        "limit": 1,
+        "query": {
+          "asset_id": 44307597
+        },
+        "sort": {
+          "timestamp": -1
+        }
+      },
+      "response_schema": null,
+      "request_body_schema": null
+    },
+    "39835f0baf7b": {
+      "method": "GET",
+      "host": "api.corva.ai",
+      "path": "/v1/data/corva/wits",
+      "statuses": [
+        200
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "response_counts": [
+        0,
+        0,
+        0
+      ],
+      "param_sample": {
+        "asset_id": 44307597,
+        "fields": "data.hole_depth,data.bit_depth"
+      },
+      "response_schema": null,
+      "request_body_schema": null
+    },
+    "22a721d11bcf": {
+      "method": "GET",
+      "host": "api.corva.ai",
+      "path": "/v1/data/corva/wits.summary-30m",
+      "statuses": [
+        304
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "response_counts": [
+        0,
+        0,
+        0
+      ],
+      "param_sample": {
+        "asset_id": 44307597,
+        "behavior": "accumulate",
+        "fields": "timestamp,data.hole_depth,data.bit_depth",
+        "limit": 10000,
+        "sort": "{timestamp:1}"
+      },
+      "response_schema": null,
+      "request_body_schema": null
+    },
+    "7cd7e55e97b1": {
+      "method": "GET",
+      "host": "data.corva.ai",
+      "path": "/api/v1/data/corva/data.drillstring/",
+      "statuses": [
+        200
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "response_counts": [
+        0,
+        0,
+        0
+      ],
+      "param_sample": {
+        "limit": 1000,
+        "query": {
+          "asset_id": 44307597
+        },
+        "sort": {
+          "data.id": -1
+        }
+      },
+      "response_schema": null,
+      "request_body_schema": null
+    },
+    "bb872633bb0c": {
+      "method": "GET",
+      "host": "data.corva.ai",
+      "path": "/api/v1/data/corva/data.casing/aggregate/",
+      "statuses": [
+        200
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "response_counts": [
+        0,
+        0,
+        0
+      ],
+      "param_sample": {
+        "limit": 1000,
+        "match": {
+          "asset_id": 44307597
+        },
+        "project": {
+          "asset_id": "$asset_id",
+          "data.bottom_depth": "$data.bottom_depth",
+          "data.outer_diameter": "$data.outer_diameter",
+          "data.inner_diameter": "$data.inner_diameter",
+          "data.is_exact_time": "$data.is_exact_time",
+          "data.setting_timestamp": "$data.setting_timestamp",
+          "data.start_timestamp": "$data.start_timestamp",
+          "data.is_riser": "$data.is_riser"
+        },
+        "sort": {
+          "timestamp": 1
+        }
+      },
+      "response_schema": null,
+      "request_body_schema": null
+    },
+    "f3f704594ddf": {
+      "method": "GET",
+      "host": "package.corva.ai",
+      "path": "/corva/app/slide_sheet.ui/packages/163/app.js",
+      "statuses": [
+        200
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "response_counts": [
+        0,
+        0
+      ],
+      "param_sample": {},
+      "response_schema": null,
+      "request_body_schema": null
+    },
+    "0f9965887d68": {
+      "method": "GET",
+      "host": "data.corva.ai",
+      "path": "/api/v1/data/corva/wcu_rule_mapping/aggregate/",
+      "statuses": [
+        200
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "response_counts": [
+        0,
+        0
+      ],
+      "param_sample": {
+        "limit": 100,
+        "match": {
+          "company_id": 3,
+          "data.app_id": 1181
+        },
+        "project": {
+          "app_id": "$data.app_id",
+          "rule_id": "$data.wcu_rules.rule_id",
+          "_id": 0
+        },
+        "sort": {
+          "timestamp": 1
+        }
+      },
+      "response_schema": null,
+      "request_body_schema": null
+    },
+    "f7313a8a250a": {
+      "method": "GET",
+      "host": "data.corva.ai",
+      "path": "/api/v1/data/corva/data.well-sections/aggregate/",
+      "statuses": [
+        200
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "response_counts": [
+        0,
+        0
+      ],
+      "param_sample": {
+        "limit": 1000,
+        "match": {
+          "asset_id": 44307597
+        },
+        "project": {
+          "start_depth": "$data.top_depth",
+          "end_depth": "$data.bottom_depth",
+          "name": "$data.name"
+        },
+        "sort": {
+          "data.top_depth": 1
+        }
+      },
+      "response_schema": null,
+      "request_body_schema": null
+    },
+    "34e90295aaca": {
+      "method": "GET",
+      "host": "data.corva.ai",
+      "path": "/api/v1/data/corva/directional.slide-sheet/aggregate/",
+      "statuses": [
+        200
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "response_counts": [
+        0,
+        0
+      ],
+      "param_sample": {
+        "limit": 1,
+        "match": {
+          "asset_id": 44307597,
+          "version": 2
+        },
+        "sort": {
+          "timestamp": -1
+        }
+      },
+      "response_schema": null,
+      "request_body_schema": null
+    },
+    "3ee24372341c": {
+      "method": "GET",
+      "host": "data.corva.ai",
+      "path": "/api/v1/data/corva/wits.summary-1m/aggregate/",
+      "statuses": [
+        200
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "response_counts": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "param_sample": {
+        "limit": 1,
+        "match": {
+          "asset_id": 44307597
+        },
+        "project": {
+          "hole_depth": "$data.hole_depth"
+        },
+        "sort": {
+          "timestamp": -1
+        }
+      },
+      "response_schema": null,
+      "request_body_schema": null
+    },
+    "88c989cd529d": {
+      "method": "GET",
+      "host": "data.corva.ai",
+      "path": "/api/v1/data/corva/data.plan_survey/aggregate/",
+      "statuses": [
+        200
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "response_counts": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "param_sample": {
+        "limit": 1,
+        "match": {
+          "asset_id": 44307597
+        },
+        "project": {
+          "stations": "$data.stations"
+        },
+        "sort": {
+          "timestamp": -1
+        }
+      },
+      "response_schema": null,
+      "request_body_schema": null
+    },
+    "ba443f5a708b": {
+      "method": "POST",
+      "host": "api.corva.ai",
+      "path": "/v1/users/13324/settings",
+      "statuses": [
+        200
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "response_counts": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "param_sample": {},
+      "response_schema": null,
+      "request_body_schema": {
+        "offset_well_picker_5_settings_v1": {
+          "isMapHidden": "boolean",
+          "isFilterExpanded": "boolean",
+          "mapStyle": "string"
+        }
+      }
+    },
+    "b8e677dc72d8": {
+      "method": "GET",
+      "host": "data.corva.ai",
+      "path": "/api/v1/data/corva/wellness_rule_settings/aggregate/",
+      "statuses": [
+        200
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "response_counts": [
+        0,
+        0
+      ],
+      "param_sample": {
+        "limit": 1000,
+        "match": {
+          "company_id": 3,
+          "data.rule_id": {
+            "$in": [
+              "6241cf2042dd1d1b70e4391b",
+              "6298b1962bd27225948ca411",
+              "6298b197f36cfe70b358c1bd",
+              "6298b197cc1c0d98b913df97",
+              "6298b19790ff08a4afc30d2a",
+              "6267f9dec10a87348ae7be7f",
+              "6241cf215d6dcaa77271ed0f",
+              "6241cf23cf9f22499dc8de42",
+              "642e86cafe656f88cdaaa93d",
+              "6298b193625d9cedb84a6494",
+              "6298b1957b235ea0e29cec35",
+              "6241cf2326436a51a2664394",
+              "6241cf247ce603350dc1b91a",
+              "6241cf246badd599894b153a",
+              "6241cf297ce603350dc1b925",
+              "6298b1962b528783f8fe3952",
+              "6241cf25f4b7cfddda04d722",
+              "64b58af10993db774b04178a",
+              "65ccda319d0e3f66554a6e15"
+            ]
+          }
+        },
+        "sort": {
+          "ts_desc": 1
+        }
+      },
+      "response_schema": null,
+      "request_body_schema": null
+    },
+    "c92b7a2a60d8": {
+      "method": "GET",
+      "host": "data.corva.ai",
+      "path": "/api/v1/data/corva/directional.slide-sheet/",
+      "statuses": [
+        200
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "response_counts": [
+        0,
+        0
+      ],
+      "param_sample": {
+        "limit": 1000,
+        "query": {
+          "version": 2,
+          "asset_id": 44307597
+        },
+        "sort": {
+          "timestamp": -1
+        },
+        "version": 2
+      },
+      "response_schema": null,
+      "request_body_schema": null
+    },
+    "d07e682d5adf": {
+      "method": "GET",
+      "host": "data.corva.ai",
+      "path": "/api/v1/data/corva/directional.toolface.summary-1ft/",
+      "statuses": [
+        200
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "response_counts": [
+        0,
+        0
+      ],
+      "param_sample": {
+        "fields": "data.active_tool_face,data.gravity_tool_face_median,data.magnetic_tool_face_median,data.hole_depth,data.tool_face_median",
+        "limit": 10000,
+        "query": {
+          "data.tool_face_median": {
+            "$gte": -200
+          },
+          "asset_id": 44307597
+        },
+        "sort": {
+          "timestamp": -1
+        }
+      },
+      "response_schema": null,
+      "request_body_schema": null
+    },
+    "72d139252bb7": {
+      "method": "GET",
+      "host": "data.corva.ai",
+      "path": "/api/v1/data/corva/data.actual_survey/",
+      "statuses": [
+        200
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "response_counts": [
+        0,
+        0
+      ],
+      "param_sample": {
+        "fields": "data.stations.inclination,data.stations.measured_depth",
+        "limit": 1,
+        "query": {
+          "asset_id": 44307597
+        },
+        "sort": {
+          "timestamp": -1
+        }
+      },
+      "response_schema": null,
+      "request_body_schema": null
+    },
+    "e8b4535bd768": {
+      "method": "GET",
+      "host": "data.corva.ai",
+      "path": "/api/v1/data/corva/directional.trend/",
+      "statuses": [
+        200
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "response_counts": [
+        0,
+        0
+      ],
+      "param_sample": {
+        "fields": "data.tfo,data.motor_yield,data.dls",
+        "limit": 1,
+        "query": {
+          "asset_id": 44307597
+        },
+        "sort": {
+          "timestamp": -1
+        }
+      },
+      "response_schema": null,
+      "request_body_schema": null
+    },
+    "ddf51c7155c9": {
+      "method": "GET",
+      "host": "data.corva.ai",
+      "path": "/api/v1/data/corva/data.formations/",
+      "statuses": [
+        200
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "response_counts": [
+        0,
+        0
+      ],
+      "param_sample": {
+        "fields": "data.md,data.td,data.formation_name",
+        "limit": 1000,
+        "query": {
+          "asset_id": 44307597
+        },
+        "sort": {
+          "data.md": 1
+        }
+      },
+      "response_schema": null,
+      "request_body_schema": null
+    },
+    "9572b451d7c2": {
+      "method": "POST",
+      "host": "api.corva.ai",
+      "path": "/v2/tasks",
+      "statuses": [
+        200
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "response_counts": [
+        0,
+        0
+      ],
+      "param_sample": {},
+      "response_schema": null,
+      "request_body_schema": {
+        "task": {
+          "provider": "string",
+          "app_key": "string",
+          "asset_id": "int",
+          "properties": {
+            "action": "string",
+            "survey_source": "string",
+            "measured_depth": [
+              "float"
+            ]
+          }
+        }
+      }
+    },
+    "0370707c3fb0": {
+      "method": "GET",
+      "host": "data.corva.ai",
+      "path": "/api/v1/data/corva/wellness_alerts/aggregate/",
+      "statuses": [
+        200
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "response_counts": [
+        0,
+        0
+      ],
+      "param_sample": {
+        "limit": 100,
+        "match": {
+          "asset_id": {
+            "$in": [
+              44307597
+            ]
+          },
+          "data.rule_id": {
+            "$in": [
+              "6298b193625d9cedb84a6494",
+              "65ccda319d0e3f66554a6e15",
+              "64b58af10993db774b04178a",
+              "642e86cafe656f88cdaaa93d",
+              "6298b197f36cfe70b358c1bd",
+              "6298b197cc1c0d98b913df97",
+              "6298b19790ff08a4afc30d2a",
+              "6298b1962bd27225948ca411",
+              "6298b1962b528783f8fe3952",
+              "6298b1957b235ea0e29cec35",
+              "6241cf2042dd1d1b70e4391b",
+              "6267f9dec10a87348ae7be7f",
+              "6241cf297ce603350dc1b925",
+              "6241cf25f4b7cfddda04d722",
+              "6241cf247ce603350dc1b91a",
+              "6241cf246badd599894b153a",
+              "6241cf23cf9f22499dc8de42",
+              "6241cf2326436a51a2664394",
+              "6241cf215d6dcaa77271ed0f"
+            ]
+          }
+        },
+        "sort": {
+          "timestamp": -1
+        }
+      },
+      "response_schema": null,
+      "request_body_schema": null
+    },
+    "29a5658f2dde": {
+      "method": "GET",
+      "host": "api.corva.ai",
+      "path": "/v2/tasks/a2c3740b-7f57-45f7-aec4-311779c7a53f",
+      "statuses": [
+        200
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "response_counts": [
+        0,
+        0
+      ],
+      "param_sample": {},
+      "response_schema": null,
+      "request_body_schema": null
+    },
+    "a7858f1588e4": {
+      "method": "GET",
+      "host": "api.corva.ai",
+      "path": "/v2/rigs/2135",
+      "statuses": [
+        304
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "response_counts": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "param_sample": {
+        "fields[]": "rig.asset_id"
+      },
+      "response_schema": null,
+      "request_body_schema": null
+    },
+    "8a6f3e4026b2": {
+      "method": "GET",
+      "host": "api.corva.ai",
+      "path": "/v2/wells/118012",
+      "statuses": [
+        304
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "response_counts": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "param_sample": {
+        "fields[]": "well.asset_id"
+      },
+      "response_schema": null,
+      "request_body_schema": null
+    },
+    "997989f86e85": {
+      "method": "PUT",
+      "host": "api.corva.ai",
+      "path": "/v1/users/13324/dashboards/519411/dashboard_apps/3670943",
+      "statuses": [
+        200
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "response_counts": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "param_sample": {
+        "asset_id": 44307597
+      },
+      "response_schema": null,
+      "request_body_schema": {
+        "id": "int",
+        "name": "string",
+        "category": "string",
+        "settings": {
+          "rigId": "null",
+          "wellId": "null",
+          "package": "string",
+          "settings": {
+            "showFormations": "boolean",
+            "showBreakingSlides": "boolean",
+            "showAverageValues": "boolean",
+            "columnsToDisplay": {
+              "start_timestamp": "boolean",
+              "end_timestamp": "boolean",
+              "start_measured_depth": "boolean",
+              "end_measured_depth": "boolean",
+              "start_tvd": "boolean",
+              "end_tvd": "boolean",
+              "slide_duration": "boolean",
+              "length": "boolean",
+              "rop": "boolean",
+              "flow_rate": "boolean",
+              "tfo": "boolean",
+              "effective_toolface": "boolean",
+              "tfo_accuracy": "boolean",
+              "weight_on_bit": "boolean",
+              "pdm_differential_pressure": "boolean",
+              "pdm_torque": "boolean",
+              "dls": "boolean",
+              "build_rate": "boolean",
+              "turn_rate": "boolean",
+              "motor_yield": "boolean"
+            },
+            "columnsOrder": [
+              "string"
+            ],
+            "isShowChart": "boolean",
+            "chartsToDisplay": {
+              "dls": "boolean",
+              "tfo": "boolean",
+              "length": "boolean",
+              "build_rate": "boolean",
+              "motor_yield": "boolean",
+              "tfo_accuracy": "boolean",
+              "effective_toolface": "boolean",
+              "slide_duration_origin": "boolean"
+            },
+            "countOfSlidesToDisplay": "string",
+            "sortDirection": "string",
+            "settingsByAsset": {
+              "15031900": {
+                "filters": "..."
+              },
+              "15266733": {
+                "filters": "..."
+              },
+              "44307597": {
+                "filters": "..."
+              },
+              "52040841": {
+                "filters": "..."
+              },
+              "52201536": {
+                "filters": "..."
+              },
+              "77297455": {
+                "filters": "..."
+              },
+              "81215918": {
+                "filters": "..."
+              }
+            }
+          }
+        },
+        "coordinates": {
+          "h": "int",
+          "w": "int",
+          "x": "int",
+          "y": "int"
+        },
+        "app": {
+          "id": "int",
+          "name": "string",
+          "app_key": "string",
+          "website": "string",
+          "description": "string(long)",
+          "summary": "string(long)",
+          "version": "string",
+          "category": "string",
+          "pricing": "null",
+          "created_at": "string",
+          "updated_at": "string",
+          "company_id": "int",
+          "task_name": "string",
+          "settings": {
+            "whitelisted_app_connection_settings": {
+              "edit": "[]",
+              "read": "[]"
+            }
+          },
+          "visibility": "string",
+          "segment": [
+            "string"
+          ],
+          "manager": "null",
+          "app_type": "string",
+          "marketing_level": "string",
+          "priority": {
+            "drilling": "int",
+            "drillout": "int",
+            "completion": "int"
+          },
+          "source_type": "[]",
+          "follows": "[]",
+          "followable": "boolean",
+          "source_name": "string",
+          "produced_data": "string",
+          "app_category_id": "int",
+          "position": "int",
+          "platform": "string",
+          "secret_parameters": "[]",
+          "author_id": "int",
+          "is_multirig": "boolean",
+          "tracking_enabled": "boolean",
+          "log_type": "string",
+          "status": "string",
+          "full_lambda_name": "null",
+          "invoke_lambda": "boolean",
+          "partial_rerun_enabled": "boolean",
+          "temporary": "boolean",
+          "delete_at": "null",
+          "managed_by_operator": "boolean",
+          "ui_settings": {
+            "initial_size": {
+              "h": "int",
+              "w": "int"
+            },
+            "use_app_header_v3": "boolean"
+          },
+          "author_email": "string",
+          "icon": {
+            "id": "int",
+            "app_id": "int",
+            "file_name": "string",
+            "file_type": "null",
+            "media_type": "string",
+            "s3_path": "string(long)",
+            "created_at": "string",
+            "updated_at": "string",
+            "position": "int",
+            "url": "string(long)"
+          }
+        },
+        "package": {
+          "id": "int",
+          "version": "int",
+          "build": "string",
+          "label": "string",
+          "status": "string",
+          "notes": "string(long)",
+          "manifest": {
+            "format": "int",
+            "license": {
+              "url": "string",
+              "type": "string"
+            },
+            "datasets": {},
+            "settings": {
+              "app": {
+                "cron_string": "...",
+                "scheduler_type": "..."
+              },
+              "runtime": "string",
+              "entrypoint": {
+                "file": "...",
+                "function": "..."
+              },
+              "environment": {},
+              "enable_isolation": "boolean"
+            },
+            "developer": {
+              "name": "string",
+              "authors": "[]",
+              "identifier": "string"
+            },
+            "application": {
+              "ui": {
+                "initial_size": "...",
+                "use_app_header_v3": "..."
+              },
+              "key": "string",
+              "name": "string",
+              "type": "string",
+              "summary": "string",
+              "website": "string",
+              "category": "string",
+              "segments": [
+                "..."
+              ],
+              "subtitle": "string",
+              "visibility": "string",
+              "description": "string(long)"
+            }
+          },
+          "package_json": {
+            "jest": {
+              "roots": [
+                "..."
+              ],
+              "testMatch": [
+                "..."
+              ],
+              "transform": {
+                "^.+\\.css$": "...",
+                "^.+\\.(js|jsx|mjs|cjs|ts|tsx)$": "...",
+                "^(?!.*\\.(js|jsx|mjs|cjs|ts|tsx|css|json)$)": "..."
+              },
+              "clearMocks": "boolean",
+              "globalSetup": "string",
+              "modulePaths": "[]",
+              "restoreMocks": "boolean",
+              "watchPlugins": [
+                "..."
+              ],
+              "testEnvironment": "string",
+              "moduleNameMapper": {
+                "^@(/.*)$": "...",
+                "@corva/ui(.*)": "...",
+                "^.+\\.module\\.(css|sass|scss)$": "..."
+              },
+              "coverageThreshold": {
+                "global": "..."
+              },
+              "setupFilesAfterEnv": [
+                "..."
+              ],
+              "collectCoverageFrom": [
+                "..."
+              ],
+              "transformIgnorePatterns": [
+                "..."
+              ]
+            },
+            "name": "string",
+            "engines": {
+              "node": "string",
+              "yarn": "string"
+            },
+            "scripts": {
+              "build": "string"
+            },
+            "version": "string",
+            "description": "string(long)",
+            "resolutions": {
+              "@types/react": "string"
+            },
+            "dependencies": {
+              "uuid": "string",
+              "react": "string",
+              "lodash": "string",
+              "moment": "string",
+              "echarts": "string",
+              "numeral": "string",
+              "@corva/ui": "string",
+              "react-dom": "string",
+              "classnames": "string",
+              "highcharts": "string",
+              "moment-timezone": "string",
+              "@material-ui/lab": "string",
+              "@material-ui/core": "string",
+              "echarts-for-react": "string",
+              "react-virtualized": "string",
+              "@material-ui/icons": "string",
+              "react-sortable-hoc": "string",
+              "corva-convert-units": "string",
+              "@material-ui/pickers": "string",
+              "moment-duration-format": "string",
+              "highcharts-react-official": "string"
+            },
+            "devDependencies": {
+              "jest": "string",
+              "husky": "string",
+              "eslint": "string",
+              "ts-loader": "string",
+              "babel-jest": "string",
+              "typescript": "string",
+              "@types/jest": "string",
+              "@types/react": "string",
+              "postcss-loader": "string",
+              "@commitlint/cli": "string",
+              "@types/react-dom": "string",
+              "@types/material-ui": "string",
+              "eslint-config-airbnb": "string",
+              "jest-watch-typeahead": "string",
+              "@testing-library/react": "string",
+              "babel-preset-react-app": "string",
+              "@corva/dc-platform-shared": "string",
+              "@testing-library/jest-dom": "string",
+              "@typescript-eslint/parser": "string",
+              "@tsconfig/create-react-app": "string",
+              "@testing-library/user-event": "string",
+              "eslint-plugin-destructuring": "string",
+              "@testing-library/react-hooks": "string",
+              "@types/moment-duration-format": "string",
+              "@commitlint/config-conventional": "string",
+              "eslint-config-airbnb-typescript": "string",
+              "@typescript-eslint/eslint-plugin": "string"
+            }
+          },
+          "url": "string(long)",
+          "created_at": "string",
+          "updated_at": "string",
+          "package_code_version": "string",
+          "ui_settings": {
+            "initial_size": {
+              "h": "int",
+              "w": "int"
+            },
+            "use_app_header_v3": "boolean"
+          }
+        },
+        "segment": [
+          "string"
+        ],
+        "availability": {
+          "subscription": "boolean",
+          "asset_subscription": "boolean"
+        },
+        "dashboard_id": "int",
+        "dashboard_workflow_id": "null"
+      }
+    },
+    "91d0f33a1a37": {
+      "method": "GET",
+      "host": "data.corva.ai",
+      "path": "/api/v1/data/corva/data.formations/aggregate/",
+      "statuses": [
+        200
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "response_counts": [
+        0,
+        0
+      ],
+      "param_sample": {
+        "limit": 1000,
+        "match": {
+          "asset_id": 44307597
+        },
+        "project": {
+          "md": "$data.md",
+          "td": "$data.td",
+          "name": "$data.formation_name"
+        },
+        "sort": {
+          "data.md": 1
+        }
+      },
+      "response_schema": null,
+      "request_body_schema": null
+    },
+    "10db73272607": {
+      "method": "GET",
+      "host": "api.corva.ai",
+      "path": "/v2/tasks/0737ecd4-ee85-43bd-8641-4565fe6ccafa",
+      "statuses": [
+        200
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "response_counts": [
+        0,
+        0
+      ],
+      "param_sample": {},
+      "response_schema": null,
+      "request_body_schema": null
+    },
+    "e873e28e1e6e": {
+      "method": "GET",
+      "host": "data.corva.ai",
+      "path": "/api/v1/data/corva/data.drillstring/aggregate/",
+      "statuses": [
+        200
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "response_counts": [
+        0
+      ],
+      "param_sample": {
+        "limit": 1000,
+        "match": {
+          "asset_id": 44307597
+        },
+        "project": {
+          "start_depth": "$data.start_depth",
+          "end_depth": "$data.end_depth",
+          "index": "$data.id",
+          "name": "$data.name"
+        },
+        "sort": {
+          "data.start_depth": 1
+        }
+      },
+      "response_schema": null,
+      "request_body_schema": null
+    },
+    "df2470649b2b": {
+      "method": "GET",
+      "host": "data.corva.ai",
+      "path": "/api/v1/data/corva/wellness_alerts/",
+      "statuses": [
+        200
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "response_counts": [
+        0
+      ],
+      "param_sample": {
+        "limit": 1,
+        "query": {
+          "asset_id": 44307597,
+          "data.segment": "drilling",
+          "timestamp": {
+            "$lt": 1681102800
+          }
+        },
+        "sort": {
+          "timestamp": -1
+        }
+      },
+      "response_schema": null,
+      "request_body_schema": null
+    },
+    "f4fab01042b1": {
+      "method": "GET",
+      "host": "data.corva.ai",
+      "path": "/api/v1/data/corva/wellness_scores/",
+      "statuses": [
+        200
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "response_counts": [
+        0
+      ],
+      "param_sample": {
+        "fields": "asset_id,data.overall_percent_change,data.overall_qc_score,data.segment",
+        "limit": 1,
+        "query": {
+          "asset_id": 44307597,
+          "data.segment": "drilling"
+        },
+        "sort": {
+          "timestamp": -1
+        }
+      },
+      "response_schema": null,
+      "request_body_schema": null
+    },
+    "d2149ba86388": {
+      "method": "GET",
+      "host": "api.corva.ai",
+      "path": "/v1/users/13324/dashboards/jdp-ea4e044468",
+      "statuses": [
+        200
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "response_counts": [
+        0,
+        0,
+        0
+      ],
+      "param_sample": {
+        "asset_id": 44307597
+      },
+      "response_schema": null,
+      "request_body_schema": null
+    },
+    "a47b0ffb138d": {
+      "method": "GET",
+      "host": "api.corva.ai",
+      "path": "/v1/users/13324/dashboards/506436/data_filters",
+      "statuses": [
+        304
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "response_counts": [
+        0,
+        0,
+        0
+      ],
+      "param_sample": {},
+      "response_schema": null,
+      "request_body_schema": null
+    },
+    "57a59368a000": {
+      "method": "GET",
+      "host": "package.corva.ai",
+      "path": "/corva/app/directional_surveys_and_projections.ui/packages/1906/app.js",
+      "statuses": [
+        304
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "response_counts": [
+        0
+      ],
+      "param_sample": {},
+      "response_schema": null,
+      "request_body_schema": null
+    },
+    "3fdb406fdc93": {
+      "method": "GET",
+      "host": "package.corva.ai",
+      "path": "/corva/app/directional_plan_vs_actual.ui/packages/1046/app.js",
+      "statuses": [
+        304
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "response_counts": [
+        0
+      ],
+      "param_sample": {},
+      "response_schema": null,
+      "request_body_schema": null
+    }
+  },
+  "datasets": {
+    "platform/users": {
+      "provider": "platform",
+      "dataset": "users",
+      "hosts": [
+        "platform_api"
+      ],
+      "param_styles": [],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "field_paths": [],
+      "avg_record_count": 0
+    },
+    "platform/assets": {
+      "provider": "platform",
+      "dataset": "assets",
+      "hosts": [
+        "platform_api"
+      ],
+      "param_styles": [
+        "ids_fields"
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "field_paths": [],
+      "avg_record_count": 0
+    },
+    "platform/wells": {
+      "provider": "platform",
+      "dataset": "wells",
+      "hosts": [
+        "platform_api"
+      ],
+      "param_styles": [
+        "ids_fields"
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "field_paths": [],
+      "avg_record_count": 0
+    },
+    "corva/data.offset_wells": {
+      "provider": "corva",
+      "dataset": "data.offset_wells",
+      "hosts": [
+        "data_api"
+      ],
+      "param_styles": [
+        "standard_query"
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "field_paths": [],
+      "avg_record_count": 0
+    },
+    "corva/wits": {
+      "provider": "corva",
+      "dataset": "wits",
+      "hosts": [
+        "platform_api"
+      ],
+      "param_styles": [],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "field_paths": [],
+      "avg_record_count": 0
+    },
+    "corva/wits.summary-30m": {
+      "provider": "corva",
+      "dataset": "wits.summary-30m",
+      "hosts": [
+        "platform_api"
+      ],
+      "param_styles": [],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "field_paths": [],
+      "avg_record_count": 0
+    },
+    "corva/data.drillstring": {
+      "provider": "corva",
+      "dataset": "data.drillstring",
+      "hosts": [
+        "data_api"
+      ],
+      "param_styles": [
+        "match_limit",
+        "standard_query"
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "field_paths": [],
+      "avg_record_count": 0
+    },
+    "corva/data.casing": {
+      "provider": "corva",
+      "dataset": "data.casing",
+      "hosts": [
+        "data_api"
+      ],
+      "param_styles": [
+        "match_limit"
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "field_paths": [],
+      "avg_record_count": 0
+    },
+    "corva/wcu_rule_mapping": {
+      "provider": "corva",
+      "dataset": "wcu_rule_mapping",
+      "hosts": [
+        "data_api"
+      ],
+      "param_styles": [
+        "match_limit"
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "field_paths": [],
+      "avg_record_count": 0
+    },
+    "corva/data.well-sections": {
+      "provider": "corva",
+      "dataset": "data.well-sections",
+      "hosts": [
+        "data_api"
+      ],
+      "param_styles": [
+        "match_limit"
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "field_paths": [],
+      "avg_record_count": 0
+    },
+    "corva/directional.slide-sheet": {
+      "provider": "corva",
+      "dataset": "directional.slide-sheet",
+      "hosts": [
+        "data_api"
+      ],
+      "param_styles": [
+        "match_limit",
+        "standard_query"
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "field_paths": [],
+      "avg_record_count": 0
+    },
+    "corva/wits.summary-1m": {
+      "provider": "corva",
+      "dataset": "wits.summary-1m",
+      "hosts": [
+        "data_api"
+      ],
+      "param_styles": [
+        "match_limit"
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "field_paths": [],
+      "avg_record_count": 0
+    },
+    "corva/data.plan_survey": {
+      "provider": "corva",
+      "dataset": "data.plan_survey",
+      "hosts": [
+        "data_api"
+      ],
+      "param_styles": [
+        "match_limit"
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "field_paths": [],
+      "avg_record_count": 0
+    },
+    "corva/wellness_rule_settings": {
+      "provider": "corva",
+      "dataset": "wellness_rule_settings",
+      "hosts": [
+        "data_api"
+      ],
+      "param_styles": [
+        "match_limit"
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "field_paths": [],
+      "avg_record_count": 0
+    },
+    "corva/directional.toolface.summary-1ft": {
+      "provider": "corva",
+      "dataset": "directional.toolface.summary-1ft",
+      "hosts": [
+        "data_api"
+      ],
+      "param_styles": [
+        "standard_query"
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "field_paths": [],
+      "avg_record_count": 0
+    },
+    "corva/data.actual_survey": {
+      "provider": "corva",
+      "dataset": "data.actual_survey",
+      "hosts": [
+        "data_api"
+      ],
+      "param_styles": [
+        "standard_query"
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "field_paths": [],
+      "avg_record_count": 0
+    },
+    "corva/directional.trend": {
+      "provider": "corva",
+      "dataset": "directional.trend",
+      "hosts": [
+        "data_api"
+      ],
+      "param_styles": [
+        "standard_query"
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "field_paths": [],
+      "avg_record_count": 0
+    },
+    "corva/data.formations": {
+      "provider": "corva",
+      "dataset": "data.formations",
+      "hosts": [
+        "data_api"
+      ],
+      "param_styles": [
+        "match_limit",
+        "standard_query"
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "field_paths": [],
+      "avg_record_count": 0
+    },
+    "corva/wellness_alerts": {
+      "provider": "corva",
+      "dataset": "wellness_alerts",
+      "hosts": [
+        "data_api"
+      ],
+      "param_styles": [
+        "match_limit",
+        "standard_query"
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "field_paths": [],
+      "avg_record_count": 0
+    },
+    "corva/wellness_scores": {
+      "provider": "corva",
+      "dataset": "wellness_scores",
+      "hosts": [
+        "data_api"
+      ],
+      "param_styles": [
+        "standard_query"
+      ],
+      "sources": [
+        "rotationaltendencies"
+      ],
+      "field_paths": [],
+      "avg_record_count": 0
+    }
+  },
+  "metric_keys": {},
+  "component_families": {},
+  "asset_ids": [
+    44307597
+  ],
+  "company_ids": [
+    3
+  ],
+  "dashboard_context": {
+    "rigId": "2135",
+    "wellId": "118012",
+    "rigAssetId": "41655357",
+    "wellAssetId": "44307597",
+    "dashboard_slug": "506436/data_filters",
+    "has_app_catalog": true
+  },
+  "feature_flags": {},
+  "user_settings": {
+    "offset_well_picker_5_settings_v1": "{'isMapHidden': False, 'isFilterExpanded': True, 'mapStyle': 'satellite'}",
+    "singleAsset": "{'interventionWellId': 107516, 'completionWellAssetId': None, 'enrichment': [], 'interventionWellAssetId': 40545680, 'shouldUseActiveWell': True, 'rowOfFirstData': 3, 'wellId': 118012, 'rigId': 2135, 'headerRow': 1, 'padId': 10739, 'drilloutUnitId': 163, 'apps': [], 'postprocessing': {'executed_steps': ['remove_app_schedules'], 'cleanup_started_at': '2020-10-11T22:23:00.757Z', 'cleared_app_connections': [664759, 664760, 664761, 664762, 664763]}, 'logIds': ['Time_1Sec'], 'unitRow': 2, 'interventi"
+  },
+  "dataset_requested_fields": {
+    "corva/wits": [
+      "data.bit_depth",
+      "data.hole_depth"
+    ],
+    "corva/wits.summary-30m": [
+      "data.bit_depth",
+      "data.hole_depth",
+      "timestamp"
+    ],
+    "corva/directional.toolface.summary-1ft": [
+      "data.active_tool_face",
+      "data.gravity_tool_face_median",
+      "data.hole_depth",
+      "data.magnetic_tool_face_median",
+      "data.tool_face_median"
+    ],
+    "corva/data.actual_survey": [
+      "data.stations.inclination",
+      "data.stations.measured_depth"
+    ],
+    "corva/directional.trend": [
+      "data.dls",
+      "data.motor_yield",
+      "data.tfo"
+    ],
+    "corva/data.formations": [
+      "data.formation_name",
+      "data.md",
+      "data.td"
+    ],
+    "corva/wellness_scores": [
+      "asset_id",
+      "data.overall_percent_change",
+      "data.overall_qc_score",
+      "data.segment"
+    ]
+  }
+}

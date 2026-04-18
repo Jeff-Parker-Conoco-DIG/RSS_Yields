@@ -1,0 +1,1 @@
+export { AvgsWindow } from './AvgsWindow';

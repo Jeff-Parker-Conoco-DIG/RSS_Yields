@@ -130,8 +130,26 @@ export function useDrillstringInfo(assetId: number | undefined): UseDrillstringI
             motorYield,
           });
           log(`RSS tool identified: ${rssInfo.toolName} (${rssInfo.vendor}), RSS B2S=~${rssBts}ft (fixed), MWD B2S=${mwdBts}ft`);
+        } else if (hasMotor) {
+          // No RSS in BHA — bent motor (PDM + MWD) configuration.
+          // The MWD is the sole survey sensor; there is no near-bit RSS sensor.
+          setToolInfo({
+            toolName: 'Bent Motor',
+            vendor: 'PDM',
+            serialNumber: null,
+            bitToSurveyDistance: mwdBts,   // For motor: survey sensor IS the MWD
+            mwdBitToSurveyDistance: mwdBts,
+            hasMotor: true,
+            motorBendAngle,
+            motorYield,
+          });
+          log(
+            `Bent motor BHA detected: MWD B2S=${mwdBts}ft, ` +
+            `bend=${motorBendAngle ?? '?'}°, BHA motor yield=${motorYield ?? '?'}°/100ft`,
+          );
         } else {
           setToolInfo(null);
+          log('No RSS or motor found in active BHA — toolInfo set to null');
         }
       } catch (e) {
         error('useDrillstringInfo failed:', e);

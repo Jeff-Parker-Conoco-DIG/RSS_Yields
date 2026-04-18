@@ -3,6 +3,7 @@ import type { WitsChannelProfile, ResolvedChannelMap } from './types';
 export const ICRUISE_PROFILE: WitsChannelProfile = {
   id: 'icruise',
   vendorName: 'Halliburton iCruise',
+  toolType: 'rss',
   channels: {
     // RSS near-bit sensors (~8ft from bit)
     nearBitInc: 'rss_continuous_inclination',  // WITS 862 → iCInc
@@ -59,6 +60,7 @@ export const ICRUISE_PROFILE: WitsChannelProfile = {
 export const POWERDRIVE_PROFILE: WitsChannelProfile = {
   id: 'powerdrive',
   vendorName: 'SLB PowerDrive',
+  toolType: 'rss',
   channels: {
     nearBitInc: 'continuous_inclination',
     nearBitAz: 'mwd_continuous_azimuth',
@@ -75,6 +77,7 @@ export const POWERDRIVE_PROFILE: WitsChannelProfile = {
 export const GENERIC_PROFILE: WitsChannelProfile = {
   id: 'custom',
   vendorName: 'Custom / Generic',
+  toolType: 'rss',
   channels: {
     nearBitInc: 'continuous_inclination',
     nearBitAz: 'mwd_continuous_azimuth',
@@ -95,11 +98,12 @@ export const GENERIC_PROFILE: WitsChannelProfile = {
 export const BENTMOTOR_CURVE_PROFILE: WitsChannelProfile = {
   id: 'bentmotor_curve',
   vendorName: 'Bent Motor Curve',
+  toolType: 'motor',
   channels: {
     nearBitInc: 'continuous_inclination',    // MWD inc
     nearBitAz: '',                           // Azimuth ignored in curve
     mwdInc: 'continuous_inclination',
-    mwdAz: '',
+    mwdAz: 'mwd_continuous_azimuth',
     dutyCycle: 'duty_cycle',
     toolFaceSet: 'toolface_set',
     toolFaceActual: 'toolface_actual',
@@ -111,6 +115,7 @@ export const BENTMOTOR_CURVE_PROFILE: WitsChannelProfile = {
 export const RSS_CURVE_PROFILE: WitsChannelProfile = {
   id: 'rss_curve',
   vendorName: 'RSS Curve',
+  toolType: 'rss',
   channels: {
     nearBitInc: 'rss_continuous_inclination', // RSS inc
     nearBitAz: '',                            // Azimuth ignored in curve

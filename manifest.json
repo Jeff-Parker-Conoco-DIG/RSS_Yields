@@ -38,6 +38,7 @@
   "datasets": {
     "corva.data.actual_survey": { "permissions": ["read"] },
     "corva.data.drillstring": { "permissions": ["read"] },
+    "corva.data.formations": { "permissions": ["read"] },
     "corva.wits": { "permissions": ["read"] },
     "corva.wits.summary-1ft": { "permissions": ["read"] },
     "corva.drilling.halliburton.cerebro-raw": { "permissions": ["read"] },

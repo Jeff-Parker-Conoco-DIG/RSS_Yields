@@ -1,4 +1,5 @@
 import { log, warn, error } from '../utils/logger';
+import type { FormationTop } from '../types';
 
 // ─── Corva SDK Client Setup ───────────────────────────────────────
 type ApiClient = {
@@ -348,21 +349,92 @@ export async function fetchCerebroRaw(
 
 
 
-/** Fetch slide sheet records for a well */
-export async function fetchSlideSheet(assetId: number): Promise<unknown[]> {
+/** Fetch slide sheet records for a well.
+ *
+ * NOTE: The `directional.slide-sheet` dataset stores slide events nested
+ * inside `data.slides[]` arrays.  The top-level `measured_depth` on each
+ * record does NOT correspond to the individual slide depths, so depth-
+ * based filtering (`measured_depth: { $gte }`) returns zero results even
+ * when slides exist at the requested depth.  We therefore always fetch
+ * ALL records for the well and let the caller filter in memory.
+ *
+ * Sorted DESCENDING so the 500-record limit captures the most recent /
+ * deepest records first — these are the ones that contain slides near
+ * the current bit depth and matter most for the motor yield calculation.
+ */
+export async function fetchSlideSheet(
+  assetId: number,
+): Promise<unknown[]> {
   if (!corvaDataAPI) return [];
   try {
-    const data = await corvaDataAPI.get(
-      `/api/v1/data/corva/directional.slide-sheet/`,
-      {
-        query: JSON.stringify({ asset_id: assetId }),
-        sort: JSON.stringify({ measured_depth: 1 }),
-        limit: 500,
-      },
-    );
-    return Array.isArray(data) ? data : [];
+    const path = `/api/v1/data/corva/directional.slide-sheet/`;
+    const baseQuery = JSON.stringify({ asset_id: assetId });
+
+    // Pull from two sort keys and merge unique docs:
+    // - measured_depth catches deepest records
+    // - timestamp catches newest records
+    const [depthData, timeData] = await Promise.all([
+      corvaDataAPI.get(path, {
+        query: baseQuery,
+        sort: JSON.stringify({ measured_depth: -1 }),
+        limit: 5000,
+      }),
+      corvaDataAPI.get(path, {
+        query: baseQuery,
+        sort: JSON.stringify({ timestamp: -1 }),
+        limit: 5000,
+      }),
+    ]);
+
+    const depthRecords = Array.isArray(depthData) ? depthData : [];
+    const timeRecords = Array.isArray(timeData) ? timeData : [];
+    const merged = new Map<string, unknown>();
+
+    for (const rec of [...depthRecords, ...timeRecords]) {
+      const row = rec as Record<string, unknown>;
+      const key = String(row._id ?? `${row.timestamp ?? ''}:${JSON.stringify(row.data ?? {})}`);
+      if (!merged.has(key)) merged.set(key, rec);
+    }
+
+    return Array.from(merged.values());
   } catch (e) {
     error('fetchSlideSheet failed:', e);
+    return [];
+  }
+}
+
+/** Fetch formation tops for a well. */
+export async function fetchFormations(assetId: number): Promise<FormationTop[]> {
+  if (!corvaDataAPI) return [];
+  try {
+    const data = await corvaDataAPI.get('/api/v1/data/corva/data.formations/', {
+      limit: 1000,
+      query: JSON.stringify({ asset_id: assetId }),
+      sort: JSON.stringify({ 'data.md': 1 }),
+      fields: 'data.md,data.td,data.formation_name',
+    });
+
+    const records = Array.isArray(data) ? data : [];
+    const formations: FormationTop[] = [];
+
+    for (const rec of records) {
+      const row = rec as Record<string, unknown>;
+      const recData = (row.data ?? {}) as Record<string, unknown>;
+      const md = Number(recData.md);
+      const td = Number(recData.td);
+      if (!Number.isFinite(md) || !Number.isFinite(td)) continue;
+
+      formations.push({
+        md,
+        td,
+        name: String(recData.formation_name ?? ''),
+      });
+    }
+
+    formations.sort((a, b) => a.md - b.md);
+    return formations;
+  } catch (e) {
+    error('fetchFormations failed:', e);
     return [];
   }
 }

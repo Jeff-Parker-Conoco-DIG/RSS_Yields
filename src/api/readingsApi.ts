@@ -46,6 +46,15 @@ try {
 // ─── 404 guard: only log dataset-missing errors once ─────────────────
 let datasetMissingLogged = false;
 
+function sortReadingsByTimestamp(readings: YieldReading[]): YieldReading[] {
+  return [...readings].sort((a, b) => {
+    const tsA = Number.isFinite(a.timestamp) ? a.timestamp : 0;
+    const tsB = Number.isFinite(b.timestamp) ? b.timestamp : 0;
+    if (tsA !== tsB) return tsA - tsB;
+    return String(a.id ?? '').localeCompare(String(b.id ?? ''));
+  });
+}
+
 function isDatasetMissing(e: unknown): boolean {
   // Corva SDK errors have a .status property
   const status = (e as any)?.status;
@@ -63,17 +72,13 @@ export async function fetchReadings(assetId: number): Promise<YieldReading[]> {
       `/api/v1/data/${READINGS_DATASET}/`,
       {
         query: JSON.stringify({ asset_id: assetId }),
-        sort: JSON.stringify({ 'data.depth': 1 }),
+        sort: JSON.stringify({ timestamp: 1, _id: 1 }),
         limit: 5000,
       },
     );
     const records = Array.isArray(data) ? data : [];
-    // Fetch succeeded — dataset exists, clear any previous missing flag
-    if (datasetMissingLogged) {
-      datasetMissingLogged = false;
-      log(`Dataset "${READINGS_DATASET}" is now available`);
-    }
-    return records.map(docToReading).filter((r): r is YieldReading => r !== null);
+    const parsed = records.map(docToReading).filter((r): r is YieldReading => r !== null);
+    return sortReadingsByTimestamp(parsed);
   } catch (e) {
     if (isDatasetMissing(e)) {
       if (!datasetMissingLogged) {
@@ -94,6 +99,10 @@ export async function saveReading(reading: YieldReading): Promise<boolean> {
     log('No API client — reading not persisted (dev mode)');
     return false;
   }
+  if (datasetMissingLogged) {
+    // Dataset doesn't exist — skip silently (already logged once)
+    return false;
+  }
   try {
     await corvaDataAPI.post(
       `/api/v1/data/${READINGS_DATASET}/`,
@@ -104,11 +113,6 @@ export async function saveReading(reading: YieldReading): Promise<boolean> {
         data: readingToData(reading),
       },
     );
-    // If save succeeds, dataset exists — clear the missing flag
-    if (datasetMissingLogged) {
-      datasetMissingLogged = false;
-      log(`Dataset "${READINGS_DATASET}" is now available — readings will persist server-side`);
-    }
     log(`Saved reading at ${reading.depth} ft`);
     return true;
   } catch (e) {
@@ -131,7 +135,7 @@ export async function updateReadingNotes(
   readingId: string,
   notes: string,
 ): Promise<boolean> {
-  if (!corvaDataAPI) return false;
+  if (!corvaDataAPI || datasetMissingLogged) return false;
   try {
     // Find the record by reading ID, then update
     const data = await corvaDataAPI.get(
@@ -163,7 +167,7 @@ export async function updateReadingNotes(
 // ─── Delete a reading ──────────────────────────────────────────────
 
 export async function deleteReading(assetId: number, readingId: string): Promise<boolean> {
-  if (!corvaDataAPI) return false;
+  if (!corvaDataAPI || datasetMissingLogged) return false;
   try {
     const data = await corvaDataAPI.get(
       `/api/v1/data/${READINGS_DATASET}/`,
@@ -212,13 +216,32 @@ function readingToData(r: YieldReading): Record<string, unknown> {
     mwdBr: r.mwdBr,
     mwdTr: r.mwdTr,
     mwdDls: r.mwdDls,
+    deltaInc: r.deltaInc,
+    deltaAz: r.deltaAz,
+    sensorDepth: r.sensorDepth,
+    slideFt: r.slideFt,
+    rotateFt: r.rotateFt,
+    slideSeen: r.slideSeen,
+    slideAhead: r.slideAhead,
+    slideStartDepth: r.slideStartDepth,
+    slideEndDepth: r.slideEndDepth,
+    tfAccuracy: r.tfAccuracy,
+    sheetMotorYield: r.sheetMotorYield,
+    sheetBrYield: r.sheetBrYield,
+    sheetTrYield: r.sheetTrYield,
+    normalizedDls: r.normalizedDls,
+    normalizedBr: r.normalizedBr,
+    normalizedTr: r.normalizedTr,
+
     dutyCycle: r.dutyCycle,
     toolFaceSet: r.toolFaceSet,
     toolFaceActual: r.toolFaceActual,
+    toolFaceStdDev: r.toolFaceStdDev,
     steeringForce: r.steeringForce,
     resultantTF: r.resultantTF,
     buildCommand: r.buildCommand,
     turnCommand: r.turnCommand,
+    formation: r.formation,
     notes: r.notes,
     section: r.section,
     source: r.source,
@@ -231,7 +254,11 @@ function docToReading(doc: unknown): YieldReading | null {
     const data = d.data as Record<string, unknown>;
     if (!data || !data.id) return null;
 
-    const n = (v: unknown) => (v != null ? Number(v) : null);
+    const n = (v: unknown): number | null => {
+      if (v == null || v === '') return null;
+      const parsed = Number(v);
+      return Number.isFinite(parsed) ? parsed : null;
+    };
     return {
       id: String(data.id),
       assetId: Number(d.asset_id),
@@ -247,13 +274,32 @@ function docToReading(doc: unknown): YieldReading | null {
       mwdBr: n(data.mwdBr),
       mwdTr: n(data.mwdTr),
       mwdDls: n(data.mwdDls),
+      deltaInc: n(data.deltaInc),
+      deltaAz: n(data.deltaAz),
+      sensorDepth: n(data.sensorDepth),
+      slideFt: n(data.slideFt),
+      rotateFt: n(data.rotateFt),
+      slideSeen: n(data.slideSeen),
+      slideAhead: n(data.slideAhead),
+      slideStartDepth: n(data.slideStartDepth),
+      slideEndDepth: n(data.slideEndDepth),
+      tfAccuracy: n(data.tfAccuracy),
+      sheetMotorYield: n(data.sheetMotorYield),
+      sheetBrYield: n(data.sheetBrYield),
+      sheetTrYield: n(data.sheetTrYield),
+      normalizedDls: n(data.normalizedDls),
+      normalizedBr: n(data.normalizedBr),
+      normalizedTr: n(data.normalizedTr),
+
       dutyCycle: n(data.dutyCycle),
       toolFaceSet: n(data.toolFaceSet),
       toolFaceActual: n(data.toolFaceActual),
+      toolFaceStdDev: n(data.toolFaceStdDev),
       steeringForce: n(data.steeringForce),
       resultantTF: n(data.resultantTF),
       buildCommand: n(data.buildCommand),
       turnCommand: n(data.turnCommand),
+      formation: data.formation != null ? String(data.formation) : null,
       notes: String(data.notes ?? ''),
       section: (data.section as YieldReading['section']) ?? 'curve',
       timestamp: Number(d.timestamp ?? 0) * 1000, // Corva stores seconds, we use ms
